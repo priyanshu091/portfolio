@@ -141,6 +141,7 @@ const DomainPage = () => {
   const navigate = useNavigate();
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videoAspect, setVideoAspect] = useState(16 / 9);
+  const [loadedUrl, setLoadedUrl] = useState(null);
   const [isCustomBuffering, setIsCustomBuffering] = useState(false);
   const [bufferProgress, setBufferProgress] = useState(0);
   const [cmsVideos, setCmsVideos] = useState([]);
@@ -173,6 +174,120 @@ const DomainPage = () => {
     setBufferProgress(0);
     setSelectedVideo(project);
   };
+
+  // Parallel multi-threaded chunk downloader to prevent slow Azure streaming
+  useEffect(() => {
+    if (!selectedVideo) {
+      setLoadedUrl(null);
+      return;
+    }
+    
+    const embedUrl = getEmbedUrl(selectedVideo.videoUrl);
+    if (embedUrl) {
+      setLoadedUrl(embedUrl);
+      setIsCustomBuffering(false);
+      return;
+    }
+    
+    let active = true;
+    let createdUrl = null;
+    setIsCustomBuffering(true);
+    setBufferProgress(0);
+    
+    const controller = new AbortController();
+    
+    const startDownload = async () => {
+      try {
+        const headRes = await fetch(selectedVideo.videoUrl, { method: 'HEAD', signal: controller.signal });
+        let totalSize = parseInt(headRes.headers.get('Content-Length'), 10);
+        
+        if (!totalSize || isNaN(totalSize)) {
+          const rangeRes = await fetch(selectedVideo.videoUrl, { headers: { Range: 'bytes=0-0' }, signal: controller.signal });
+          const contentRange = rangeRes.headers.get('Content-Range');
+          if (contentRange) {
+            totalSize = parseInt(contentRange.split('/')[1], 10);
+          }
+        }
+        
+        if (!totalSize || isNaN(totalSize) || totalSize > 400 * 1024 * 1024) {
+          if (active) {
+            setLoadedUrl(selectedVideo.videoUrl);
+            setIsCustomBuffering(false);
+          }
+          return;
+        }
+        
+        const chunkSize = 4 * 1024 * 1024; // 4MB
+        const numChunks = Math.ceil(totalSize / chunkSize);
+        let loadedBytes = 0;
+        
+        const downloadChunk = async (index) => {
+          const start = index * chunkSize;
+          const end = Math.min(start + chunkSize - 1, totalSize - 1);
+          
+          for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+              const res = await fetch(selectedVideo.videoUrl, {
+                headers: { Range: `bytes=${start}-${end}` },
+                signal: controller.signal
+              });
+              if (!res.ok) throw new Error(`Status ${res.status}`);
+              const buffer = await res.arrayBuffer();
+              
+              if (!active) return;
+              loadedBytes += buffer.byteLength;
+              setBufferProgress(Math.min(99, Math.round((loadedBytes / totalSize) * 100)));
+              
+              return { index, buffer };
+            } catch (err) {
+              if (attempt === 2 || controller.signal.aborted) throw err;
+            }
+          }
+        };
+        
+        const promises = Array.from({ length: numChunks }, (_, i) => downloadChunk(i));
+        const results = await Promise.all(promises);
+        
+        if (!active) return;
+        
+        results.sort((a, b) => a.index - b.index);
+        
+        const finalArray = new Uint8Array(totalSize);
+        let offset = 0;
+        for (const result of results) {
+          finalArray.set(new Uint8Array(result.buffer), offset);
+          offset += result.buffer.byteLength;
+        }
+        
+        const blob = new Blob([finalArray], { type: 'video/mp4' });
+        createdUrl = URL.createObjectURL(blob);
+        
+        if (active) {
+          setLoadedUrl(createdUrl);
+          setBufferProgress(100);
+          setIsCustomBuffering(false);
+        } else {
+          URL.revokeObjectURL(createdUrl);
+        }
+      } catch (err) {
+        if (active && !controller.signal.aborted) {
+          console.error("Parallel preloader failed, streaming direct:", err);
+          setLoadedUrl(selectedVideo.videoUrl);
+          setIsCustomBuffering(false);
+        }
+      }
+    };
+    
+    startDownload();
+    
+    return () => {
+      active = false;
+      controller.abort();
+      if (createdUrl) {
+        URL.revokeObjectURL(createdUrl);
+      }
+    };
+  }, [selectedVideo]);
 
   // Scroll to top, update title & meta description on mount
   useEffect(() => {
@@ -381,7 +496,7 @@ const DomainPage = () => {
             {/* Video or IFrame element */}
             <div className="w-full h-full bg-black relative">
               {/* Custom Buffering Overlay */}
-              {isCustomBuffering && !getEmbedUrl(selectedVideo.videoUrl) && (
+              {isCustomBuffering && (
                 <div 
                   className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/75 backdrop-blur-sm"
                   onClick={(e) => e.stopPropagation()}
@@ -399,103 +514,31 @@ const DomainPage = () => {
               )}
               {getEmbedUrl(selectedVideo.videoUrl) ? (
                 <iframe 
-                  src={getEmbedUrl(selectedVideo.videoUrl)} 
+                  src={loadedUrl || getEmbedUrl(selectedVideo.videoUrl)} 
                   className="w-full h-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   title={selectedVideo.title}
                 />
               ) : (
-                <video 
-                  key={selectedVideo.id}
-                  src={selectedVideo.videoUrl} 
-                  className="w-full h-full object-contain bg-black"
-                  controls 
-                  autoPlay
-                  muted
-                  playsInline
-                  preload="auto"
-                  onLoadedMetadata={(e) => {
-                    const v = e.target;
-                    if (v.videoWidth && v.videoHeight) {
-                      setVideoAspect(v.videoWidth / v.videoHeight);
-                    }
-                  }}
-                  onProgress={(e) => {
-                    const video = e.target;
-                    if (video.buffered.length > 0) {
-                      const currentTime = video.currentTime;
-                      let bufferedEnd = currentTime;
-                      for (let i = 0; i < video.buffered.length; i++) {
-                        const start = video.buffered.start(i);
-                        const end = video.buffered.end(i);
-                        if (currentTime >= start && currentTime <= end) {
-                          bufferedEnd = end;
-                          break;
-                        }
+                loadedUrl && (
+                  <video 
+                    key={selectedVideo.id}
+                    src={loadedUrl} 
+                    className="w-full h-full object-contain bg-black"
+                    controls 
+                    autoPlay
+                    muted
+                    playsInline
+                    preload="auto"
+                    onLoadedMetadata={(e) => {
+                      const v = e.target;
+                      if (v.videoWidth && v.videoHeight) {
+                        setVideoAspect(v.videoWidth / v.videoHeight);
                       }
-                      const gap = bufferedEnd - currentTime;
-                      const duration = video.duration;
-                      const targetGap = Math.min(12, duration - currentTime);
-                      
-                      if (gap < 3 && currentTime < duration - 1 && !video.paused && !video.seeking) {
-                        video.pause();
-                        setIsCustomBuffering(true);
-                      } else if (isCustomBuffering && (gap >= targetGap || bufferedEnd >= duration - 0.5)) {
-                        video.play().catch(() => {});
-                        setIsCustomBuffering(false);
-                      }
-                      
-                      if (duration > 0) {
-                        setBufferProgress(Math.round((bufferedEnd / duration) * 100));
-                      }
-                    }
-                  }}
-                  onTimeUpdate={(e) => {
-                    const video = e.target;
-                    if (video.buffered.length > 0) {
-                      const currentTime = video.currentTime;
-                      let bufferedEnd = currentTime;
-                      for (let i = 0; i < video.buffered.length; i++) {
-                        const start = video.buffered.start(i);
-                        const end = video.buffered.end(i);
-                        if (currentTime >= start && currentTime <= end) {
-                          bufferedEnd = end;
-                          break;
-                        }
-                      }
-                      const gap = bufferedEnd - currentTime;
-                      if (gap < 2 && currentTime < video.duration - 1 && !video.paused && !video.seeking) {
-                        video.pause();
-                        setIsCustomBuffering(true);
-                      }
-                    }
-                  }}
-                  onWaiting={() => setIsCustomBuffering(true)}
-                  onPlaying={() => setIsCustomBuffering(false)}
-                  onSeeking={() => setIsCustomBuffering(true)}
-                  onSeeked={(e) => {
-                    const video = e.target;
-                    if (video.buffered.length > 0) {
-                      const currentTime = video.currentTime;
-                      let bufferedEnd = currentTime;
-                      for (let i = 0; i < video.buffered.length; i++) {
-                        const start = video.buffered.start(i);
-                        const end = video.buffered.end(i);
-                        if (currentTime >= start && currentTime <= end) {
-                          bufferedEnd = end;
-                          break;
-                        }
-                      }
-                      const gap = bufferedEnd - currentTime;
-                      if (gap >= Math.min(6, video.duration - currentTime)) {
-                        setIsCustomBuffering(false);
-                      }
-                    } else {
-                      setIsCustomBuffering(true);
-                    }
-                  }}
-                />
+                    }}
+                  />
+                )
               )}
             </div>
 
