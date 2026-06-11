@@ -8,6 +8,7 @@ import Services from "./components/Services"
 import Contact from "./components/Contact"
 import DomainPage from "./components/DomainPage"
 import CursorGlow from "./components/CursorGlow"
+import AdminPanel from "./components/AdminPanel"
 
 function App() {
   return (
@@ -26,9 +27,11 @@ function App() {
           </>
         } />
         <Route path="/work/:domainId" element={<DomainPage />} />
+        <Route path="/admin" element={<AdminPanel />} />
       </Routes>
     </>
   )
 }
 
 export default App
+

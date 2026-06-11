@@ -95,8 +95,28 @@ const DomainPage = () => {
   const navigate = useNavigate();
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videoAspect, setVideoAspect] = useState(16 / 9);
+  const [cmsVideos, setCmsVideos] = useState([]);
   
   const data = domainData[domainId];
+
+  // Fetch CMS videos and merge with hardcoded ones
+  useEffect(() => {
+    fetch('/api/videos')
+      .then(res => res.json())
+      .then(result => {
+        const sectionVideos = (result.videos || [])
+          .filter(v => v.section === domainId)
+          .map(v => ({ id: v.id, title: v.title, tag: v.tag, videoUrl: v.videoUrl }));
+        setCmsVideos(sectionVideos);
+      })
+      .catch(() => setCmsVideos([])); // silently fail, hardcoded data is fallback
+  }, [domainId]);
+
+  // Merge: CMS videos first, then hardcoded
+  const mergedData = data ? {
+    ...data,
+    projects: [...cmsVideos, ...data.projects],
+  } : data;
 
   // Reset aspect ratio when a new video is selected
   const handleSelectVideo = (project) => {
@@ -184,7 +204,7 @@ const DomainPage = () => {
 
       {/* VIDEO GRID GALLERY */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {(data.projects || []).map((project, index) => (
+        {(mergedData.projects || []).map((project, index) => (
           <div 
             key={project.id || index}
             className="group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl animate-fade-in"
@@ -229,7 +249,7 @@ const DomainPage = () => {
 
       {/* GORGEOUS VIDEO LIGHTBOX/MODAL */}
       {selectedVideo && (() => {
-        const projects = data.projects || [];
+        const projects = mergedData.projects || [];
         const currentIndex = projects.findIndex(p => p.id === selectedVideo.id);
         const hasPrev = currentIndex > 0;
         const hasNext = currentIndex < projects.length - 1;
