@@ -124,8 +124,27 @@ const Navbar = () => {
         }
       `}</style>
 
-      {/* LEFT: Kinetic Particle Logo */}
-      <div ref={logoRef} className="pointer-events-auto cursor-pointer" onClick={handleLogoClick}>
+      {/* LEFT: Kinetic Particle Logo with Glassmorphic Wrapper */}
+      <div 
+        ref={logoRef} 
+        className="pointer-events-auto cursor-pointer px-4 py-1.5 rounded-full border backdrop-blur-md transition-all duration-300 flex items-center justify-center" 
+        onClick={handleLogoClick}
+        style={{
+          backgroundColor: 'rgba(13, 13, 13, 0.45)',
+          borderColor: 'rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 0 8px 0 rgba(255, 255, 255, 0.02)',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.borderColor = 'rgba(255, 45, 85, 0.35)';
+          e.currentTarget.style.backgroundColor = 'rgba(20, 20, 20, 0.6)';
+          e.currentTarget.style.boxShadow = '0 8px 32px 0 rgba(255, 45, 85, 0.15), inset 0 0 12px 0 rgba(255, 45, 85, 0.05)';
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+          e.currentTarget.style.backgroundColor = 'rgba(13, 13, 13, 0.45)';
+          e.currentTarget.style.boxShadow = '0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 0 8px 0 rgba(255, 255, 255, 0.02)';
+        }}
+      >
         <ParticleLogo />
       </div>
 

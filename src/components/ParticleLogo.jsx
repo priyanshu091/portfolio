@@ -267,8 +267,8 @@ const ParticleLogo = () => {
   const chromaticTextShadow = `${chromaticOffset.rx}px ${chromaticOffset.ry}px 0px ${SCARLET_GLOW}, ${chromaticOffset.cx}px ${chromaticOffset.cy}px 0px ${CYAN_PRIMARY}`;
 
   const mainStyle = isGlitching
-    ? { padding: '8px 4px', clipPath: 'inset(0 0 50% 0)', transform: 'translateX(4px) skewX(-2deg)' }
-    : { padding: '8px 4px' };
+    ? { padding: '2px 4px', clipPath: 'inset(0 0 50% 0)', transform: 'translateX(4px) skewX(-2deg)' }
+    : { padding: '2px 4px' };
 
   const glitchCloneStyle = isGlitching
     ? {
@@ -276,7 +276,7 @@ const ParticleLogo = () => {
         top: 0, left: 0, right: 0, bottom: 0,
         display: 'flex',
         alignItems: 'center',
-        padding: '8px 4px',
+        padding: '2px 4px',
         clipPath: 'inset(50% 0 0 0)',
         transform: 'translateX(-4px) skewX(2deg)',
         pointerEvents: 'none',
