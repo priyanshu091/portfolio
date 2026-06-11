@@ -94,8 +94,15 @@ const DomainPage = () => {
   const { domainId } = useParams();
   const navigate = useNavigate();
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [videoAspect, setVideoAspect] = useState(16 / 9);
   
   const data = domainData[domainId];
+
+  // Reset aspect ratio when a new video is selected
+  const handleSelectVideo = (project) => {
+    setVideoAspect(16 / 9); // default until metadata loads
+    setSelectedVideo(project);
+  };
 
   // Scroll to top, update title & meta description on mount
   useEffect(() => {
@@ -186,7 +193,7 @@ const DomainPage = () => {
               backgroundColor: 'var(--bg-surface)',
               boxShadow: `0 0 0 rgba(0,0,0,0)`
             }}
-            onClick={() => setSelectedVideo(project)}
+            onClick={() => handleSelectVideo(project)}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = data.color; e.currentTarget.style.boxShadow = `0 15px 40px ${data.color}22`; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-subtle)'; e.currentTarget.style.boxShadow = `0 0 0 rgba(0,0,0,0)`; }}
           >
@@ -227,8 +234,13 @@ const DomainPage = () => {
           onClick={() => setSelectedVideo(null)}
         >
           <div 
-            className="relative w-full max-w-5xl rounded-2xl overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-2xl scale-entry"
-            style={{ boxShadow: `0 25px 60px -15px ${data.color}25` }}
+            className="relative rounded-2xl overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-2xl scale-entry"
+            style={{ 
+              boxShadow: `0 25px 60px -15px ${data.color}25`,
+              maxWidth: videoAspect < 1 ? '400px' : '1280px',
+              maxHeight: '90vh',
+              width: '100%',
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Custom Animation helper */}
@@ -240,16 +252,10 @@ const DomainPage = () => {
               .scale-entry {
                 animation: scaleEntry 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
               }
-              @keyframes spin {
-                to { transform: rotate(360deg); }
-              }
-              .spinner {
-                animation: spin 1s linear infinite;
-              }
             `}</style>
 
             {/* Video or IFrame element */}
-            <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+            <div className="relative w-full" style={{ aspectRatio: `${videoAspect}` }}>
               {getEmbedUrl(selectedVideo.videoUrl) ? (
                 <iframe 
                   src={getEmbedUrl(selectedVideo.videoUrl)} 
@@ -268,6 +274,12 @@ const DomainPage = () => {
                   muted
                   playsInline
                   preload="metadata"
+                  onLoadedMetadata={(e) => {
+                    const v = e.target;
+                    if (v.videoWidth && v.videoHeight) {
+                      setVideoAspect(v.videoWidth / v.videoHeight);
+                    }
+                  }}
                 />
               )}
             </div>
