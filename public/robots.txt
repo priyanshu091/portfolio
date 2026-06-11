@@ -1,0 +1,15 @@
+# Divyansh Vishwakarma — Video Editor Portfolio
+# https://video-editor-portfolio.vercel.app
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://video-editor-portfolio.vercel.app/sitemap.xml
+
+# Crawl-delay (optional, for polite crawling)
+Crawl-delay: 1
+
+# Block unnecessary paths
+Disallow: /assets/
+Disallow: /.vercel/
