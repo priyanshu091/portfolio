@@ -344,6 +344,18 @@ function Dashboard({ onLogout }) {
 
   return (
     <div style={styles.dashboard}>
+      <style>{`
+        @keyframes cardEntrance {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
       {/* Header */}
       <header style={styles.dashHeader}>
         <div>
@@ -478,7 +490,7 @@ function Dashboard({ onLogout }) {
         </div>
       ) : (
         <div style={styles.videoGrid}>
-          {filtered.map(video => {
+          {filtered.map((video, index) => {
             const sectionInfo = SECTIONS.find(s => s.id === video.section);
             const isPlaying = playingId === video.id;
             return (
@@ -487,6 +499,9 @@ function Dashboard({ onLogout }) {
                 style={{
                   ...styles.videoCard,
                   transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                  opacity: 0,
+                  animation: 'cardEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                  animationDelay: `${index * 0.08}s`,
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';

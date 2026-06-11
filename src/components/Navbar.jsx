@@ -8,7 +8,6 @@ const Navbar = () => {
   const navRef = useRef(null);
   const logoRef = useRef(null);
   const linksRef = useRef([]);
-  const menuRef = useRef(null);
   const [hoveredLink, setHoveredLink] = useState(null);
   const [activeLink, setActiveLink] = useState(null);
 
@@ -101,11 +100,6 @@ const Navbar = () => {
       { y: -15, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: 'expo.out' },
       '-=0.8'
-    )
-    .fromTo(menuRef.current,
-      { x: 30, opacity: 0 },
-      { x: 0, opacity: 1, duration: 1, ease: 'expo.out' },
-      '-=0.8'
     );
   }, []);
 
@@ -154,7 +148,7 @@ const Navbar = () => {
 
         {/* Glassmorphic Nav Panel */}
         <div
-          className="hidden md:flex items-center p-1 rounded-full backdrop-blur-md gap-3 mr-12"
+          className="hidden md:flex items-center p-1 rounded-full backdrop-blur-md gap-3"
           style={{
             backgroundColor: 'rgba(13, 13, 13, 0.4)',
             perspective: '1000px',
@@ -237,27 +231,6 @@ const Navbar = () => {
             );
           })}
         </div>
-
-        {/* Hamburger */}
-        <button
-          ref={menuRef}
-          className="group flex flex-col justify-center items-end space-y-[6px] w-8 h-8 cursor-pointer"
-          aria-label="Menu"
-        >
-          <span
-            className="block w-8 h-[1px] transition-all duration-400 ease-out group-hover:w-5"
-            style={{ backgroundColor: 'var(--scarlet-primary)' }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--text-primary)'}
-          />
-          <span
-            className="block w-8 h-[1px] transition-all duration-400 ease-out"
-            style={{ backgroundColor: 'var(--scarlet-primary)' }}
-          />
-          <span
-            className="block w-5 h-[1px] transition-all duration-400 ease-out group-hover:w-8"
-            style={{ backgroundColor: 'var(--scarlet-primary)' }}
-          />
-        </button>
       </div>
     </nav>
   );
