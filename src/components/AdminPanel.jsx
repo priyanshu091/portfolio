@@ -25,6 +25,43 @@ function authHeaders() {
   };
 }
 
+const LazyVideo = ({ src, style }) => {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    const currentRef = ref.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} style={{ width: '100%', height: '100%' }}>
+      {visible && (
+        <video
+          src={`${src}#t=0.1`}
+          className="preview-video-element"
+          style={{ ...style, opacity: 0.6, transition: 'opacity 0.4s' }}
+          preload="metadata"
+          muted
+          playsInline
+        />
+      )}
+    </div>
+  );
+};
+
 /* ───────────────────── LOGIN SCREEN ───────────────────── */
 function LoginScreen({ onLogin }) {
   const [password, setPassword] = useState('');
@@ -530,13 +567,9 @@ function Dashboard({ onLogout }) {
                     />
                   ) : (
                     <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setPlayingId(video.id)}>
-                      <video
+                      <LazyVideo
                         src={video.videoUrl}
-                        className="preview-video-element"
-                        style={{ ...styles.videoThumb, opacity: 0.6, transition: 'opacity 0.4s' }}
-                        preload="metadata"
-                        muted
-                        playsInline
+                        style={styles.videoThumb}
                       />
                       <div style={styles.videoOverlay}>
                         <div 

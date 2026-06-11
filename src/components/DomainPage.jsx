@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const domainData = {
@@ -97,6 +97,43 @@ const getEmbedUrl = (url) => {
   }
   
   return null;
+};
+
+const LazyVideo = ({ src, className }) => {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    const currentRef = ref.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className={className} style={{ position: 'absolute', inset: 0 }}>
+      {visible && (
+        <video
+          src={`${src}#t=0.1`}
+          className="w-full h-full object-cover"
+          preload="metadata"
+          muted
+          playsInline
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      )}
+    </div>
+  );
 };
 
 const DomainPage = () => {
@@ -235,12 +272,9 @@ const DomainPage = () => {
             </div>
 
             {/* Video First-Frame Thumbnail Background */}
-            <video
+            <LazyVideo
               src={project.videoUrl}
               className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-85 transition-opacity duration-500 z-0 pointer-events-none"
-              preload="metadata"
-              muted
-              playsInline
             />
 
             {/* Central Play Icon */}
