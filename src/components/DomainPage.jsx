@@ -17,7 +17,7 @@ const domainData = {
     tag: 'SHORT FORM', 
     color: 'var(--cyan-primary)',
     projects: [
-      { id: 'reels-1', title: 'THE MILLIONAIRE MINDSET', tag: 'PODCAST REEL', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4' },
+      { id: 'reels-1', title: 'TRS PODCAST SHORTS', tag: 'PODCAST REEL', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/BBROs.mp4' },
       { id: 'reels-2', title: '3 RULES OF FOCUS', tag: 'MOTIVATION REEL', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' },
       { id: 'reels-3', title: 'WHY AI WILL CHANGE WORK', tag: 'TECH REEL', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-curvy-road-on-a-grassy-hill-42223-large.mp4' }
     ]
@@ -36,7 +36,7 @@ const domainData = {
     tag: 'DYNAMIC', 
     color: 'var(--scarlet-glow)',
     projects: [
-      { id: 'beat-1', title: 'WANDERLUST ICELAND', tag: 'TRAVEL SYNC', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-curvy-road-on-a-grassy-hill-42223-large.mp4' },
+      { id: 'beat-1', title: 'GARTANG GALI EXPEDITION', tag: 'TRAVEL SYNC', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/GARTANGGALI4.mp4' },
       { id: 'beat-2', title: 'NEON STREETS TOKYO', tag: 'BEAT SYNC', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4' }
     ]
   },
@@ -45,7 +45,7 @@ const domainData = {
     tag: 'RETENTION', 
     color: 'var(--cyan-primary)',
     projects: [
-      { id: 'long-1', title: 'CREATOR TALKS EPISODE', tag: 'FULL EPISODE', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' },
+      { id: 'long-1', title: 'THE BEERBICEPS SHOW', tag: 'FULL EPISODE', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/BBROs.mp4' },
       { id: 'long-2', title: 'THE FUTURE OF WORKPLACE', tag: 'DISCUSSION', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-curvy-road-on-a-grassy-hill-42223-large.mp4' }
     ]
   },
@@ -54,7 +54,7 @@ const domainData = {
     tag: 'GENERATIVE', 
     color: 'var(--cyan-primary)',
     projects: [
-      { id: 'ai-1', title: 'SYNTHETIC DREAMSCAPES', tag: 'AI GENERATED', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4' },
+      { id: 'ai-1', title: 'SYNTHETIC JAGUAR RUN', tag: 'AI GENERATED', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/aijaguar.mp4' },
       { id: 'ai-2', title: 'DIGITAL PARADISE', tag: 'STOCK COMPILATION', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' }
     ]
   },
@@ -68,6 +68,7 @@ const domainData = {
     ]
   }
 };
+
 
 const getEmbedUrl = (url) => {
   if (!url) return null;
