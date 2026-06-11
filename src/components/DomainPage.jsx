@@ -197,7 +197,7 @@ const DomainPage = () => {
           <span className="text-xs uppercase tracking-[4px] font-bold">{data.tag} // ARCHIVE</span>
         </div>
         
-        <h1 className="text-white text-5xl md:text-7xl font-black uppercase tracking-tight leading-none" style={{ fontFamily: '"Inter", sans-serif' }}>
+        <h1 className="text-white text-5xl md:text-7xl font-black uppercase tracking-tight leading-none" style={{ fontFamily: 'var(--font-heading)' }}>
           {data.title}
         </h1>
       </div>

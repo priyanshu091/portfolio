@@ -401,7 +401,7 @@ const ParticleLogo = () => {
         {/* TIMECODE COUNTER — cyan accent */}
         <span
           style={{
-            fontFamily: '"Courier New", "SF Mono", monospace',
+            fontFamily: 'var(--font-mono)',
             fontSize: '10px',
             color: 'var(--cyan-primary)',
             opacity: 0.55,
@@ -429,7 +429,7 @@ const ParticleLogo = () => {
           <div style={{ width: `${CANVAS_W}px`, height: `${CANVAS_H}px`, marginLeft: '-1px' }} />
           <span
             style={{
-              fontFamily: '"Courier New", "SF Mono", monospace',
+              fontFamily: 'var(--font-mono)',
               fontSize: '9px',
               color: 'var(--cyan-primary)',
               opacity: 0.5,

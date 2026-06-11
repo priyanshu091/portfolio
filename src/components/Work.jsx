@@ -145,7 +145,7 @@ const Work = () => {
             <span className="text-[11px] uppercase tracking-[3px] font-bold">SELECT WORKS</span>
             <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
           </div>
-          <h2 className="text-white text-4xl md:text-5xl font-black uppercase tracking-tight leading-[1.1] mb-6" style={{ fontFamily: '"Inter", sans-serif' }}>
+          <h2 className="text-white text-4xl md:text-5xl font-black uppercase tracking-tight leading-[1.1] mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
             {activeTab === 'edited' ? (
               <>CHOOSE YOUR EDITING <span style={{ color: 'var(--scarlet-primary)' }}>JOURNEY</span></>
             ) : activeTab === 'shooted' ? (
@@ -154,7 +154,7 @@ const Work = () => {
               <>CREATIVE GRAPHIC <span style={{ color: 'var(--scarlet-primary)' }}>DESIGNS</span></>
             )}
           </h2>
-          <p className="text-[16px] leading-[1.5] max-w-lg" style={{ color: 'var(--text-secondary)', fontFamily: '"Inter", "Outfit", sans-serif' }}>
+          <p className="text-[16px] leading-[1.5] max-w-lg" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
             {activeTab === 'edited' ? (
               "We edit across a wide range of formats. Click on a category below to explore our work and find the style that fits your project."
             ) : activeTab === 'shooted' ? (

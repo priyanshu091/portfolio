@@ -300,7 +300,7 @@ const Services = () => {
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <h2 className="text-white text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05]" style={{ fontFamily: '"Inter",sans-serif' }}>
+              <h2 className="text-white text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05]" style={{ fontFamily: 'var(--font-heading)' }}>
                 WHAT WE<br />
                 <span style={{ color: 'var(--scarlet-primary)' }}>DELIVER</span>
               </h2>
@@ -386,7 +386,7 @@ const Services = () => {
                 <div className="flex items-start justify-between mb-5">
                   <div className="flex flex-col gap-2">
                     {/* Code */}
-                    <span className="text-[9px] font-bold uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: '"Courier New",monospace' }}>SVC_{svc.code}</span>
+                    <span className="text-[9px] font-bold uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>SVC_{svc.code}</span>
                     {/* Tag pill */}
                     <div className="inline-flex items-center gap-1.5 px-2 py-1" style={{ border: `1px solid ${svc.color}40`, backgroundColor: `${svc.color}0D` }}>
                       <div className="w-1 h-1 rounded-full" style={{ backgroundColor: svc.color, animation: 'svcTagBlink 2s ease-in-out infinite' }} />
@@ -405,7 +405,7 @@ const Services = () => {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-white text-[17px] font-black uppercase tracking-wide leading-tight mb-3" style={{ fontFamily: '"Inter",sans-serif' }}>
+                <h3 className="text-white text-[17px] font-black uppercase tracking-wide leading-tight mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
                   {svc.title}
                 </h3>
 
@@ -429,7 +429,7 @@ const Services = () => {
 
                 {/* Footer: turnaround */}
                 <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                  <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: '"Courier New",monospace' }}>TURNAROUND</span>
+                  <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>TURNAROUND</span>
                   <span className="text-[10px] font-black uppercase tracking-[1px]" style={{ color: isHov ? svc.color : 'var(--text-secondary)' }}>{svc.turnaround}</span>
                 </div>
               </div>
@@ -449,7 +449,7 @@ const Services = () => {
           <span className="absolute bottom-2 right-2 w-4 h-4 border-b border-r" style={{ borderColor: 'rgba(255,45,85,0.3)' }} />
 
           <div>
-            <div className="text-[9px] uppercase tracking-[2px] mb-2 font-bold" style={{ color: 'var(--text-muted)', fontFamily: '"Courier New",monospace' }}>// CUSTOM_PROJECT_INQUIRY</div>
+            <div className="text-[9px] uppercase tracking-[2px] mb-2 font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>// CUSTOM_PROJECT_INQUIRY</div>
             <p className="text-white font-bold text-lg uppercase tracking-wide">Need something not listed?</p>
             <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>Every great project starts with a conversation.</p>
           </div>

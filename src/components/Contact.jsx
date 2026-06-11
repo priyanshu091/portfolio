@@ -56,7 +56,7 @@ const Contact = () => {
     outline: 'none',
     transition: 'border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease',
     boxShadow: hoveredField === name ? '0 0 20px rgba(255,45,85,0.1), inset 0 0 12px rgba(255,45,85,0.04)' : 'none',
-    fontFamily: '"Inter", sans-serif',
+    fontFamily: 'var(--font-body)',
     fontSize: '14px',
   });
 
@@ -213,7 +213,7 @@ const Contact = () => {
             <div className="flex-1 h-[1px]" style={{ background: 'linear-gradient(90deg, var(--cyan-primary), transparent)' }} />
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <h2 className="text-white text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05]" style={{ fontFamily: '"Inter", sans-serif' }}>
+            <h2 className="text-white text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05]" style={{ fontFamily: 'var(--font-heading)' }}>
               LET'S CREATE<br />
               <span style={{ color: 'var(--scarlet-primary)' }}>SOMETHING</span><br />
               REMARKABLE.
@@ -239,7 +239,7 @@ const Contact = () => {
             {/* HUD top bar */}
             <div className="flex items-center gap-3 mb-2">
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1))' }} />
-              <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: '"Courier New", monospace' }}>SYS::CHANNEL_LIST</span>
+              <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>SYS::CHANNEL_LIST</span>
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
             </div>
 
@@ -263,7 +263,7 @@ const Contact = () => {
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)' }}>{item.label}</span>
-                  <span className="text-[13px] font-medium" style={{ color: 'var(--text-secondary)', fontFamily: '"Inter", sans-serif' }}>{item.value}</span>
+                  <span className="text-[13px] font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>{item.value}</span>
                 </div>
                 <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: 'var(--scarlet-primary)' }}>↗</div>
               </a>
@@ -272,8 +272,8 @@ const Contact = () => {
             {/* Decorative HUD bottom panel */}
             <div className="mt-2 p-4 border border-dashed" style={{ borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(13,13,13,0.3)' }}>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: '"Courier New", monospace' }}>RESPONSE_TIME</span>
-                <span className="text-[9px] uppercase tracking-[2px]" style={{ color: '#00FF88', fontFamily: '"Courier New", monospace' }}>FAST</span>
+                <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>RESPONSE_TIME</span>
+                <span className="text-[9px] uppercase tracking-[2px]" style={{ color: '#00FF88', fontFamily: 'var(--font-mono)' }}>FAST</span>
               </div>
               <div className="w-full h-[2px] rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
                 <div className="h-full rounded-full" style={{ width: '85%', background: 'linear-gradient(90deg, var(--scarlet-primary), var(--cyan-primary))' }} />
@@ -290,7 +290,7 @@ const Contact = () => {
             {/* Form HUD top label */}
             <div className="flex items-center gap-3 mb-4">
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1))' }} />
-              <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: '"Courier New", monospace' }}>SYS::TRANSMIT_FORM</span>
+              <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>SYS::TRANSMIT_FORM</span>
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
             </div>
 
@@ -333,7 +333,7 @@ const Contact = () => {
                     <p className="text-white text-xl font-bold tracking-widest uppercase mb-2">TRANSMISSION SENT</p>
                     <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>We'll get back to you within 48 hours.</p>
                   </div>
-                  <span className="text-[9px] uppercase tracking-[3px] font-bold" style={{ color: '#00FF88', fontFamily: '"Courier New", monospace' }}>// SYS_OK :: MSG_QUEUED</span>
+                  <span className="text-[9px] uppercase tracking-[3px] font-bold" style={{ color: '#00FF88', fontFamily: 'var(--font-mono)' }}>// SYS_OK :: MSG_QUEUED</span>
                 </div>
               ) : (
                 /* ── Form ── */
@@ -454,7 +454,7 @@ const Contact = () => {
                     {/* Status dot */}
                     <span className="relative z-10 mr-3 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: sending ? '#00FF88' : 'var(--scarlet-primary)', boxShadow: `0 0 6px ${sending ? '#00FF88' : 'var(--scarlet-primary)'}`, animation: 'contactBlink 1s ease-in-out infinite' }} />
 
-                    <span className="relative z-10 text-[11px] font-bold uppercase tracking-[3px]" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: '"Inter", sans-serif' }}>
+                    <span className="relative z-10 text-[11px] font-bold uppercase tracking-[3px]" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'var(--font-heading)' }}>
                       {sending ? 'TRANSMITTING...' : 'SEND TRANSMISSION'}
                     </span>
 
@@ -475,7 +475,7 @@ const Contact = () => {
             <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--scarlet-primary)', boxShadow: '0 0 6px var(--scarlet-primary)' }} />
             <span className="text-[10px] uppercase tracking-[3px] font-bold" style={{ color: 'var(--text-muted)' }}>DIVYANSH VISHWAKARMA</span>
           </div>
-          <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: '"Courier New", monospace' }}>
+          <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
             © 2025 — ALL RIGHTS RESERVED // BUILD_v1.0
           </span>
           <div className="flex items-center gap-5">
@@ -527,7 +527,7 @@ const Contact = () => {
         </div>
 
         {/* ── Created By Credit Bar ── */}
-        <div className="mt-8 flex flex-wrap justify-center items-center gap-2 text-[9px] uppercase tracking-[2px] text-center" style={{ color: 'var(--text-muted)', fontFamily: '"Courier New", monospace' }}>
+        <div className="mt-8 flex flex-wrap justify-center items-center gap-2 text-[9px] uppercase tracking-[2px] text-center" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
           <span>CREATED BY</span>
           <a 
             href="https://www.linkedin.com/in/priyanshu-vishwakarma-407695242/" 

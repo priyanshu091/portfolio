@@ -385,7 +385,7 @@ const Hero = () => {
           <h1 
             ref={bgTextRef}
             className="text-[18vw] font-black tracking-tighter opacity-0 whitespace-nowrap"
-            style={{ color: 'var(--scarlet-primary)', fontFamily: '"Inter", sans-serif' }}
+            style={{ color: 'var(--scarlet-primary)', fontFamily: 'var(--font-heading)' }}
           >
             CREATIVE
           </h1>
@@ -454,14 +454,14 @@ const Hero = () => {
             </div>
 
             {/* Headline */}
-            <h2 className="text-white text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05] mb-6" style={{ fontFamily: '"Inter", sans-serif' }}>
+            <h2 className="text-white text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05] mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
               <span className="block hero-title-line opacity-0">WE TURN</span>
               <span className="block hero-title-line opacity-0">FOOTAGE</span>
               <span className="block hero-title-line opacity-0">INTO <span style={{ color: 'var(--scarlet-primary)' }}>IMPACT.</span></span>
             </h2>
 
             {/* Subtext */}
-            <p className="hero-subtitle opacity-0 text-[16px] md:text-[18px] leading-[1.5] max-w-sm md:max-w-md mb-12" style={{ color: 'var(--text-secondary)', fontFamily: '"Inter", "Outfit", sans-serif' }}>
+            <p className="hero-subtitle opacity-0 text-[16px] md:text-[18px] leading-[1.5] max-w-sm md:max-w-md mb-12" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
               Cinematic edits, powerful storytelling and content that keeps your audience hooked.
             </p>
 
@@ -627,7 +627,7 @@ const Hero = () => {
                 {/* Label */}
                 <span
                   className="btn-label relative z-10 text-[11px] font-bold uppercase tracking-[3px] mr-4 transition-all duration-300"
-                  style={{ color: 'rgba(255,255,255,0.85)', fontFamily: '"Inter", sans-serif' }}
+                  style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'var(--font-heading)' }}
                 >
                   VIEW OUR WORK
                 </span>
@@ -753,7 +753,7 @@ const Hero = () => {
                 {/* Label */}
                 <span
                   className="btn-label relative z-10 text-[11px] font-bold uppercase tracking-[3px] mr-4 transition-all duration-300"
-                  style={{ color: 'rgba(255,255,255,0.85)', fontFamily: '"Inter", sans-serif' }}
+                  style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'var(--font-heading)' }}
                 >
                   BOOK SERVICES
                 </span>
@@ -774,10 +774,10 @@ const Hero = () => {
             
             {/* Timecode Block */}
             <div className="flex flex-col items-end gap-2 border border-dashed p-3 rounded-sm opacity-60" style={{ borderColor: 'var(--border-subtle)', backgroundColor: 'rgba(13, 13, 13, 0.3)' }}>
-              <div style={{ fontFamily: '"Courier New", monospace', fontSize: '13px', color: 'var(--text-secondary)', letterSpacing: '2px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: 'var(--text-secondary)', letterSpacing: '2px' }}>
                 00:01:30:00
               </div>
-              <div style={{ fontFamily: '"Courier New", monospace', fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '2px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '2px' }}>
                 FRAME 0248
               </div>
             </div>

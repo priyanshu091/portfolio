@@ -150,12 +150,12 @@ const TechStack = () => {
             <h2 
               ref={headingRef}
               className="text-white text-4xl md:text-5xl font-black uppercase tracking-tight leading-[1.1] mb-6" 
-              style={{ fontFamily: '"Inter", sans-serif' }}
+              style={{ fontFamily: 'var(--font-heading)' }}
             />
             <p 
               ref={descRef}
               className="text-[16px] leading-[1.5] max-w-sm" 
-              style={{ color: 'var(--text-secondary)', fontFamily: '"Inter", "Outfit", sans-serif' }}
+              style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}
             />
           </div>
 
@@ -211,6 +211,10 @@ const TechStack = () => {
               0%, 100% { transform: translate(0, 0) scale(1); }
               50% { transform: translate(6px, -6px) scale(1.15); }
             }
+            @keyframes particlePulse {
+              0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+              50% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
+            }
           `}</style>
 
           {/* Central Core */}
@@ -224,24 +228,82 @@ const TechStack = () => {
             </div>
           </div>
 
-          {/* PASS 1: Orbit ring visuals only (no satellites) */}
+          {/* PASS 1: Orbit ring visuals + orbiting particles */}
           {tools.map((tool) => {
             const isPaused = hoveredTool !== null;
             const isHovered = hoveredTool?.id === tool.id;
+            const ringSize = tool.orbitRadius * 2;
+            // Generate 3 particles at different angles for each ring
+            const particles = [0, 120, 240].map((offsetAngle, i) => {
+              const angle = (offsetAngle * Math.PI) / 180;
+              const px = tool.orbitRadius + Math.cos(angle) * tool.orbitRadius;
+              const py = tool.orbitRadius + Math.sin(angle) * tool.orbitRadius;
+              return { px, py, delay: i * 1.2, size: i === 0 ? 4 : 3 };
+            });
             return (
-              <div
-                key={`ring-${tool.id}`}
-                className="absolute top-1/2 left-1/2 border border-dashed rounded-full pointer-events-none transition-opacity duration-500"
-                style={{
-                  width: `${tool.orbitRadius * 2}px`,
-                  height: `${tool.orbitRadius * 2}px`,
-                  borderColor: isHovered ? tool.color : 'rgba(255,255,255,0.05)',
-                  animation: `orbitRotation ${tool.speed}s linear infinite`,
-                  animationPlayState: isPaused ? 'paused' : 'running',
-                  opacity: isPaused && !isHovered ? 0.3 : 1,
-                  zIndex: isHovered ? 25 : 10,
-                }}
-              />
+              <div key={`ring-${tool.id}`}>
+                {/* Main visible ring — solid subtle border */}
+                <div
+                  className="absolute top-1/2 left-1/2 rounded-full pointer-events-none transition-all duration-500"
+                  style={{
+                    width: `${ringSize}px`,
+                    height: `${ringSize}px`,
+                    border: `1px solid ${isHovered ? tool.color + '60' : 'rgba(255,255,255,0.12)'}`,
+                    animation: `orbitRotation ${tool.speed}s linear infinite`,
+                    animationPlayState: isPaused ? 'paused' : 'running',
+                    opacity: isPaused && !isHovered ? 0.3 : 1,
+                    zIndex: isHovered ? 25 : 10,
+                  }}
+                />
+                {/* Glow ring — blurred duplicate for outer glow effect */}
+                <div
+                  className="absolute top-1/2 left-1/2 rounded-full pointer-events-none transition-all duration-500"
+                  style={{
+                    width: `${ringSize}px`,
+                    height: `${ringSize}px`,
+                    border: `1px solid ${isHovered ? tool.color + '30' : 'rgba(255,255,255,0.06)'}`,
+                    boxShadow: isHovered 
+                      ? `0 0 15px ${tool.color}20, inset 0 0 15px ${tool.color}10`
+                      : '0 0 8px rgba(255,255,255,0.03), inset 0 0 8px rgba(255,255,255,0.02)',
+                    animation: `orbitRotation ${tool.speed}s linear infinite`,
+                    animationPlayState: isPaused ? 'paused' : 'running',
+                    opacity: isPaused && !isHovered ? 0.2 : 1,
+                    zIndex: isHovered ? 24 : 9,
+                    filter: 'blur(1px)',
+                  }}
+                />
+                {/* Orbiting particles — small glowing dots on the ring path */}
+                {particles.map((p, pIdx) => (
+                  <div
+                    key={`particle-${tool.id}-${pIdx}`}
+                    className="absolute top-1/2 left-1/2 pointer-events-none"
+                    style={{
+                      width: `${ringSize}px`,
+                      height: `${ringSize}px`,
+                      animation: `orbitRotation ${tool.speed * (0.7 + pIdx * 0.2)}s linear infinite`,
+                      animationPlayState: isPaused ? 'paused' : 'running',
+                      opacity: isPaused && !isHovered ? 0.2 : 1,
+                      zIndex: isHovered ? 26 : 11,
+                    }}
+                  >
+                    <div
+                      className="absolute rounded-full"
+                      style={{
+                        left: `${p.px}px`,
+                        top: `${p.py}px`,
+                        width: `${p.size}px`,
+                        height: `${p.size}px`,
+                        backgroundColor: isHovered ? tool.color : 'rgba(255,255,255,0.5)',
+                        boxShadow: isHovered 
+                          ? `0 0 8px ${tool.color}, 0 0 16px ${tool.color}60`
+                          : '0 0 6px rgba(255,255,255,0.3), 0 0 12px rgba(255,255,255,0.15)',
+                        animation: `particlePulse ${2 + pIdx * 0.5}s ease-in-out infinite`,
+                        animationDelay: `${p.delay}s`,
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
             );
           })}
 

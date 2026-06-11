@@ -143,7 +143,7 @@ const BeforeAfterSlider = ({ isOpen, onClose }) => {
           <button 
             onClick={onClose}
             className="group flex items-center gap-2 px-3 py-1.5 border border-white/15 hover:border-[var(--scarlet-primary)] bg-white/5 hover:bg-[var(--scarlet-primary)]/10 text-[10px] font-bold uppercase tracking-widest text-white transition-all duration-300"
-            style={{ fontFamily: '"Courier New", monospace' }}
+            style={{ fontFamily: 'var(--font-mono)' }}
           >
             <span>CLOSE</span>
             <span className="transition-transform duration-300 group-hover:rotate-90">✕</span>
@@ -221,7 +221,7 @@ const BeforeAfterSlider = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer info/controls */}
-        <div className="w-full flex justify-between items-center mt-6 text-[10px] tracking-[2px] text-white/40 uppercase" style={{ fontFamily: '"Courier New", monospace' }}>
+        <div className="w-full flex justify-between items-center mt-6 text-[10px] tracking-[2px] text-white/40 uppercase" style={{ fontFamily: 'var(--font-mono)' }}>
           <span>DRAG DIVISION HANDLE</span>
           <span>SYSTEM_READY_V1.7</span>
         </div>

@@ -299,17 +299,17 @@ const About = () => {
             <h2
               ref={headingRef}
               className="text-white text-5xl md:text-6xl xl:text-7xl font-black uppercase tracking-tight leading-[1.05] mb-8"
-              style={{ fontFamily: '"Inter", sans-serif' }}
+              style={{ fontFamily: 'var(--font-heading)' }}
             />
 
             {/* HUD subtitle line */}
             <div className="flex items-center gap-3 mb-6">
               <div className="h-[1px] w-8" style={{ backgroundColor: 'var(--scarlet-primary)' }} />
-              <span ref={subRef} className="text-[10px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--scarlet-primary)', fontFamily: '"Courier New", monospace' }} />
+              <span ref={subRef} className="text-[10px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--scarlet-primary)', fontFamily: 'var(--font-mono)' }} />
             </div>
 
-            <p ref={p1Ref} className="text-[16px] leading-[1.8] mb-4" style={{ color: 'var(--text-secondary)', fontFamily: '"Inter", sans-serif' }} />
-            <p ref={p2Ref} className="text-[15px] leading-[1.8] mb-10" style={{ color: 'var(--text-muted)', fontFamily: '"Inter", sans-serif' }} />
+            <p ref={p1Ref} className="text-[16px] leading-[1.8] mb-4" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }} />
+            <p ref={p2Ref} className="text-[15px] leading-[1.8] mb-10" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }} />
 
             {/* Trait cards grid */}
             <div className="grid grid-cols-2 gap-3">
@@ -346,11 +346,11 @@ const About = () => {
               <span className="absolute bottom-2 left-2 w-4 h-4 border-b border-l pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.4)' }} />
               <span className="absolute bottom-2 right-2 w-4 h-4 border-b border-r pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.4)' }} />
 
-              <div className="text-[9px] uppercase tracking-[2px] mb-6 font-bold" style={{ color: 'var(--text-muted)', fontFamily: '"Courier New", monospace' }}>// CAREER_METRICS</div>
+              <div className="text-[9px] uppercase tracking-[2px] mb-6 font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>// CAREER_METRICS</div>
 
               <div className="grid grid-cols-3 gap-6">
                 <div className="flex flex-col gap-1">
-                  <div className="text-4xl font-black" style={{ color: 'var(--scarlet-primary)', fontFamily: '"Inter", sans-serif' }}>
+                  <div className="text-4xl font-black" style={{ color: 'var(--scarlet-primary)', fontFamily: 'var(--font-heading)' }}>
                     {projects}<span className="text-2xl">+</span>
                   </div>
                   <div className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)' }}>PROJECTS</div>
@@ -359,7 +359,7 @@ const About = () => {
                   </div>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <div className="text-4xl font-black" style={{ color: 'var(--cyan-primary)', fontFamily: '"Inter", sans-serif' }}>
+                  <div className="text-4xl font-black" style={{ color: 'var(--cyan-primary)', fontFamily: 'var(--font-heading)' }}>
                     {views}<span className="text-2xl">M+</span>
                   </div>
                   <div className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)' }}>VIEWS GEN.</div>
@@ -368,7 +368,7 @@ const About = () => {
                   </div>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <div className="text-4xl font-black" style={{ color: '#00FF88', fontFamily: '"Inter", sans-serif' }}>
+                  <div className="text-4xl font-black" style={{ color: '#00FF88', fontFamily: 'var(--font-heading)' }}>
                     {clients}<span className="text-2xl">+</span>
                   </div>
                   <div className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)' }}>CLIENTS</div>
@@ -383,7 +383,7 @@ const About = () => {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1))' }} />
-                <span className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)', fontFamily: '"Courier New", monospace' }}>SYS::CAREER_LOG</span>
+                <span className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>SYS::CAREER_LOG</span>
                 <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
               </div>
 

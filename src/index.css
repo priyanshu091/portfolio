@@ -31,6 +31,11 @@
   --border-subtle: #262626;
   --border-default: #404040;
   --border-bright: #525252;
+
+  /* Typography */
+  --font-heading: 'Bebas Neue', 'Impact', sans-serif;
+  --font-body: 'DM Sans', 'Inter', sans-serif;
+  --font-mono: 'Courier New', 'SF Mono', monospace;
 }
 
 /* Hide scrollbar for a premium experience */
@@ -46,4 +51,10 @@ html, body {
   -ms-overflow-style: none;
   scrollbar-width: none;
   background-color: var(--bg-deep);
+  font-family: var(--font-body);
+}
+
+/* Global heading typography — Bebas Neue */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
 }
