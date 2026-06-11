@@ -69,6 +69,26 @@ const domainData = {
   }
 };
 
+const getEmbedUrl = (url) => {
+  if (!url) return null;
+  
+  // YouTube regex
+  const ytRegex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const ytMatch = url.match(ytRegex);
+  if (ytMatch && ytMatch[2].length === 11) {
+    return `https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1&rel=0`;
+  }
+  
+  // Vimeo regex
+  const vimeoRegex = /vimeo\.com\/(?:video\/)?([0-9]+)/;
+  const vimeoMatch = url.match(vimeoRegex);
+  if (vimeoMatch && vimeoMatch[1]) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+  }
+  
+  return null;
+};
+
 const DomainPage = () => {
   const { domainId } = useParams();
   const navigate = useNavigate();
@@ -221,14 +241,24 @@ const DomainPage = () => {
               }
             `}</style>
 
-            {/* Video element */}
-            <video 
-              src={selectedVideo.videoUrl} 
-              className="w-full h-full object-contain"
-              controls 
-              autoPlay 
-              playsInline
-            />
+            {/* Video or IFrame element */}
+            {getEmbedUrl(selectedVideo.videoUrl) ? (
+              <iframe 
+                src={getEmbedUrl(selectedVideo.videoUrl)} 
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title={selectedVideo.title}
+              />
+            ) : (
+              <video 
+                src={selectedVideo.videoUrl} 
+                className="w-full h-full object-contain"
+                controls 
+                autoPlay 
+                playsInline
+              />
+            )}
             
             {/* Bottom Info bar */}
             <div className="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent text-white z-10">
