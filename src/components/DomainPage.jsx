@@ -99,7 +99,7 @@ const getEmbedUrl = (url) => {
   return null;
 };
 
-const LazyVideo = ({ src, className }) => {
+const LazyVideo = ({ src, className, isPaused }) => {
   const [visible, setVisible] = useState(false);
   const ref = useRef(null);
 
@@ -122,7 +122,7 @@ const LazyVideo = ({ src, className }) => {
 
   return (
     <div ref={ref} className={className} style={{ position: 'absolute', inset: 0 }}>
-      {visible && (
+      {visible && !isPaused && (
         <video
           src={`${src}#t=0.1`}
           className="w-full h-full object-cover"
@@ -275,6 +275,7 @@ const DomainPage = () => {
             <LazyVideo
               src={project.videoUrl}
               className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-85 transition-opacity duration-500 z-0 pointer-events-none"
+              isPaused={selectedVideo !== null}
             />
 
             {/* Central Play Icon */}
@@ -392,7 +393,7 @@ const DomainPage = () => {
                   autoPlay
                   muted
                   playsInline
-                  preload="metadata"
+                  preload="auto"
                   onLoadedMetadata={(e) => {
                     const v = e.target;
                     if (v.videoWidth && v.videoHeight) {

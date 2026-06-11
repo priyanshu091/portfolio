@@ -25,7 +25,7 @@ function authHeaders() {
   };
 }
 
-const LazyVideo = ({ src, style }) => {
+const LazyVideo = ({ src, style, isPaused }) => {
   const [visible, setVisible] = useState(false);
   const ref = useRef(null);
 
@@ -48,7 +48,7 @@ const LazyVideo = ({ src, style }) => {
 
   return (
     <div ref={ref} style={{ width: '100%', height: '100%' }}>
-      {visible && (
+      {visible && !isPaused && (
         <video
           src={`${src}#t=0.1`}
           className="preview-video-element"
@@ -570,6 +570,7 @@ function Dashboard({ onLogout }) {
                       <LazyVideo
                         src={video.videoUrl}
                         style={styles.videoThumb}
+                        isPaused={playingId !== null}
                       />
                       <div style={styles.videoOverlay}>
                         <div 
