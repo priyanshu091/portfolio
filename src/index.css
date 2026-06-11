@@ -1,12 +1,49 @@
 @import "tailwindcss";
 
+/* ========================================
+   NEON SCARLET DESIGN SYSTEM
+   ======================================== */
+:root {
+  /* Backgrounds */
+  --bg-deep: #0D0D0D;
+  --bg-surface: #1F1F1F;
+  --bg-elevated: #2A2A2A;
+
+  /* Scarlet (Neon Red Family) */
+  --scarlet-glow: #FF5470;
+  --scarlet-primary: #FF2D55;
+  --scarlet-deep: #E11D48;
+  --scarlet-dark: #991B3A;
+
+  /* Electric Cyan (Futuristic Accent) */
+  --cyan-glow: #5EEEFF;
+  --cyan-primary: #00D9FF;
+  --cyan-deep: #0099CC;
+  --cyan-dark: #006680;
+
+  /* Text */
+  --text-primary: #FFFFFF;
+  --text-secondary: #A3A3A3;
+  --text-muted: #737373;
+  --text-disabled: #525252;
+
+  /* Borders */
+  --border-subtle: #262626;
+  --border-default: #404040;
+  --border-bright: #525252;
+}
+
 /* Hide scrollbar for a premium experience */
 ::-webkit-scrollbar {
   display: none;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html, body {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-  background-color: #000000;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  background-color: var(--bg-deep);
 }

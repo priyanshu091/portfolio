@@ -3,10 +3,12 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import heroOverlayImg from '../assets/hero-video/hero-image/hero.png';
+import BeforeAfterSlider from './BeforeAfterSlider';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Hero = () => {
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
   const circleRef = useRef(null);
@@ -18,6 +20,11 @@ const Hero = () => {
   const revealMaskCanvasRef = useRef(null);
   const heroOverlayObj = useRef(null);
   const mouseRef = useRef({ x: -1000, y: -1000, isActive: false });
+
+  // Stats Counting Refs
+  const viewsRef = useRef(null);
+  const projectsRef = useRef(null);
+  const timeRef = useRef(null);
 
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -37,7 +44,7 @@ const Hero = () => {
     for (let i = 1; i <= frameCount; i++) {
       const num = String(i).padStart(3, '0');
       const img = new Image();
-      img.src = `/src/assets/hero-video/ezgif-frame-${num}.jpg`;
+      img.src = `/hero-video/ezgif-frame-${num}.webp`;
       
       img.onload = () => {
         loadedCount++;
@@ -141,22 +148,7 @@ const Hero = () => {
       duration: 1.8,
       stagger: 0.12,
       ease: 'power4.inOut'
-    })
-    .fromTo('.hero-title', 
-      { opacity: 0, y: 80 }, 
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out' },
-      '-=1'
-    )
-    .fromTo('.hero-subtitle', 
-      { opacity: 0, y: 80 }, 
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out' },
-      '-=0.8'
-    )
-    .fromTo('.hero-cta', 
-      { opacity: 0, y: 80 }, 
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out' },
-      '-=0.8'
-    );
+    });
 
     // Initial Render & Resize Listener
     handleResize();
@@ -164,15 +156,20 @@ const Hero = () => {
 
     const frameCount = 240;
 
-    // Canvas Image Sequence Scrub
+    // Canvas Image Sequence Scrub (Completes at 75% progress)
     ScrollTrigger.create({
       trigger: containerRef.current,
       start: 'top top',
       end: 'bottom bottom',
       scrub: 1, // Smooth premium scrub
       onUpdate: (self) => {
-        // Map progress to frame
-        const frameIndex = Math.floor(self.progress * (frameCount - 1));
+        // Map 0 -> 0.75 progress to 0 -> 239 frame index
+        let frameIndex;
+        if (self.progress <= 0.75) {
+          frameIndex = Math.floor((self.progress / 0.75) * (frameCount - 1));
+        } else {
+          frameIndex = frameCount - 1;
+        }
         
         // requestAnimationFrame prevents unnecessary re-renders
         if (frameIndex !== currentFrameRef.current.index) {
@@ -181,6 +178,55 @@ const Hero = () => {
         }
       }
     });
+
+    // Text entrance blur timeline scrubbed in the remaining 25% scroll progress
+    const textTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1, // Smooth premium scrub matching canvas
+      }
+    });
+
+    // 75% of timeline duration is empty spacer
+    textTimeline.to({}, { duration: 3 });
+
+    // Staggered reveal animations in the final 25%
+    textTimeline.fromTo('.hero-title-tag', 
+      { opacity: 0, y: 30, filter: 'blur(15px)' }, 
+      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.35, ease: 'none' }
+    )
+    .fromTo('.hero-title-line', 
+      { opacity: 0, y: 50, filter: 'blur(30px)' }, 
+      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.6, stagger: 0.2, ease: 'none' },
+      '-=0.2'
+    )
+    .fromTo('.hero-subtitle', 
+      { opacity: 0, y: 40, filter: 'blur(15px)' }, 
+      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.45, ease: 'none' },
+      '-=0.3'
+    );
+
+    // High-performance scroll-scrubbed numbers animation
+    const statsObj = { views: 0, projects: 0, time: 0 };
+    textTimeline.fromTo('.hero-cta', 
+      { opacity: 0, y: 30 }, 
+      { opacity: 1, y: 0, duration: 0.45, ease: 'none' },
+      '-=0.3'
+    )
+    .to(statsObj, {
+      views: 10,
+      projects: 150,
+      time: 48,
+      duration: 0.5,
+      ease: 'none',
+      onUpdate: () => {
+        if (viewsRef.current) viewsRef.current.innerText = Math.floor(statsObj.views);
+        if (projectsRef.current) projectsRef.current.innerText = Math.floor(statsObj.projects);
+        if (timeRef.current) timeRef.current.innerText = Math.floor(statsObj.time);
+      }
+    }, '-=0.45');
 
     // Subtle Canvas Zoom Effect
     gsap.to(canvasRef.current, {
@@ -295,7 +341,7 @@ const Hero = () => {
   }, { scope: containerRef, dependencies: [isLoaded] });
 
   return (
-    <section ref={containerRef} className="relative h-[400vh] w-full bg-black">
+    <section ref={containerRef} className="relative h-[400vh] w-full" style={{ backgroundColor: 'var(--bg-deep)' }}>
       
       {/* Premium GSAP 6-Panel Preloader */}
       {!preloaderComplete && (
@@ -303,8 +349,8 @@ const Hero = () => {
           {[...Array(6)].map((_, i) => (
             <div 
               key={i} 
-              className="preloader-panel h-full bg-[#1a1a1a] border-r border-[#222]"
-              style={{ width: '16.666667%' }}
+              className="preloader-panel h-full border-r"
+              style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)', width: '16.666667%' }}
             />
           ))}
           {!isLoaded && (
@@ -336,8 +382,8 @@ const Hero = () => {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1]">
           <h1 
             ref={bgTextRef}
-            className="text-[18vw] font-black text-[#ff2a2a] tracking-tighter opacity-0 whitespace-nowrap"
-            style={{ fontFamily: '"Inter", sans-serif' }}
+            className="text-[18vw] font-black tracking-tighter opacity-0 whitespace-nowrap"
+            style={{ color: 'var(--scarlet-primary)', fontFamily: '"Inter", sans-serif' }}
           >
             CREATIVE
           </h1>
@@ -346,77 +392,469 @@ const Hero = () => {
         {/* Top Layer Cutout Image */}
         <img 
           ref={topLayerRef}
-          src="/src/assets/hero-video/ezgif-frame-240.jpg" 
+          src="/hero-video/ezgif-frame-240.webp" 
           className="absolute inset-0 h-full w-full object-cover origin-center pointer-events-none z-[2] opacity-0"
           alt="Top Layer Cutout"
         />
 
-        {/* Red Circle Design Overlay */}
+        {/* HUD Ring Design Overlay */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1]">
           <div 
             ref={circleRef}
-            className="absolute rounded-full border border-[rgba(255,0,0,0.8)] h-[320px] w-[320px] md:h-[500px] md:w-[500px] lg:h-[650px] lg:w-[650px]"
-            style={{ borderWidth: '1px' }}
-          ></div>
+            className="relative flex items-center justify-center"
+          >
+            {/* Outer dashed ring (spins slowly) */}
+            <div className="absolute rounded-full h-[400px] w-[400px] md:h-[650px] md:w-[650px] animate-[spin_60s_linear_infinite]" style={{ border: '1px dashed rgba(255, 45, 85, 0.3)' }}></div>
+            {/* Inner solid ring */}
+            <div className="absolute rounded-full h-[360px] w-[360px] md:h-[600px] md:w-[600px]" style={{ border: '1px solid rgba(255, 45, 85, 0.6)', boxShadow: '0 0 30px rgba(255, 45, 85, 0.1) inset' }}></div>
+            {/* Inner dotted tech ring */}
+            <div className="absolute rounded-full h-[320px] w-[320px] md:h-[550px] md:w-[550px]" style={{ border: '1px dotted rgba(0, 217, 255, 0.3)' }}></div>
+            
+            {/* Crosshairs */}
+            <div className="absolute w-[1px] h-[420px] md:h-[680px]" style={{ backgroundColor: 'rgba(255, 45, 85, 0.15)' }}></div>
+            <div className="absolute h-[1px] w-[420px] md:w-[680px]" style={{ backgroundColor: 'rgba(255, 45, 85, 0.15)' }}></div>
+            
+            {/* Dots on inner ring */}
+            <div className="absolute top-0 w-2 h-2 rounded-full -translate-y-[180px] md:-translate-y-[300px]" style={{ backgroundColor: 'var(--cyan-primary)' }}></div>
+            <div className="absolute bottom-0 w-2 h-2 rounded-full translate-y-[180px] md:translate-y-[300px]" style={{ backgroundColor: 'var(--cyan-primary)' }}></div>
+            <div className="absolute left-0 w-2 h-2 rounded-full -translate-x-[180px] md:-translate-x-[300px]" style={{ backgroundColor: 'var(--cyan-primary)' }}></div>
+            <div className="absolute right-0 w-2 h-2 rounded-full translate-x-[180px] md:translate-x-[300px]" style={{ backgroundColor: 'var(--cyan-primary)' }}></div>
+          </div>
         </div>
 
-        {/* BOTTOM CONTENT OVERLAY */}
-        <div className="absolute bottom-0 left-0 w-full z-[10] px-8 md:px-16 pb-12 flex flex-col pointer-events-auto">
+        {/* NEW FINAL SCROLL CONTENT OVERLAY */}
+        <div className="absolute inset-0 z-[10] pointer-events-auto overflow-hidden">
           
-          {/* Top Row: 3 Columns */}
-          <div className="flex flex-col md:flex-row justify-between items-end w-full mb-8 max-w-[1800px] mx-auto">
+          {/* LEFT SIDEBAR: Socials */}
+          <div className="hidden sm:flex absolute left-8 md:left-12 top-1/2 -translate-y-1/2 flex-col gap-8">
+            {/* Instagram */}
+            <a href="https://www.instagram.com/its_divyansh.x/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:scale-110 transform" style={{ color: 'var(--text-secondary)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--scarlet-primary)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+            {/* YouTube */}
+            <a href="https://www.youtube.com/@Divyansh_Uncovered" target="_blank" rel="noopener noreferrer" className="transition-colors hover:scale-110 transform" style={{ color: 'var(--text-secondary)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--scarlet-primary)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+            </a>
+            {/* LinkedIn */}
+            <a href="https://www.linkedin.com/in/divyansh-vishwakarma-9a84533a8/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:scale-110 transform" style={{ color: 'var(--text-secondary)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--scarlet-primary)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            </a>
+          </div>
+
+          {/* MAIN CONTENT (Left Aligned) */}
+          <div className="absolute left-8 sm:left-24 md:left-32 top-1/2 -translate-y-1/2 max-w-xl pr-4 mt-8">
             
-            {/* LEFT COLUMN */}
-            <div className="flex-1 mb-8 md:mb-0">
-              <div className="w-8 h-[1px] bg-[#ff2a2a] mb-5"></div>
-              <h3 className="hero-title opacity-0 text-[#ff2a2a] text-[12px] uppercase tracking-[2px] font-medium mb-3">
-                WE CREATE
-              </h3>
-              <p className="hero-subtitle opacity-0 text-[#ffffff] text-[14px] leading-[1.4] font-light max-w-[180px]" style={{ fontFamily: '"Inter", "Outfit", sans-serif' }}>
-                BOLD IDEAS THAT<br/>INSPIRE ACTION.
-              </p>
+            {/* Tag */}
+            <div className="hero-title-tag opacity-0 flex items-center gap-3 mb-6" style={{ color: 'var(--cyan-primary)' }}>
+              <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
+              <span className="text-[11px] uppercase tracking-[3px] font-bold">VIDEO EDITOR</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
             </div>
 
-            {/* CENTER COLUMN */}
-            <div className="hidden md:block flex-[2]"></div>
+            {/* Headline */}
+            <h2 className="text-white text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05] mb-6" style={{ fontFamily: '"Inter", sans-serif' }}>
+              <span className="block hero-title-line opacity-0">WE TURN</span>
+              <span className="block hero-title-line opacity-0">FOOTAGE</span>
+              <span className="block hero-title-line opacity-0">INTO <span style={{ color: 'var(--scarlet-primary)' }}>IMPACT.</span></span>
+            </h2>
 
-            {/* RIGHT COLUMN */}
-            <div className="flex-1 flex justify-start md:justify-end">
-              <a href="#work" className="hero-cta opacity-0 group inline-flex flex-col items-start md:items-end">
-                <div className="flex items-center text-[#ff2a2a] text-[12px] uppercase tracking-[2px] mb-2 transition-colors duration-300 group-hover:text-white">
-                  <span className="mr-2">VIEW WORK</span>
-                  <span className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
+            {/* Subtext */}
+            <p className="hero-subtitle opacity-0 text-[16px] md:text-[18px] leading-[1.5] max-w-sm md:max-w-md mb-12" style={{ color: 'var(--text-secondary)', fontFamily: '"Inter", "Outfit", sans-serif' }}>
+              Cinematic edits, powerful storytelling and content that keeps your audience hooked.
+            </p>
+
+            {/* Stats */}
+            <div className="hero-cta opacity-0 flex items-center gap-8 md:gap-12 mb-12">
+              <div>
+                <div className="text-3xl md:text-4xl font-bold mb-1" style={{ color: 'var(--scarlet-primary)' }}>
+                  <span ref={viewsRef}>0</span>M+
                 </div>
-                <div className="w-full h-[1px] bg-[#ff2a2a] opacity-30 transition-all duration-300 group-hover:opacity-100 group-hover:bg-white"></div>
+                <div className="text-[9px] uppercase tracking-[1.5px]" style={{ color: 'var(--text-muted)' }}>VIEWS GENERATED</div>
+              </div>
+              <div>
+                <div className="text-3xl md:text-4xl font-bold mb-1" style={{ color: 'var(--scarlet-primary)' }}>
+                  <span ref={projectsRef}>0</span>+
+                </div>
+                <div className="text-[9px] uppercase tracking-[1.5px]" style={{ color: 'var(--text-muted)' }}>PROJECTS DONE</div>
+              </div>
+              <div>
+                <div className="text-3xl md:text-4xl font-bold mb-1" style={{ color: 'var(--scarlet-primary)' }}>
+                  <span ref={timeRef}>0</span>HR
+                </div>
+                <div className="text-[9px] uppercase tracking-[1.5px]" style={{ color: 'var(--text-muted)' }}>TURNAROUND TIME</div>
+              </div>
+            </div>
+
+            {/* Premium Techie Button */}
+            <style>{`
+              @keyframes btnScanLine {
+                0% { transform: translateY(-100%); opacity: 0; }
+                20% { opacity: 1; }
+                80% { opacity: 1; }
+                100% { transform: translateY(400%); opacity: 0; }
+              }
+              @keyframes btnAuroraBlob1 {
+                0%, 100% { transform: translate(0, 0) scale(1); }
+                50% { transform: translate(10px, -6px) scale(1.12); }
+              }
+              @keyframes btnAuroraBlob2 {
+                0%, 100% { transform: translate(0, 0) scale(1); }
+                50% { transform: translate(-8px, 8px) scale(0.88); }
+              }
+              @keyframes btnCornerPulse {
+                0%, 100% { opacity: 0.5; }
+                50% { opacity: 1; }
+              }
+              .tech-btn:hover .btn-liquid { transform: translateY(0%) !important; }
+              .tech-btn:hover .btn-sweep { left: 120% !important; opacity: 1 !important; }
+              .tech-btn:hover .btn-aurora1 { animation-play-state: running !important; }
+              .tech-btn:hover .btn-aurora2 { animation-play-state: running !important; }
+              .tech-btn:hover .btn-border-glow { opacity: 1 !important; }
+              .tech-btn:hover .btn-corner { opacity: 1 !important; border-color: var(--scarlet-primary) !important; }
+              .tech-btn:hover .btn-label { color: #ffffff !important; text-shadow: 0 0 12px var(--scarlet-glow); }
+              .tech-btn:hover .btn-arrow { transform: translate(3px, -3px); }
+              .tech-btn:hover { border-color: rgba(255,45,85,0.6) !important; box-shadow: 0 0 25px rgba(255,45,85,0.2), inset 0 0 25px rgba(255,45,85,0.04) !important; }
+            `}</style>
+
+            <div className="hero-cta opacity-0 flex flex-col sm:flex-row gap-4 sm:gap-6 mt-8">
+              {/* Button 1: VIEW OUR WORK */}
+              <a
+                href="#work"
+                className="tech-btn relative inline-flex items-center justify-center px-10 py-4 overflow-hidden cursor-pointer"
+                style={{
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  backgroundColor: 'rgba(13,13,13,0.6)',
+                  backdropFilter: 'blur(12px)',
+                  transition: 'border-color 0.5s ease, box-shadow 0.5s ease',
+                  minWidth: '220px',
+                }}
+              >
+                {/* Liquid Aurora Fill — rises from bottom on hover */}
+                <div
+                  className="btn-liquid absolute inset-0 pointer-events-none overflow-hidden"
+                  style={{ transform: 'translateY(100%)', transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)' }}
+                >
+                  {/* Deep liquid base */}
+                  <div className="absolute inset-0" style={{ backgroundColor: 'rgba(255,45,85,0.12)' }} />
+
+                  {/* Aurora Blob 1 — Purple */}
+                  <div
+                    className="btn-aurora1 absolute -top-1/2 -left-1/4 w-[200%] h-[200%] rounded-full mix-blend-screen"
+                    style={{
+                      background: 'radial-gradient(circle, rgba(217,152,255,0.25) 0%, transparent 70%)',
+                      filter: 'blur(20px)',
+                      opacity: 0.6,
+                      animation: 'btnAuroraBlob1 7s ease-in-out infinite',
+                      animationPlayState: 'paused',
+                    }}
+                  />
+
+                  {/* Aurora Blob 2 — Cyan */}
+                  <div
+                    className="btn-aurora2 absolute -bottom-1/2 -right-1/4 w-[200%] h-[200%] rounded-full mix-blend-screen"
+                    style={{
+                      background: 'radial-gradient(circle, rgba(0,217,255,0.2) 0%, transparent 70%)',
+                      filter: 'blur(20px)',
+                      opacity: 0.5,
+                      animation: 'btnAuroraBlob2 10s ease-in-out infinite',
+                      animationPlayState: 'paused',
+                    }}
+                  />
+
+                  {/* Scarlet glow bloom at center */}
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: 'radial-gradient(ellipse at center, rgba(255,45,85,0.2) 0%, transparent 70%)',
+                    }}
+                  />
+                </div>
+
+                {/* Horizontal Sweep Orb — slides across on hover */}
+                <div
+                  className="btn-sweep absolute top-0 bottom-0 w-[60px] mix-blend-screen pointer-events-none"
+                  style={{
+                    left: '-80%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255,45,85,0.5), transparent)',
+                    filter: 'blur(8px)',
+                    opacity: 0,
+                    transition: 'left 1.1s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.1s',
+                  }}
+                />
+
+                {/* Border Glow overlay */}
+                <div
+                  className="btn-border-glow absolute inset-0 pointer-events-none opacity-0"
+                  style={{
+                    boxShadow: 'inset 0 0 16px rgba(255,45,85,0.15)',
+                    transition: 'opacity 0.5s ease',
+                  }}
+                />
+
+                {/* Scan Line */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                  <div
+                    className="absolute left-0 right-0 h-[1px]"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent, rgba(255,45,85,0.6), transparent)',
+                      animation: 'btnScanLine 2.5s ease-in-out infinite',
+                    }}
+                  />
+                </div>
+
+                {/* Corner Tech Brackets */}
+                {/* Top-left */}
+                <span className="btn-corner absolute top-1 left-1 w-3 h-3 border-t border-l opacity-40 transition-all duration-500" style={{ borderColor: 'rgba(255,255,255,0.4)' }} />
+                {/* Top-right */}
+                <span className="btn-corner absolute top-1 right-1 w-3 h-3 border-t border-r opacity-40 transition-all duration-500" style={{ borderColor: 'rgba(255,255,255,0.4)' }} />
+                {/* Bottom-left */}
+                <span className="btn-corner absolute bottom-1 left-1 w-3 h-3 border-b border-l opacity-40 transition-all duration-500" style={{ borderColor: 'rgba(255,255,255,0.4)' }} />
+                {/* Bottom-right */}
+                <span className="btn-corner absolute bottom-1 right-1 w-3 h-3 border-b border-r opacity-40 transition-all duration-500" style={{ borderColor: 'rgba(255,255,255,0.4)' }} />
+
+                {/* Status dot */}
+                <span
+                  className="relative z-10 mr-3 w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{
+                    backgroundColor: 'var(--scarlet-primary)',
+                    boxShadow: '0 0 6px var(--scarlet-primary)',
+                    animation: 'btnCornerPulse 2s ease-in-out infinite',
+                  }}
+                />
+
+                {/* Label */}
+                <span
+                  className="btn-label relative z-10 text-[11px] font-bold uppercase tracking-[3px] mr-4 transition-all duration-300"
+                  style={{ color: 'rgba(255,255,255,0.85)', fontFamily: '"Inter", sans-serif' }}
+                >
+                  VIEW OUR WORK
+                </span>
+
+                {/* Animated arrow */}
+                <span
+                  className="btn-arrow relative z-10 text-[18px] transition-transform duration-500"
+                  style={{ color: 'var(--scarlet-primary)', lineHeight: 1 }}
+                >
+                  ↗
+                </span>
+              </a>
+
+              {/* Button 2: BOOK SERVICES */}
+              <a
+                href="#services"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.dispatchEvent(new CustomEvent('bookServices'));
+                }}
+                className="tech-btn relative inline-flex items-center justify-center px-10 py-4 overflow-hidden cursor-pointer"
+                style={{
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  backgroundColor: 'rgba(13,13,13,0.6)',
+                  backdropFilter: 'blur(12px)',
+                  transition: 'border-color 0.5s ease, box-shadow 0.5s ease',
+                  minWidth: '220px',
+                }}
+              >
+                {/* Liquid Aurora Fill — rises from bottom on hover */}
+                <div
+                  className="btn-liquid absolute inset-0 pointer-events-none overflow-hidden"
+                  style={{ transform: 'translateY(100%)', transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)' }}
+                >
+                  {/* Deep liquid base */}
+                  <div className="absolute inset-0" style={{ backgroundColor: 'rgba(255,45,85,0.12)' }} />
+
+                  {/* Aurora Blob 1 — Purple */}
+                  <div
+                    className="btn-aurora1 absolute -top-1/2 -left-1/4 w-[200%] h-[200%] rounded-full mix-blend-screen"
+                    style={{
+                      background: 'radial-gradient(circle, rgba(217,152,255,0.25) 0%, transparent 70%)',
+                      filter: 'blur(20px)',
+                      opacity: 0.6,
+                      animation: 'btnAuroraBlob1 7s ease-in-out infinite',
+                      animationPlayState: 'paused',
+                    }}
+                  />
+
+                  {/* Aurora Blob 2 — Cyan */}
+                  <div
+                    className="btn-aurora2 absolute -bottom-1/2 -right-1/4 w-[200%] h-[200%] rounded-full mix-blend-screen"
+                    style={{
+                      background: 'radial-gradient(circle, rgba(0,217,255,0.2) 0%, transparent 70%)',
+                      filter: 'blur(20px)',
+                      opacity: 0.5,
+                      animation: 'btnAuroraBlob2 10s ease-in-out infinite',
+                      animationPlayState: 'paused',
+                    }}
+                  />
+
+                  {/* Scarlet glow bloom at center */}
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: 'radial-gradient(ellipse at center, rgba(255,45,85,0.2) 0%, transparent 70%)',
+                    }}
+                  />
+                </div>
+
+                {/* Horizontal Sweep Orb — slides across on hover */}
+                <div
+                  className="btn-sweep absolute top-0 bottom-0 w-[60px] mix-blend-screen pointer-events-none"
+                  style={{
+                    left: '-80%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255,45,85,0.5), transparent)',
+                    filter: 'blur(8px)',
+                    opacity: 0,
+                    transition: 'left 1.1s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.1s',
+                  }}
+                />
+
+                {/* Border Glow overlay */}
+                <div
+                  className="btn-border-glow absolute inset-0 pointer-events-none opacity-0"
+                  style={{
+                    boxShadow: 'inset 0 0 16px rgba(255,45,85,0.15)',
+                    transition: 'opacity 0.5s ease',
+                  }}
+                />
+
+                {/* Scan Line */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                  <div
+                    className="absolute left-0 right-0 h-[1px]"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent, rgba(255,45,85,0.6), transparent)',
+                      animation: 'btnScanLine 2.5s ease-in-out infinite',
+                    }}
+                  />
+                </div>
+
+                {/* Corner Tech Brackets */}
+                {/* Top-left */}
+                <span className="btn-corner absolute top-1 left-1 w-3 h-3 border-t border-l opacity-40 transition-all duration-500" style={{ borderColor: 'rgba(255,255,255,0.4)' }} />
+                {/* Top-right */}
+                <span className="btn-corner absolute top-1 right-1 w-3 h-3 border-t border-r opacity-40 transition-all duration-500" style={{ borderColor: 'rgba(255,255,255,0.4)' }} />
+                {/* Bottom-left */}
+                <span className="btn-corner absolute bottom-1 left-1 w-3 h-3 border-b border-l opacity-40 transition-all duration-500" style={{ borderColor: 'rgba(255,255,255,0.4)' }} />
+                {/* Bottom-right */}
+                <span className="btn-corner absolute bottom-1 right-1 w-3 h-3 border-b border-r opacity-40 transition-all duration-500" style={{ borderColor: 'rgba(255,255,255,0.4)' }} />
+
+                {/* Status dot */}
+                <span
+                  className="relative z-10 mr-3 w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{
+                    backgroundColor: 'var(--scarlet-primary)',
+                    boxShadow: '0 0 6px var(--scarlet-primary)',
+                    animation: 'btnCornerPulse 2s ease-in-out infinite',
+                  }}
+                />
+
+                {/* Label */}
+                <span
+                  className="btn-label relative z-10 text-[11px] font-bold uppercase tracking-[3px] mr-4 transition-all duration-300"
+                  style={{ color: 'rgba(255,255,255,0.85)', fontFamily: '"Inter", sans-serif' }}
+                >
+                  BOOK SERVICES
+                </span>
+
+                {/* Animated arrow */}
+                <span
+                  className="btn-arrow relative z-10 text-[18px] transition-transform duration-500"
+                  style={{ color: 'var(--scarlet-primary)', lineHeight: 1 }}
+                >
+                  ↗
+                </span>
               </a>
             </div>
           </div>
 
-          {/* BOTTOM ROW */}
-          <div className="w-full max-w-[1800px] mx-auto flex flex-col md:flex-row justify-between items-center pt-8 border-t border-[rgba(255,255,255,0.05)]">
+          {/* RIGHT SIDEBAR: Tech Elements */}
+          <div className="hidden xl:flex absolute right-16 top-1/2 -translate-y-1/2 flex-col items-end gap-32 mt-8">
             
-            {/* Left Side Socials */}
-            <div className="flex items-center space-x-12 mb-4 md:mb-0">
-              {['INSTAGRAM', 'TWITTER', 'LINKEDIN'].map((social) => (
-                <a 
-                  key={social} 
-                  href={`#${social.toLowerCase()}`}
-                  className="text-[#ff2a2a] text-[10px] uppercase tracking-[2px] transition-colors duration-300 hover:text-white"
-                >
-                  {social}
-                </a>
-              ))}
+            {/* Timecode Block */}
+            <div className="flex flex-col items-end gap-2 border border-dashed p-3 rounded-sm opacity-60" style={{ borderColor: 'var(--border-subtle)', backgroundColor: 'rgba(13, 13, 13, 0.3)' }}>
+              <div style={{ fontFamily: '"Courier New", monospace', fontSize: '13px', color: 'var(--text-secondary)', letterSpacing: '2px' }}>
+                00:01:30:00
+              </div>
+              <div style={{ fontFamily: '"Courier New", monospace', fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '2px' }}>
+                FRAME 0248
+              </div>
             </div>
 
-            {/* Right Side Copyright */}
-            <div className="text-[rgba(255,255,255,0.5)] text-[10px] uppercase tracking-[1px]">
-              &copy; 2026 LEMA.WEB. ALL RIGHTS RESERVED.
+            {/* Compare/Reveal Graphic */}
+            <div 
+              onClick={() => setIsCompareOpen(true)}
+              className="relative flex items-center justify-center w-28 h-28 rounded-full border border-dashed cursor-pointer group" 
+              style={{ borderColor: 'var(--border-default)' }} 
+              onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--scarlet-primary)'} 
+              onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-default)'}
+            >
+              {/* Outer glow */}
+              <div className="absolute inset-0 rounded-full transition-all duration-500 group-hover:scale-125" style={{ backgroundColor: 'var(--scarlet-dark)', opacity: 0.1, filter: 'blur(15px)' }}></div>
+              {/* Inner circle */}
+              <div className="w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
+                {/* Compare split slider icon */}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--scarlet-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300 group-hover:scale-110">
+                  <line x1="12" y1="2" x2="12" y2="22" strokeDasharray="3 3" />
+                  <circle cx="12" cy="12" r="3" fill="var(--scarlet-primary)" />
+                  <path d="M18 8l4 4-4 4" />
+                  <path d="M6 16l-4-4 4-4" />
+                </svg>
+              </div>
+              {/* Corner brackets */}
+              <div className="absolute -top-2 -left-2 w-3 h-3 border-t-2 border-l-2 opacity-50" style={{ borderColor: 'var(--text-muted)' }}></div>
+              <div className="absolute -top-2 -right-2 w-3 h-3 border-t-2 border-r-2 opacity-50" style={{ borderColor: 'var(--text-muted)' }}></div>
+              <div className="absolute -bottom-2 -left-2 w-3 h-3 border-b-2 border-l-2 opacity-50" style={{ borderColor: 'var(--text-muted)' }}></div>
+              <div className="absolute -bottom-2 -right-2 w-3 h-3 border-b-2 border-r-2 opacity-50" style={{ borderColor: 'var(--text-muted)' }}></div>
+              
+              <div className="absolute -bottom-8 text-[9px] uppercase tracking-[4px]" style={{ color: 'var(--text-muted)' }}>COMPARE</div>
             </div>
 
           </div>
+
+          {/* BOTTOM CENTER: Cyberpunk Scroll Indicator */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center group cursor-pointer" onClick={() => window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })}>
+            
+            <style>{`
+              @keyframes cyberScrollTrack {
+                0% { transform: translateY(-100%); opacity: 0; }
+                20% { opacity: 1; }
+                80% { opacity: 1; }
+                100% { transform: translateY(300%); opacity: 0; }
+              }
+              @keyframes cyberChevron {
+                0%, 100% { opacity: 0.1; transform: translateY(0); }
+                50% { opacity: 1; transform: translateY(2px); }
+              }
+            `}</style>
+
+            {/* Glowing Vertical Track */}
+            <div className="w-[2px] h-10 relative overflow-hidden mb-2" style={{ backgroundColor: 'var(--border-subtle)' }}>
+              <div 
+                className="absolute top-0 left-0 w-full h-1/3" 
+                style={{ 
+                  backgroundColor: 'var(--scarlet-primary)', 
+                  boxShadow: '0 0 10px var(--scarlet-primary)',
+                  animation: 'cyberScrollTrack 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite'
+                }}
+              ></div>
+            </div>
+
+            {/* Animated Chevrons */}
+            <div className="flex flex-col items-center -space-y-1 mb-2">
+              <div className="w-2.5 h-2.5 border-r-[2px] border-b-[2px] rotate-45" style={{ borderColor: 'var(--scarlet-primary)', animation: 'cyberChevron 1.5s ease-in-out infinite' }}></div>
+              <div className="w-2.5 h-2.5 border-r-[2px] border-b-[2px] rotate-45" style={{ borderColor: 'var(--scarlet-primary)', animation: 'cyberChevron 1.5s ease-in-out 0.15s infinite' }}></div>
+              <div className="w-2.5 h-2.5 border-r-[2px] border-b-[2px] rotate-45" style={{ borderColor: 'var(--scarlet-primary)', animation: 'cyberChevron 1.5s ease-in-out 0.3s infinite' }}></div>
+            </div>
+
+            <span className="text-[9px] uppercase tracking-[3px] font-bold transition-colors duration-300 group-hover:text-white" style={{ color: 'var(--scarlet-primary)' }}>
+              SCROLL LINK
+            </span>
+          </div>
+
         </div>
 
       </div>
+      <BeforeAfterSlider isOpen={isCompareOpen} onClose={() => setIsCompareOpen(false)} />
     </section>
   );
 };

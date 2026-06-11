@@ -1,0 +1,434 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const projects = [
+  { 
+    id: 'doc', 
+    title: 'DOCUMENTARY & FACT STYLE', 
+    tag: 'DEEP DIVE', 
+    gridClasses: 'col-span-1 md:col-span-2 row-span-1 md:row-span-2',
+    color: '#FF2D55', // Using hex for ThreeJS
+    model: 'doc'
+  },
+  { 
+    id: 'reels', 
+    title: 'PODCAST REELS', 
+    tag: 'SHORT FORM', 
+    gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-2',
+    color: '#00D9FF',
+    model: 'reels'
+  },
+  { 
+    id: 'comm', 
+    title: 'COMMERCIAL & BRAND', 
+    tag: 'ADVERTISING', 
+    gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
+    color: '#FFFFFF',
+    model: 'comm'
+  },
+  { 
+    id: 'beat', 
+    title: 'BEAT SYNC & TRAVEL', 
+    tag: 'DYNAMIC', 
+    gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
+    color: '#FF5470',
+    model: 'beat'
+  },
+  { 
+    id: 'long', 
+    title: 'LONG FORMAT PODCAST', 
+    tag: 'RETENTION', 
+    gridClasses: 'col-span-1 md:col-span-2 row-span-1 md:row-span-1',
+    color: '#00D9FF',
+    model: 'long'
+  },
+  { 
+    id: 'ai', 
+    title: 'AI & STOCK MEDIA', 
+    tag: 'GENERATIVE', 
+    gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
+    color: '#00D9FF',
+    model: 'ai'
+  },
+  { 
+    id: 'wed', 
+    title: 'WEDDING & EVENT', 
+    tag: 'CINEMATIC', 
+    gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
+    color: '#FF2D55',
+    model: 'wed'
+  }
+];
+
+const shootedVideos = [
+  { id: 'shoot-1', title: 'ICELAND VOLCANIC ERUPTION', tag: 'TRAVEL // CINEMATIC', color: '#FF2D55' },
+  { id: 'shoot-2', title: 'ROADSIDE STORIES: TOKYO', tag: 'STREET // COLD STYLE', color: '#00D9FF' },
+  { id: 'shoot-3', title: 'CHASING LIGHT: AMSTERDAM', tag: 'TRAVEL // ARCHIVE', color: '#FFFFFF' },
+  { id: 'shoot-4', title: 'CYBERPUNK NEON RIDE', tag: 'CREATIVE // SHOTOVER', color: '#FF5470' },
+  { id: 'shoot-5', title: 'AESTHETIC FITNESS PROMO', tag: 'SPORTS // SPEC AD', color: '#00D9FF' },
+  { id: 'shoot-6', title: 'MOUNTAIN SUMMIT RETREAT', tag: 'CINEMATIC // DRONE', color: '#FF2D55' }
+];
+
+const graphicDesigns = [
+  { id: 'design-1', title: 'CINEMATIC KEY ART POSTER', tag: 'POSTER // KEY ART', color: '#FFCC00' },
+  { id: 'design-2', title: 'YOUTUBE THUMBNAIL SUITE', tag: 'THUMBNAIL // RETENTION', color: '#00D9FF' },
+  { id: 'design-3', title: 'GAMING STREAM OVERLAY PACK', tag: 'UI // STREAMING', color: '#FF2D55' },
+  { id: 'design-4', title: 'BRAND VISUAL IDENTITY SYSTEM', tag: 'BRANDING // IDENTITY', color: '#00FF9D' },
+  { id: 'design-5', title: 'MATTE PAINTING & CONCEPT ART', tag: 'CONCEPT // VFX', color: '#D998FF' },
+  { id: 'design-6', title: 'SOCIAL MEDIA MARKETING KIT', tag: 'PROMOTION // AD', color: '#FF5470' }
+];
+
+const Work = () => {
+  const navigate = useNavigate();
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const [activeTab, setActiveTab] = useState('edited'); // 'edited' | 'shooted' | 'graphics'
+  const [hoveredTab, setHoveredTab] = useState(null); // 'edited' | 'shooted' | 'graphics' | null
+  const [displayedTab, setDisplayedTab] = useState('edited');
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const handleTabChange = (newTab) => {
+    if (newTab === activeTab || isTransitioning) return;
+    setIsTransitioning(true);
+
+    // Highlight switcher immediately
+    setActiveTab(newTab);
+
+    // Snell exit fadeout (150ms)
+    setTimeout(() => {
+      setDisplayedTab(newTab);
+      setIsTransitioning(false);
+    }, 150);
+  };
+
+  // Helper to render the appropriate 3D model
+  const render3DModel = (type, color, isHovered) => {
+    switch(type) {
+      case 'doc': return <DocModel color={color} hovered={isHovered} />;
+      case 'reels': return <ReelsModel color={color} hovered={isHovered} />;
+      case 'comm': return <CommModel color={color} hovered={isHovered} />;
+      case 'beat': return <BeatModel color={color} hovered={isHovered} />;
+      case 'long': return <LongModel color={color} hovered={isHovered} />;
+      case 'ai': return <AiModel color={color} hovered={isHovered} />;
+      case 'wed': return <WedModel color={color} hovered={isHovered} />;
+      default: return null;
+    }
+  };
+
+  return (
+    <section 
+      id="work" 
+      className="relative w-full py-24 md:py-32 overflow-hidden"
+      style={{ backgroundColor: 'var(--bg-deep)' }}
+    >
+      <style>{`
+        @keyframes cardExit {
+          0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+          100% { opacity: 0; transform: translateY(-12px) scale(0.97); filter: blur(2px); }
+        }
+        @keyframes cardEntry {
+          0% { opacity: 0; transform: translateY(20px) scale(0.96); filter: blur(3px); }
+          100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        .card-exit {
+          animation: cardExit 0.15s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+        .card-entry {
+          animation: cardEntry 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+      `}</style>
+      <div className="container mx-auto px-8 md:px-16">
+        
+        {/* Dynamic Title Block based on Tab */}
+        <div className="mb-12 flex flex-col items-center text-center">
+          <div className="flex items-center gap-3 mb-4" style={{ color: 'var(--cyan-primary)' }}>
+            <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
+            <span className="text-[11px] uppercase tracking-[3px] font-bold">SELECT WORKS</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
+          </div>
+          <h2 className="text-white text-4xl md:text-5xl font-black uppercase tracking-tight leading-[1.1] mb-6" style={{ fontFamily: '"Inter", sans-serif' }}>
+            {activeTab === 'edited' ? (
+              <>CHOOSE YOUR EDITING <span style={{ color: 'var(--scarlet-primary)' }}>JOURNEY</span></>
+            ) : activeTab === 'shooted' ? (
+              <>FULL <span style={{ color: 'var(--scarlet-primary)' }}>PRODUCTION</span></>
+            ) : (
+              <>CREATIVE GRAPHIC <span style={{ color: 'var(--scarlet-primary)' }}>DESIGNS</span></>
+            )}
+          </h2>
+          <p className="text-[16px] leading-[1.5] max-w-lg" style={{ color: 'var(--text-secondary)', fontFamily: '"Inter", "Outfit", sans-serif' }}>
+            {activeTab === 'edited' ? (
+              "We edit across a wide range of formats. Click on a category below to explore our work and find the style that fits your project."
+            ) : activeTab === 'shooted' ? (
+              "Explore a collection of visual stories and cinematic works shot entirely by us."
+            ) : (
+              "High-impact visuals, key art, thumbnails, and brand assets designed to command attention."
+            )}
+          </p>
+        </div>
+
+        {/* HUD Tab Switcher Bar with 3D Perspective */}
+        <div className="flex justify-center mb-16">
+          <div 
+            className="inline-flex flex-wrap md:flex-nowrap p-1 rounded-2xl md:rounded-full border backdrop-blur-md transition-all duration-500 ease-out gap-2 md:gap-3 justify-center" 
+            style={{ 
+              backgroundColor: 'rgba(13,13,13,0.6)', 
+              borderColor: 'var(--border-subtle)',
+              perspective: '1000px',
+              transformStyle: 'preserve-3d'
+            }}
+          >
+            <button 
+              onClick={() => handleTabChange('edited')}
+              onMouseEnter={() => setHoveredTab('edited')}
+              onMouseLeave={() => setHoveredTab(null)}
+              className="relative px-5 md:px-8 py-2.5 md:py-3 rounded-full text-[10px] md:text-[11px] font-bold uppercase tracking-widest transition-all duration-500 ease-out"
+              style={{ 
+                color: activeTab === 'edited' ? 'var(--text-primary)' : 'var(--text-muted)',
+                backgroundColor: activeTab === 'edited' ? 'var(--bg-elevated)' : 'transparent',
+                borderColor: activeTab === 'edited' 
+                  ? 'var(--scarlet-primary)' 
+                  : (hoveredTab === 'edited' ? 'rgba(255,255,255,0.15)' : 'transparent'),
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                transform: hoveredTab === 'edited'
+                  ? 'translateY(-5px) translateZ(15px) scale(1.05)'
+                  : (activeTab === 'edited' ? 'translateY(0) translateZ(5px) scale(1)' : 'translateY(0) translateZ(0) scale(1)'),
+                boxShadow: activeTab === 'edited'
+                  ? (hoveredTab === 'edited' 
+                      ? '0 12px 30px rgba(255, 45, 85, 0.4), inset 0 0 10px rgba(255, 45, 85, 0.2)' 
+                      : '0 6px 20px rgba(255, 45, 85, 0.2), inset 0 0 8px rgba(255, 45, 85, 0.1)')
+                  : (hoveredTab === 'edited' ? '0 8px 20px rgba(255,255,255,0.08)' : 'none'),
+                textShadow: activeTab === 'edited' ? '0 0 8px var(--scarlet-glow)' : 'none',
+                zIndex: activeTab === 'edited' ? 10 : 1
+              }}
+            >
+              Edited Videos
+            </button>
+            <button 
+              onClick={() => handleTabChange('shooted')}
+              onMouseEnter={() => setHoveredTab('shooted')}
+              onMouseLeave={() => setHoveredTab(null)}
+              className="relative px-5 md:px-8 py-2.5 md:py-3 rounded-full text-[10px] md:text-[11px] font-bold uppercase tracking-widest transition-all duration-500 ease-out"
+              style={{ 
+                color: activeTab === 'shooted' ? 'var(--text-primary)' : 'var(--text-muted)',
+                backgroundColor: activeTab === 'shooted' ? 'var(--bg-elevated)' : 'transparent',
+                borderColor: activeTab === 'shooted' 
+                  ? 'var(--scarlet-primary)' 
+                  : (hoveredTab === 'shooted' ? 'rgba(255,255,255,0.15)' : 'transparent'),
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                transform: hoveredTab === 'shooted'
+                  ? 'translateY(-5px) translateZ(15px) scale(1.05)'
+                  : (activeTab === 'shooted' ? 'translateY(0) translateZ(5px) scale(1)' : 'translateY(0) translateZ(0) scale(1)'),
+                boxShadow: activeTab === 'shooted'
+                  ? (hoveredTab === 'shooted' 
+                      ? '0 12px 30px rgba(255, 45, 85, 0.4), inset 0 0 10px rgba(255, 45, 85, 0.2)' 
+                      : '0 6px 20px rgba(255, 45, 85, 0.2), inset 0 0 8px rgba(255, 45, 85, 0.1)')
+                  : (hoveredTab === 'shooted' ? '0 8px 20px rgba(255,255,255,0.08)' : 'none'),
+                textShadow: activeTab === 'shooted' ? '0 0 8px var(--scarlet-glow)' : 'none',
+                zIndex: activeTab === 'shooted' ? 10 : 1
+              }}
+            >
+              Full Production
+            </button>
+            <button 
+              onClick={() => handleTabChange('graphics')}
+              onMouseEnter={() => setHoveredTab('graphics')}
+              onMouseLeave={() => setHoveredTab(null)}
+              className="relative px-5 md:px-8 py-2.5 md:py-3 rounded-full text-[10px] md:text-[11px] font-bold uppercase tracking-widest transition-all duration-500 ease-out"
+              style={{ 
+                color: activeTab === 'graphics' ? 'var(--text-primary)' : 'var(--text-muted)',
+                backgroundColor: activeTab === 'graphics' ? 'var(--bg-elevated)' : 'transparent',
+                borderColor: activeTab === 'graphics' 
+                  ? 'var(--scarlet-primary)' 
+                  : (hoveredTab === 'graphics' ? 'rgba(255,255,255,0.15)' : 'transparent'),
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                transform: hoveredTab === 'graphics'
+                  ? 'translateY(-5px) translateZ(15px) scale(1.05)'
+                  : (activeTab === 'graphics' ? 'translateY(0) translateZ(5px) scale(1)' : 'translateY(0) translateZ(0) scale(1)'),
+                boxShadow: activeTab === 'graphics'
+                  ? (hoveredTab === 'graphics' 
+                      ? '0 12px 30px rgba(255, 45, 85, 0.4), inset 0 0 10px rgba(255, 45, 85, 0.2)' 
+                      : '0 6px 20px rgba(255, 45, 85, 0.2), inset 0 0 8px rgba(255, 45, 85, 0.1)')
+                  : (hoveredTab === 'graphics' ? '0 8px 20px rgba(255,255,255,0.08)' : 'none'),
+                textShadow: activeTab === 'graphics' ? '0 0 8px var(--scarlet-glow)' : 'none',
+                zIndex: activeTab === 'graphics' ? 10 : 1
+              }}
+            >
+              Graphic Designing
+            </button>
+          </div>
+        </div>
+
+        {/* Content Render based on selected Tab with transition effects */}
+        <div className="relative w-full">
+
+          {displayedTab === 'edited' ? (
+            /* GRID FOR EDITED VIDEOS (matching the own shooted videos styling) */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+              {projects.map((project, i) => (
+                <div 
+                  key={project.id}
+                  className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${
+                    isTransitioning ? 'card-exit' : 'card-entry'
+                  }`}
+                  style={{ 
+                    borderColor: 'var(--border-subtle)', 
+                    backgroundColor: 'var(--bg-surface)',
+                    animationDelay: isTransitioning ? '0s' : `${i * 0.08}s`
+                  }}
+                  onClick={() => navigate(`/work/${project.id}`)}
+                  onMouseEnter={(e) => { 
+                    e.currentTarget.style.borderColor = project.color; 
+                    e.currentTarget.style.boxShadow = `0 15px 40px ${project.color}22`; 
+                  }}
+                  onMouseLeave={(e) => { 
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)'; 
+                    e.currentTarget.style.boxShadow = `0 0 0 rgba(0,0,0,0)`; 
+                  }}
+                >
+                  {/* Grainy Noise Background */}
+                  <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-10"></div>
+                  
+                  {/* Dynamic neon blur spotlight background */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-[#0D0D0D] via-[#191919] to-[#0D0D0D] z-0 flex items-center justify-center opacity-85">
+                    <div className="absolute w-24 h-24 rounded-full blur-2xl opacity-10" style={{ backgroundColor: project.color }}></div>
+                  </div>
+
+                  {/* Central Play Icon */}
+                  <div className="absolute inset-0 flex items-center justify-center z-25">
+                    <div 
+                      className="w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border transition-transform duration-300 group-hover:scale-110" 
+                      style={{ backgroundColor: 'rgba(13,13,13,0.4)', borderColor: project.color }}
+                    >
+                      <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[11px] border-l-white border-b-[6px] border-b-transparent ml-1"></div>
+                    </div>
+                  </div>
+
+                  {/* Video Info Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-[rgba(0,0,0,0.3)] to-transparent opacity-90 z-10 flex flex-col justify-end p-6 pointer-events-none">
+                    <span className="inline-block self-start px-2 py-0.5 text-[8px] uppercase tracking-[2px] font-bold rounded-sm border backdrop-blur-sm mb-2" style={{ color: project.color, borderColor: project.color, backgroundColor: 'rgba(13, 13, 13, 0.5)' }}>
+                      {project.tag}
+                    </span>
+                    <span className="text-white text-md font-bold uppercase tracking-widest">{project.title}</span>
+                    <span className="text-[9px] uppercase tracking-[2px] mt-1" style={{ color: 'var(--text-muted)' }}>ENTER ARCHIVE ↗</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : displayedTab === 'shooted' ? (
+            /* VIDEO GRID GALLERY FOR OWN SHOOTED VIDEOS */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+              {shootedVideos.map((video, i) => (
+                <div 
+                  key={video.id}
+                  className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${
+                    isTransitioning ? 'card-exit' : 'card-entry'
+                  }`}
+                  style={{ 
+                    borderColor: 'var(--border-subtle)', 
+                    backgroundColor: 'var(--bg-surface)',
+                    animationDelay: isTransitioning ? '0s' : `${i * 0.08}s`
+                  }}
+                  onMouseEnter={(e) => { 
+                    e.currentTarget.style.borderColor = video.color; 
+                    e.currentTarget.style.boxShadow = `0 15px 40px ${video.color}22`; 
+                  }}
+                  onMouseLeave={(e) => { 
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)'; 
+                    e.currentTarget.style.boxShadow = `0 0 0 rgba(0,0,0,0)`; 
+                  }}
+                >
+                  {/* Grainy Noise Background */}
+                  <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-10"></div>
+                  
+                  {/* Dynamic neon blur spotlight background */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-[#0D0D0D] via-[#191919] to-[#0D0D0D] z-0 flex items-center justify-center opacity-85">
+                    <div className="absolute w-24 h-24 rounded-full blur-2xl opacity-10" style={{ backgroundColor: video.color }}></div>
+                  </div>
+
+                  {/* Central Play Icon */}
+                  <div className="absolute inset-0 flex items-center justify-center z-25">
+                    <div 
+                      className="w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border transition-transform duration-300 group-hover:scale-110" 
+                      style={{ backgroundColor: 'rgba(13,13,13,0.4)', borderColor: video.color }}
+                    >
+                      <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[11px] border-l-white border-b-[6px] border-b-transparent ml-1"></div>
+                    </div>
+                  </div>
+
+                  {/* Video Info Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-[rgba(0,0,0,0.3)] to-transparent opacity-90 z-10 flex flex-col justify-end p-6 pointer-events-none">
+                    <span className="inline-block self-start px-2 py-0.5 text-[8px] uppercase tracking-[2px] font-bold rounded-sm border backdrop-blur-sm mb-2" style={{ color: video.color, borderColor: video.color, backgroundColor: 'rgba(13, 13, 13, 0.5)' }}>
+                      {video.tag}
+                    </span>
+                    <span className="text-white text-md font-bold uppercase tracking-widest">{video.title}</span>
+                    <span className="text-[9px] uppercase tracking-[2px] mt-1" style={{ color: 'var(--text-muted)' }}>4K // RAW FOOTAGE</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            /* GRAPHIC DESIGN GRID GALLERY */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+              {graphicDesigns.map((design, i) => (
+                <div 
+                  key={design.id}
+                  className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${
+                    isTransitioning ? 'card-exit' : 'card-entry'
+                  }`}
+                  style={{ 
+                    borderColor: 'var(--border-subtle)', 
+                    backgroundColor: 'var(--bg-surface)',
+                    animationDelay: isTransitioning ? '0s' : `${i * 0.08}s`
+                  }}
+                  onMouseEnter={(e) => { 
+                    e.currentTarget.style.borderColor = design.color; 
+                    e.currentTarget.style.boxShadow = `0 15px 40px ${design.color}22`; 
+                  }}
+                  onMouseLeave={(e) => { 
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)'; 
+                    e.currentTarget.style.boxShadow = `0 0 0 rgba(0,0,0,0)`; 
+                  }}
+                >
+                  {/* Grainy Noise Background */}
+                  <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-10"></div>
+                  
+                  {/* Dynamic neon blur spotlight background */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-[#0D0D0D] via-[#191919] to-[#0D0D0D] z-0 flex items-center justify-center opacity-85">
+                    <div className="absolute w-24 h-24 rounded-full blur-2xl opacity-10" style={{ backgroundColor: design.color }}></div>
+                  </div>
+
+                  {/* Central Eye/View Icon */}
+                  <div className="absolute inset-0 flex items-center justify-center z-25">
+                    <div 
+                      className="w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border transition-transform duration-300 group-hover:scale-110" 
+                      style={{ backgroundColor: 'rgba(13,13,13,0.4)', borderColor: design.color }}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Info Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-[rgba(0,0,0,0.3)] to-transparent opacity-90 z-10 flex flex-col justify-end p-6 pointer-events-none">
+                    <span className="inline-block self-start px-2 py-0.5 text-[8px] uppercase tracking-[2px] font-bold rounded-sm border backdrop-blur-sm mb-2" style={{ color: design.color, borderColor: design.color, backgroundColor: 'rgba(13, 13, 13, 0.5)' }}>
+                      {design.tag}
+                    </span>
+                    <span className="text-white text-md font-bold uppercase tracking-widest">{design.title}</span>
+                    <span className="text-[9px] uppercase tracking-[2px] mt-1" style={{ color: 'var(--text-muted)' }}>VIEW DESIGN ↗</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+      </div>
+    </section>
+  );
+};
+
+export default Work;
