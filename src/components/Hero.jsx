@@ -277,14 +277,16 @@ const Hero = () => {
 
       mouseRef.current.isActive = true;
       
-      // 1. Fade the mask trail over time
+      const { x, y } = mouseRef.current;
+      const isMouseActive = x >= 0 && y >= 0;
+
+      // 1. Fade the mask back to black (hide the image) — fast fade when mouse is away
       maskCtx.globalCompositeOperation = 'source-over';
-      maskCtx.fillStyle = 'rgba(0, 0, 0, 0.05)'; // Trail fade speed
+      maskCtx.fillStyle = isMouseActive ? 'rgba(0, 0, 0, 0.08)' : 'rgba(0, 0, 0, 0.15)';
       maskCtx.fillRect(0, 0, w, h);
       
-      // 2. Draw brush stroke to reveal image
-      const { x, y } = mouseRef.current;
-      if (x >= 0 && y >= 0) {
+      // 2. Draw brush stroke to reveal image only where mouse is hovering
+      if (isMouseActive) {
         maskCtx.globalCompositeOperation = 'destination-out';
         const radius = 250; // Soft brush size
         const gradient = maskCtx.createRadialGradient(x, y, 0, x, y, radius);
@@ -309,7 +311,7 @@ const Hero = () => {
       ctx.globalCompositeOperation = 'source-over';
       ctx.drawImage(img, 0, imgY, img.width * scale, img.height * scale);
       
-      // Apply the mask
+      // Apply the mask (hides everything except where mouse revealed)
       ctx.globalCompositeOperation = 'destination-out';
       ctx.drawImage(maskCanvas, 0, 0);
     };
