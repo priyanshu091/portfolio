@@ -330,18 +330,21 @@ const DomainPage = () => {
             className="relative rounded-2xl overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-2xl scale-entry"
             style={{ 
               boxShadow: `0 25px 60px -15px ${data.color}25`,
-              maxWidth: videoAspect < 1 ? '400px' : '1280px',
-              maxHeight: '85vh',
+              maxWidth: videoAspect < 1 
+                ? `min(400px, 90vw, calc(75vh * ${videoAspect}))` 
+                : `min(1280px, 90vw, calc(75vh * ${videoAspect}))`,
+              maxHeight: '75vh',
               width: '100%',
+              aspectRatio: `${videoAspect}`,
             }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Video or IFrame element */}
-            <div className="relative w-full" style={{ aspectRatio: `${videoAspect}`, maxHeight: '75vh' }}>
+            <div className="w-full h-full bg-black">
               {getEmbedUrl(selectedVideo.videoUrl) ? (
                 <iframe 
                   src={getEmbedUrl(selectedVideo.videoUrl)} 
-                  className="absolute inset-0 w-full h-full border-0"
+                  className="w-full h-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   title={selectedVideo.title}
@@ -350,7 +353,7 @@ const DomainPage = () => {
                 <video 
                   key={selectedVideo.id}
                   src={selectedVideo.videoUrl} 
-                  className="absolute inset-0 w-full h-full object-contain bg-black"
+                  className="w-full h-full object-contain bg-black"
                   controls 
                   autoPlay
                   muted
