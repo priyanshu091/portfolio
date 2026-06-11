@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import ParticleLogo from './ParticleLogo';
@@ -11,13 +12,51 @@ const Navbar = () => {
   const [hoveredLink, setHoveredLink] = useState(null);
   const [activeLink, setActiveLink] = useState(null);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
   const navLinks = ['WORK', 'ABOUT', 'SERVICES', 'CONTACT'];
 
+  // Handle nav link click - navigate to homepage + scroll to section
+  const handleNavClick = (e, link) => {
+    e.preventDefault();
+    const sectionId = link.toLowerCase();
+    
+    if (isHomePage) {
+      // Already on homepage, just scroll to section
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      // Navigate to homepage first, then scroll after render
+      navigate('/');
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  };
+
+  // Handle logo click - go to homepage top
+  const handleLogoClick = () => {
+    if (isHomePage) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      navigate('/');
+    }
+  };
+
   // ── Active section tracking via scroll position ──
-  // getBoundingClientRect approach is the most reliable method:
-  // walks every section on each scroll event and picks the last one
-  // whose top edge has crossed 40% down the viewport.
   useEffect(() => {
+    if (!isHomePage) {
+      setActiveLink(null);
+      return;
+    }
+
     const sectionIds = ['work', 'about', 'services', 'contact'];
 
     const determineActive = () => {
@@ -29,13 +68,8 @@ const Navbar = () => {
         return;
       }
 
-      // Threshold: 40% down from the top of the viewport feels natural.
-      // We use a fixed pixel offset (navbarHeight + a bit) for consistency.
       const THRESHOLD = 130;
 
-      // Iterate sections in order; the LAST one whose top is above THRESHOLD wins.
-      // This means whichever section is currently occupying the top of the screen
-      // stays active for as long as you're inside it.
       let found = null;
       for (const id of sectionIds) {
         const el = document.getElementById(id);
@@ -49,12 +83,11 @@ const Navbar = () => {
       setActiveLink(found);
     };
 
-    // Run immediately in case the page loaded with a hash anchor
     determineActive();
 
     window.addEventListener('scroll', determineActive, { passive: true });
     return () => window.removeEventListener('scroll', determineActive);
-  }, []);
+  }, [isHomePage]);
 
   // ── Entrance animation ──
   useGSAP(() => {
@@ -92,7 +125,7 @@ const Navbar = () => {
       `}</style>
 
       {/* LEFT: Kinetic Particle Logo */}
-      <div ref={logoRef} className="pointer-events-auto">
+      <div ref={logoRef} className="pointer-events-auto cursor-pointer" onClick={handleLogoClick}>
         <ParticleLogo />
       </div>
 
@@ -141,6 +174,7 @@ const Navbar = () => {
                 key={link}
                 ref={el => linksRef.current[index] = el}
                 href={`#${link.toLowerCase()}`}
+                onClick={(e) => handleNavClick(e, link)}
                 onMouseEnter={() => setHoveredLink(link)}
                 onMouseLeave={() => setHoveredLink(null)}
                 className="relative px-5 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-widest border backdrop-blur-md"
@@ -211,3 +245,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
