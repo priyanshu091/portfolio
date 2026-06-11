@@ -223,11 +223,11 @@ const DomainPage = () => {
       {/* GORGEOUS VIDEO LIGHTBOX/MODAL */}
       {selectedVideo && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 backdrop-blur-xl bg-black/95 transition-all duration-300"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 backdrop-blur-xl bg-black/95"
           onClick={() => setSelectedVideo(null)}
         >
           <div 
-            className="relative w-full max-w-5xl aspect-video rounded-2xl overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-2xl flex flex-col scale-entry"
+            className="relative w-full max-w-5xl rounded-2xl overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-2xl scale-entry"
             style={{ boxShadow: `0 25px 60px -15px ${data.color}25` }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -240,42 +240,53 @@ const DomainPage = () => {
               .scale-entry {
                 animation: scaleEntry 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
               }
+              @keyframes spin {
+                to { transform: rotate(360deg); }
+              }
+              .spinner {
+                animation: spin 1s linear infinite;
+              }
             `}</style>
 
             {/* Video or IFrame element */}
-            {getEmbedUrl(selectedVideo.videoUrl) ? (
-              <iframe 
-                src={getEmbedUrl(selectedVideo.videoUrl)} 
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                title={selectedVideo.title}
-              />
-            ) : (
-              <video 
-                src={selectedVideo.videoUrl} 
-                className="w-full h-full object-contain"
-                controls 
-                autoPlay 
-                playsInline
-              />
-            )}
-            
-            {/* Bottom Info bar */}
-            <div className="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent text-white z-10">
-              <span className="inline-block px-2 py-0.5 text-[8px] uppercase tracking-[2px] font-bold rounded-sm border mb-2" style={{ color: data.color, borderColor: data.color, backgroundColor: 'rgba(13, 13, 13, 0.5)' }}>
-                {selectedVideo.tag}
-              </span>
-              <h3 className="text-lg md:text-xl font-bold uppercase tracking-wider leading-tight">{selectedVideo.title}</h3>
+            <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+              {getEmbedUrl(selectedVideo.videoUrl) ? (
+                <iframe 
+                  src={getEmbedUrl(selectedVideo.videoUrl)} 
+                  className="absolute inset-0 w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title={selectedVideo.title}
+                />
+              ) : (
+                <video 
+                  key={selectedVideo.id}
+                  src={selectedVideo.videoUrl} 
+                  className="absolute inset-0 w-full h-full object-contain bg-black"
+                  controls 
+                  autoPlay
+                  muted
+                  playsInline
+                  preload="metadata"
+                />
+              )}
             </div>
 
             {/* Close button */}
             <button 
-              className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full flex items-center justify-center bg-black/70 border border-white/15 hover:border-white/30 text-white transition-all duration-300 hover:scale-110 active:scale-95"
+              className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center bg-black/70 border border-white/15 hover:border-white/30 text-white transition-all duration-300 hover:scale-110 active:scale-95"
               onClick={() => setSelectedVideo(null)}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
+
+            {/* Top Info bar (not bottom, so it doesn't cover video controls) */}
+            <div className="absolute top-0 inset-x-0 p-4 bg-gradient-to-b from-black/80 via-black/40 to-transparent text-white z-20 pointer-events-none">
+              <span className="inline-block px-2 py-0.5 text-[8px] uppercase tracking-[2px] font-bold rounded-sm border mb-1" style={{ color: data.color, borderColor: data.color, backgroundColor: 'rgba(13, 13, 13, 0.5)' }}>
+                {selectedVideo.tag}
+              </span>
+              <h3 className="text-sm md:text-base font-bold uppercase tracking-wider leading-tight">{selectedVideo.title}</h3>
+            </div>
           </div>
         </div>
       )}
