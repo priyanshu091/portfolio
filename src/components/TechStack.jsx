@@ -10,45 +10,45 @@ const tools = [
     name: 'AFTER EFFECTS',
     category: 'VFX & COMPOSITING',
     desc: 'Advanced motion tracking, rotoscoping, and 2.5D animation.',
-    orbitRadius: 180,
+    orbitRadius: 140,
     speed: 25,
     startAngle: 0,
     color: '#D998FF',
-    icon: <span className="font-bold text-3xl tracking-tighter" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Ae</span>
+    icon: <span className="font-bold text-2xl tracking-tighter" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Ae</span>
   },
   {
     id: 'premiere',
     name: 'PREMIERE PRO',
     category: 'VIDEO EDITING',
     desc: 'Primary NLE for assembly, pacing, and multi-cam storytelling.',
-    orbitRadius: 260,
+    orbitRadius: 200,
     speed: 35,
     startAngle: 72,
     color: '#0055FF',
-    icon: <span className="font-bold text-3xl tracking-tighter" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Pr</span>
+    icon: <span className="font-bold text-2xl tracking-tighter" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Pr</span>
   },
   {
     id: 'photoshop',
     name: 'PHOTOSHOP',
     category: 'ASSET DESIGN',
     desc: 'Custom thumbnail creation, rotobrush masking, and plates.',
-    orbitRadius: 310,
+    orbitRadius: 240,
     speed: 45,
     startAngle: 144,
     color: '#00D9FF',
-    icon: <span className="font-bold text-3xl tracking-tighter" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Ps</span>
+    icon: <span className="font-bold text-2xl tracking-tighter" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Ps</span>
   },
   {
     id: 'capcut',
     name: 'CAPCUT',
     category: 'SHORT FORM',
     desc: 'Rapid workflow for reels, auto-captions, and trending effects.',
-    orbitRadius: 380,
+    orbitRadius: 290,
     speed: 55,
     startAngle: 216,
     color: '#FFFFFF',
     icon: (
-      <svg viewBox="0 0 512 512" fill="currentColor" className="w-8 h-8">
+      <svg viewBox="0 0 512 512" fill="currentColor" className="w-7 h-7">
         <path d="M109.095 181.505c2.223-19.532 18.316-34.578 37.955-35.483l167.194-.001a40.612 40.612 0 0 1 30.095 17.427 42.152 42.152 0 0 1 6.39 14.915l49.135-24.364a2.185 2.185 0 0 1 3.141 1.674v27.628l.001.096a4.571 4.571 0 0 1-2.837 4.229 177620.936 177620.936 0 0 0-135.63 67.336l135.324 66.948a4.695 4.695 0 0 1 3.142 4.08v27.685a2.266 2.266 0 0 1-3.613 1.821c-16.12-8.162-32.464-15.854-48.462-24.18a63.503 63.503 0 0 1-4.282 11.225 40.813 40.813 0 0 1-26.098 20.135 44.994 44.994 0 0 1-11.221.919l-155.833.003c-3.51 0-7.04 0-10.53-.266-18.089-2.705-32.049-17.363-33.869-35.565v-26.77a5.935 5.935 0 0 1 4.08-4.879c27.791-13.732 55.521-27.587 83.353-41.258a32412.61 32412.61 0 0 0-84.17-41.748 5.41 5.41 0 0 1-3.223-4.918c-.042-8.876-.185-17.792-.042-26.689zm30.975.184c-1.674 3.367-.898 7.263-1.041 10.896 30.608 15.12 60.99 30.321 91.536 45.339 30.185-14.963 60.384-29.927 90.596-44.89 0-2.714.123-5.428 0-8.162a10.203 10.203 0 0 0-10.096-8.734h-.106l-161.565.001a10.082 10.082 0 0 0-9.345 5.55h.021zm-1.041 135.406c.142 3.673-.654 7.631 1.122 11.039a10.204 10.204 0 0 0 9.284 5.405l161.667.002.081-.001c3.618 0 6.961-1.94 8.754-5.081 2.04-3.57 1.102-7.855 1.305-11.773-30.26-14.936-60.48-30.118-90.801-44.89a43915.126 43915.126 0 0 0-91.432 45.299h.02z" />
       </svg>
     )
@@ -58,12 +58,12 @@ const tools = [
     name: 'FILMORA',
     category: 'QUICK EDITS',
     desc: 'Efficient drag-and-drop workflow for fast turnaround projects.',
-    orbitRadius: 260,
+    orbitRadius: 200,
     speed: 35,
     startAngle: 288,
     color: '#00FF9D',
     icon: (
-      <svg viewBox="0 0 122.88 122.88" className="w-8 h-8">
+      <svg viewBox="0 0 122.88 122.88" className="w-7 h-7">
         <path fill="#ffffff" d="M46,55.24,29.32,38.55,49.94,17.91,70.55,38.54,46.92,62.21l-.11-.12A5.58,5.58,0,0,0,46,55.24Z"/>
         <polygon fill="#00FF9D" points="93.58 61.27 49.92 104.97 29.3 84.34 72.96 40.63 93.58 61.27 93.58 61.27"/>
       </svg>
@@ -125,7 +125,7 @@ const TechStack = () => {
     <section 
       id="tech" 
       ref={containerRef}
-      className="relative w-full min-h-screen overflow-hidden flex items-center justify-center pt-24"
+      className="relative w-full min-h-fit overflow-hidden flex items-center justify-center py-12 md:py-16"
       style={{ backgroundColor: 'var(--bg-deep)' }}
     >
       {/* Background Subtle Grid */}
@@ -139,9 +139,9 @@ const TechStack = () => {
       <div className="container mx-auto px-8 md:px-16 relative z-10 flex flex-col lg:flex-row items-center justify-between h-full">
         
         {/* LEFT: Text & HUD Panel */}
-        <div className="w-full lg:w-1/3 z-20 pointer-events-none mb-16 lg:mb-0">
+        <div className="w-full lg:w-1/3 z-20 pointer-events-none mb-8 lg:mb-0">
           
-          <div className="mb-12">
+          <div className="mb-6">
             <div className="flex items-center gap-3 mb-4" style={{ color: 'var(--cyan-primary)' }}>
               <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
               <span className="text-[11px] uppercase tracking-[3px] font-bold">WORKFLOW</span>
@@ -149,7 +149,7 @@ const TechStack = () => {
             </div>
             <h2 
               ref={headingRef}
-              className="text-white text-4xl md:text-5xl font-black uppercase tracking-tight leading-[1.1] mb-6" 
+              className="text-white text-3xl md:text-4xl font-black uppercase tracking-tight leading-[1.1] mb-4" 
               style={{ fontFamily: 'var(--font-heading)' }}
             />
             <p 
@@ -160,7 +160,7 @@ const TechStack = () => {
           </div>
 
           {/* Dynamic HUD Panel based on hover */}
-          <div className={`relative p-6 border transition-all duration-500 overflow-hidden ${hoveredTool ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+          <div className={`relative p-4 border transition-all duration-500 overflow-hidden ${hoveredTool ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
                style={{ 
                  borderColor: hoveredTool ? hoveredTool.color : 'var(--border-subtle)',
                  backgroundColor: 'rgba(31, 31, 31, 0.6)',
@@ -187,7 +187,7 @@ const TechStack = () => {
         </div>
 
         {/* RIGHT: Holographic Orbit System */}
-        <div className="w-full lg:w-2/3 flex items-center justify-center relative h-[600px] lg:h-[800px]">
+        <div className="w-full lg:w-2/3 flex items-center justify-center relative h-[450px] lg:h-[600px]">
           
           {/* Inject Keyframes for orbit */}
           <style>{`
@@ -347,7 +347,7 @@ const TechStack = () => {
                     }}
                   >
                     <div
-                      className="relative w-20 h-20 rounded-[1.25rem] flex items-center justify-center pointer-events-auto cursor-pointer"
+                      className="relative w-16 h-16 rounded-[1.05rem] flex items-center justify-center pointer-events-auto cursor-pointer"
                       style={{
                         backgroundColor: isHovered ? 'rgba(10, 10, 15, 0.55)' : 'rgba(20, 20, 20, 0.25)',
                         backdropFilter: isHovered ? 'blur(20px)' : 'blur(14px)',
@@ -361,7 +361,7 @@ const TechStack = () => {
                       }}
                     >
                       {/* Aurora Glow Underlay */}
-                      <div className="absolute inset-[1px] overflow-hidden rounded-[1.15rem] pointer-events-none z-0">
+                      <div className="absolute inset-[1px] overflow-hidden rounded-[0.95rem] pointer-events-none z-0">
                         <div
                           className="absolute inset-0 transition-opacity duration-700 ease-in-out"
                           style={{

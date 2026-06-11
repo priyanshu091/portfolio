@@ -112,7 +112,7 @@ const Contact = () => {
   return (
     <section
       id="contact"
-      className="relative w-full min-h-screen overflow-hidden flex items-center justify-center py-32"
+      className="relative w-full min-h-fit overflow-hidden flex items-center justify-center py-12 md:py-16"
       style={{ backgroundColor: 'var(--bg-deep)' }}
     >
       {/* ── Keyframes ── */}
@@ -206,14 +206,14 @@ const Contact = () => {
       <div className="container mx-auto px-8 md:px-16 relative z-10">
 
         {/* ── Section Header ── */}
-        <div className="mb-16 md:mb-20">
+        <div className="mb-8 md:mb-10">
           <div className="flex items-center gap-3 mb-4" style={{ color: 'var(--cyan-primary)' }}>
             <div className="w-1.5 h-1.5 rounded-full bg-current" style={{ animation: 'contactPulse 2s ease-in-out infinite' }} />
             <span className="text-[11px] uppercase tracking-[3px] font-bold">INITIATE CONTACT</span>
             <div className="flex-1 h-[1px]" style={{ background: 'linear-gradient(90deg, var(--cyan-primary), transparent)' }} />
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <h2 className="text-white text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05]" style={{ fontFamily: 'var(--font-heading)' }}>
+            <h2 className="text-white text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[1.05]" style={{ fontFamily: 'var(--font-heading)' }}>
               LET'S CREATE<br />
               <span style={{ color: 'var(--scarlet-primary)' }}>SOMETHING</span><br />
               REMARKABLE.
@@ -231,10 +231,10 @@ const Contact = () => {
         </div>
 
         {/* ── Main Grid ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-5">
 
           {/* LEFT — Info Panel */}
-          <div className="lg:col-span-2 flex flex-col gap-4">
+          <div className="lg:col-span-2 flex flex-col gap-3">
 
             {/* HUD top bar */}
             <div className="flex items-center gap-3 mb-2">
@@ -250,7 +250,7 @@ const Contact = () => {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="contact-info-card group flex items-center gap-4 p-4 transition-all duration-400 cursor-pointer"
+                className="contact-info-card group flex items-center gap-4 p-3 transition-all duration-400 cursor-pointer"
                 style={{
                   border: '1px solid rgba(255,255,255,0.06)',
                   backgroundColor: 'rgba(13,13,13,0.4)',
@@ -258,7 +258,7 @@ const Contact = () => {
                   transition: 'border-color 0.35s ease, background 0.35s ease',
                 }}
               >
-                <div className="info-icon w-10 h-10 flex items-center justify-center flex-shrink-0 transition-colors duration-300" style={{ color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.08)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                <div className="info-icon w-8 h-8 flex items-center justify-center flex-shrink-0 transition-colors duration-300" style={{ color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.08)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
                   {item.icon}
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -288,7 +288,7 @@ const Contact = () => {
           {/* RIGHT — Contact Form */}
           <div className="lg:col-span-3 relative">
             {/* Form HUD top label */}
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-2">
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1))' }} />
               <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>SYS::TRANSMIT_FORM</span>
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
@@ -297,7 +297,7 @@ const Contact = () => {
             {/* Glassmorphic form card */}
             <div
               ref={formCardRef}
-              className={`relative p-8 overflow-hidden ${isHighlighted ? 'form-highlight' : ''}`}
+              className={`relative p-5 md:p-6 overflow-hidden ${isHighlighted ? 'form-highlight' : ''}`}
               style={{
                 border: '1px solid rgba(255,255,255,0.07)',
                 backgroundColor: 'rgba(13,13,13,0.5)',
@@ -337,7 +337,7 @@ const Contact = () => {
                 </div>
               ) : (
                 /* ── Form ── */
-                <form onSubmit={handleSubmit} className="flex flex-col gap-5 relative z-10">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-3 relative z-10">
                   {/* Row 1: Name + Email */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-2">
@@ -351,7 +351,7 @@ const Contact = () => {
                         onChange={handleChange}
                         onFocus={() => setHoveredField('name')}
                         onBlur={() => setHoveredField(null)}
-                        className="contact-field w-full px-4 py-3"
+                        className="contact-field w-full px-4 py-2"
                         style={{ ...fieldStyle('name'), '::placeholder': { color: 'var(--text-muted)' } }}
                       />
                     </div>
@@ -366,7 +366,7 @@ const Contact = () => {
                         onChange={handleChange}
                         onFocus={() => setHoveredField('email')}
                         onBlur={() => setHoveredField(null)}
-                        className="contact-field w-full px-4 py-3"
+                        className="contact-field w-full px-4 py-2"
                         style={fieldStyle('email')}
                       />
                     </div>
@@ -382,7 +382,7 @@ const Contact = () => {
                       onChange={handleChange}
                       onFocus={() => setHoveredField('project')}
                       onBlur={() => setHoveredField(null)}
-                      className="contact-field w-full px-4 py-3"
+                      className="contact-field w-full px-4 py-2"
                       style={{ ...fieldStyle('project'), cursor: 'pointer' }}
                     >
                       <option value="" style={{ backgroundColor: '#0D0D0D' }}>— Select project type —</option>
@@ -393,6 +393,7 @@ const Contact = () => {
                       <option value="long-form" style={{ backgroundColor: '#0D0D0D' }}>Long Format Podcast</option>
                       <option value="wedding" style={{ backgroundColor: '#0D0D0D' }}>Wedding & Event</option>
                       <option value="graphics" style={{ backgroundColor: '#0D0D0D' }}>Graphic Designing</option>
+                      <option value="motion" style={{ backgroundColor: '#0D0D0D' }}>Motion Graphics</option>
                       <option value="other" style={{ backgroundColor: '#0D0D0D' }}>Other</option>
                     </select>
                   </div>
@@ -403,13 +404,13 @@ const Contact = () => {
                     <textarea
                       name="message"
                       required
-                      rows={5}
+                      rows={4}
                       placeholder="Describe your project, timeline, and goals..."
                       value={formData.message}
                       onChange={handleChange}
                       onFocus={() => setHoveredField('message')}
                       onBlur={() => setHoveredField(null)}
-                      className="contact-field w-full px-4 py-3 resize-none"
+                      className="contact-field w-full px-4 py-2 resize-none"
                       style={fieldStyle('message')}
                     />
                   </div>
@@ -418,7 +419,7 @@ const Contact = () => {
                   <button
                     type="submit"
                     disabled={sending}
-                    className="contact-submit relative inline-flex items-center justify-center px-10 py-4 overflow-hidden w-full mt-2 cursor-pointer"
+                    className="contact-submit relative inline-flex items-center justify-center px-10 py-3 overflow-hidden w-full mt-1 cursor-pointer"
                     style={{
                       border: '1px solid rgba(255,255,255,0.12)',
                       backgroundColor: 'rgba(13,13,13,0.7)',
@@ -469,7 +470,7 @@ const Contact = () => {
         </div>
 
         {/* ── Footer Bar ── */}
-        <div className="mt-16 pt-8 flex flex-col md:flex-row items-center justify-between gap-4"
+        <div className="mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4"
           style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           <div className="flex items-center gap-3">
             <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--scarlet-primary)', boxShadow: '0 0 6px var(--scarlet-primary)' }} />
@@ -527,7 +528,7 @@ const Contact = () => {
         </div>
 
         {/* ── Created By Credit Bar ── */}
-        <div className="mt-8 flex flex-wrap justify-center items-center gap-2 text-[9px] uppercase tracking-[2px] text-center" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+        <div className="mt-4 flex flex-wrap justify-center items-center gap-2 text-[9px] uppercase tracking-[2px] text-center" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
           <span>CREATED BY</span>
           <a 
             href="https://www.linkedin.com/in/priyanshu-vishwakarma-407695242/" 

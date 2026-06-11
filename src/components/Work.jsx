@@ -57,6 +57,14 @@ const projects = [
     gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
     color: '#FF2D55',
     model: 'wed'
+  },
+  { 
+    id: 'motion', 
+    title: 'MOTION GRAPHICS', 
+    tag: 'ANIMATION', 
+    gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
+    color: '#D998FF',
+    model: 'motion'
   }
 ];
 
@@ -117,7 +125,7 @@ const Work = () => {
   return (
     <section 
       id="work" 
-      className="relative w-full py-24 md:py-32 overflow-hidden"
+      className="relative w-full py-12 md:py-16 overflow-hidden"
       style={{ backgroundColor: 'var(--bg-deep)' }}
     >
       <style>{`
@@ -139,13 +147,13 @@ const Work = () => {
       <div className="container mx-auto px-8 md:px-16">
         
         {/* Dynamic Title Block based on Tab */}
-        <div className="mb-12 flex flex-col items-center text-center">
+        <div className="mb-8 flex flex-col items-center text-center">
           <div className="flex items-center gap-3 mb-4" style={{ color: 'var(--cyan-primary)' }}>
             <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
             <span className="text-[11px] uppercase tracking-[3px] font-bold">SELECT WORKS</span>
             <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
           </div>
-          <h2 className="text-white text-4xl md:text-5xl font-black uppercase tracking-tight leading-[1.1] mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
+          <h2 className="text-white text-3xl md:text-4xl font-black uppercase tracking-tight leading-[1.1] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
             {activeTab === 'edited' ? (
               <>CHOOSE YOUR EDITING <span style={{ color: 'var(--scarlet-primary)' }}>JOURNEY</span></>
             ) : activeTab === 'shooted' ? (
@@ -166,7 +174,7 @@ const Work = () => {
         </div>
 
         {/* HUD Tab Switcher Bar with 3D Perspective */}
-        <div className="flex justify-center mb-16">
+        <div className="flex justify-center mb-8">
           <div 
             className="inline-flex flex-wrap md:flex-nowrap p-1 rounded-2xl md:rounded-full border backdrop-blur-md transition-all duration-500 ease-out gap-2 md:gap-3 justify-center" 
             style={{ 
@@ -180,7 +188,7 @@ const Work = () => {
               onClick={() => handleTabChange('edited')}
               onMouseEnter={() => setHoveredTab('edited')}
               onMouseLeave={() => setHoveredTab(null)}
-              className="relative px-5 md:px-8 py-2.5 md:py-3 rounded-full text-[10px] md:text-[11px] font-bold uppercase tracking-widest transition-all duration-500 ease-out"
+              className="relative px-4 md:px-6 py-2 md:py-2.5 rounded-full text-[10px] md:text-[11px] font-bold uppercase tracking-widest transition-all duration-500 ease-out"
               style={{ 
                 color: activeTab === 'edited' ? 'var(--text-primary)' : 'var(--text-muted)',
                 backgroundColor: activeTab === 'edited' ? 'var(--bg-elevated)' : 'transparent',
@@ -207,7 +215,7 @@ const Work = () => {
               onClick={() => handleTabChange('shooted')}
               onMouseEnter={() => setHoveredTab('shooted')}
               onMouseLeave={() => setHoveredTab(null)}
-              className="relative px-5 md:px-8 py-2.5 md:py-3 rounded-full text-[10px] md:text-[11px] font-bold uppercase tracking-widest transition-all duration-500 ease-out"
+              className="relative px-4 md:px-6 py-2 md:py-2.5 rounded-full text-[10px] md:text-[11px] font-bold uppercase tracking-widest transition-all duration-500 ease-out"
               style={{ 
                 color: activeTab === 'shooted' ? 'var(--text-primary)' : 'var(--text-muted)',
                 backgroundColor: activeTab === 'shooted' ? 'var(--bg-elevated)' : 'transparent',
@@ -234,7 +242,7 @@ const Work = () => {
               onClick={() => handleTabChange('graphics')}
               onMouseEnter={() => setHoveredTab('graphics')}
               onMouseLeave={() => setHoveredTab(null)}
-              className="relative px-5 md:px-8 py-2.5 md:py-3 rounded-full text-[10px] md:text-[11px] font-bold uppercase tracking-widest transition-all duration-500 ease-out"
+              className="relative px-4 md:px-6 py-2 md:py-2.5 rounded-full text-[10px] md:text-[11px] font-bold uppercase tracking-widest transition-all duration-500 ease-out"
               style={{ 
                 color: activeTab === 'graphics' ? 'var(--text-primary)' : 'var(--text-muted)',
                 backgroundColor: activeTab === 'graphics' ? 'var(--bg-elevated)' : 'transparent',
@@ -265,7 +273,7 @@ const Work = () => {
 
           {displayedTab === 'edited' ? (
             /* GRID FOR EDITED VIDEOS (matching the own shooted videos styling) */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
               {projects.map((project, i) => (
                 <div 
                   key={project.id}
@@ -318,7 +326,7 @@ const Work = () => {
             </div>
           ) : displayedTab === 'shooted' ? (
             /* VIDEO GRID GALLERY FOR OWN SHOOTED VIDEOS */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
               {shootedVideos.map((video, i) => (
                 <div 
                   key={video.id}
@@ -370,7 +378,7 @@ const Work = () => {
             </div>
           ) : (
             /* GRAPHIC DESIGN GRID GALLERY */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
               {graphicDesigns.map((design, i) => (
                 <div 
                   key={design.id}

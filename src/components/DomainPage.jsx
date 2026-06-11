@@ -66,6 +66,15 @@ const domainData = {
       { id: 'wed-1', title: 'ANISH & KRITIKA - TEASER', tag: 'WEDDING TEASER', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' },
       { id: 'wed-2', title: 'THE ROYAL WEDDING HIGHLIGHTS', tag: 'CINEMATIC FILM', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-curvy-road-on-a-grassy-hill-42223-large.mp4' }
     ]
+  },
+  motion: { 
+    title: 'MOTION GRAPHICS', 
+    tag: 'ANIMATION', 
+    color: '#D998FF',
+    projects: [
+      { id: 'motion-1', title: 'CYBER TECH LOGO REVEAL', tag: 'LOGO ANIMATION', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4' },
+      { id: 'motion-2', title: 'KINETIC TYPOGRAPHY PROMO', tag: 'KINETIC TEXT', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' }
+    ]
   }
 };
 

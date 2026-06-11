@@ -9,6 +9,7 @@ const SECTIONS = [
   { id: 'long', label: 'Long Format Podcast', color: '#00D4FF' },
   { id: 'ai',   label: 'AI & Stock Media', color: '#00D4FF' },
   { id: 'wed',  label: 'Wedding & Event', color: '#FF3B30' },
+  { id: 'motion', label: 'Motion Graphics', color: '#D998FF' },
 ];
 
 const API_BASE = '/api';

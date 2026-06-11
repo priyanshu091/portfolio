@@ -125,7 +125,7 @@ const About = () => {
     <section
       id="about"
       ref={sectionRef}
-      className="relative w-full min-h-screen overflow-hidden flex items-center py-32"
+      className="relative w-full min-h-fit overflow-hidden flex items-center py-12 md:py-16"
       style={{ backgroundColor: 'var(--bg-deep)' }}
     >
       <style>{`
@@ -284,39 +284,39 @@ const About = () => {
       <div className="container mx-auto px-8 md:px-16 relative z-10 w-full">
 
         {/* ── Section label ── */}
-        <div className="flex items-center gap-3 mb-16">
+        <div className="flex items-center gap-3 mb-8">
           <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--cyan-primary)', animation: 'aboutPulse 2s ease-in-out infinite' }} />
           <span className="text-[11px] uppercase tracking-[3px] font-bold" style={{ color: 'var(--cyan-primary)' }}>ABOUT THE EDITOR</span>
           <div className="flex-1 h-[1px]" style={{ background: 'linear-gradient(90deg, var(--cyan-primary), transparent)' }} />
         </div>
 
         {/* ── Main two-column layout ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 xl:gap-24 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-12 items-start">
 
           {/* LEFT — Headline + Bio + Traits */}
           <div>
             {/* Headline with glitch */}
             <h2
               ref={headingRef}
-              className="text-white text-5xl md:text-6xl xl:text-7xl font-black uppercase tracking-tight leading-[1.05] mb-8"
+              className="text-white text-4xl md:text-5xl xl:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4"
               style={{ fontFamily: 'var(--font-heading)' }}
             />
 
             {/* HUD subtitle line */}
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-4">
               <div className="h-[1px] w-8" style={{ backgroundColor: 'var(--scarlet-primary)' }} />
               <span ref={subRef} className="text-[10px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--scarlet-primary)', fontFamily: 'var(--font-mono)' }} />
             </div>
 
-            <p ref={p1Ref} className="text-[16px] leading-[1.8] mb-4" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }} />
-            <p ref={p2Ref} className="text-[15px] leading-[1.8] mb-10" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }} />
+            <p ref={p1Ref} className="text-[16px] leading-[1.8] mb-2" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }} />
+            <p ref={p2Ref} className="text-[15px] leading-[1.8] mb-6" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }} />
 
             {/* Trait cards grid */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               {traits.map((t) => (
                 <div
                   key={t.label}
-                  className="about-trait-card p-4 cursor-default"
+                  className="about-trait-card p-3 cursor-default"
                   style={{
                     border: '1px solid rgba(255,255,255,0.06)',
                     backgroundColor: 'rgba(13,13,13,0.4)',
@@ -333,11 +333,11 @@ const About = () => {
           </div>
 
           {/* RIGHT — Stats + Timeline */}
-          <div className="flex flex-col gap-10">
+          <div className="flex flex-col gap-6">
 
             {/* Animated stat counters */}
             <div
-              className="about-stats-card relative p-8 overflow-hidden"
+              className="about-stats-card relative p-6 overflow-hidden"
               style={{ border: '1px solid rgba(255,255,255,0.07)', backgroundColor: 'rgba(13,13,13,0.5)', backdropFilter: 'blur(20px)' }}
             >
               {/* Corner brackets */}
@@ -346,9 +346,9 @@ const About = () => {
               <span className="absolute bottom-2 left-2 w-4 h-4 border-b border-l pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.4)' }} />
               <span className="absolute bottom-2 right-2 w-4 h-4 border-b border-r pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.4)' }} />
 
-              <div className="text-[9px] uppercase tracking-[2px] mb-6 font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>// CAREER_METRICS</div>
+              <div className="text-[9px] uppercase tracking-[2px] mb-4 font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>// CAREER_METRICS</div>
 
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="flex flex-col gap-1">
                   <div className="text-4xl font-black" style={{ color: 'var(--scarlet-primary)', fontFamily: 'var(--font-heading)' }}>
                     {projects}<span className="text-2xl">+</span>
@@ -381,7 +381,7 @@ const About = () => {
 
             {/* Timeline */}
             <div>
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-4">
                 <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1))' }} />
                 <span className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>SYS::CAREER_LOG</span>
                 <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
@@ -396,7 +396,7 @@ const About = () => {
                   return (
                     <div
                       key={m.year}
-                      className="about-timeline-card relative flex items-start gap-5 p-3 pl-3 cursor-pointer"
+                      className="about-timeline-card relative flex items-start gap-5 p-2 pl-3 cursor-pointer"
                       onClick={() => setActiveYear(isActive ? null : i)}
                     >
                       {/* Dot */}

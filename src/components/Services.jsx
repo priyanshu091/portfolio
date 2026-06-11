@@ -106,6 +106,23 @@ const services = [
       </svg>
     ),
   },
+  {
+    id: 'motion',
+    code: '08',
+    title: 'MOTION GRAPHICS',
+    tag: 'ANIMATION',
+    color: '#D998FF',
+    desc: 'Kinetic typography, custom transitions, logo reveals, and advanced 2D/3D motion assets engineered to elevate your visual identity.',
+    deliverables: ['Kinetic Typography', 'Logo Animation', 'Custom Intros', 'Overlay Templates'],
+    turnaround: '48–72 HRS',
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2" />
+        <polyline points="2 17 12 22 22 17" />
+        <polyline points="2 12 12 17 22 12" />
+      </svg>
+    ),
+  },
 ];
 
 const Services = () => {
@@ -156,9 +173,9 @@ const Services = () => {
       
       // After scroll settles, reveal all cards in perfect ascending order with the glow sequence
       setTimeout(() => {
-        setVisibleCards([0, 1, 2, 3, 4, 5, 6]);
+        setVisibleCards([0, 1, 2, 3, 4, 5, 6, 7]);
         setIsGlowing(true);
-        setTimeout(() => setIsGlowing(false), 3000); // 3.0s fits (6 * 0.3s + 0.9s = 2.7s) with buffer
+        setTimeout(() => setIsGlowing(false), 3300); // 3.3s fits (7 * 0.3s + 0.9s = 3.0s) with buffer
       }, 600);
     };
 
@@ -172,7 +189,7 @@ const Services = () => {
     <section
       id="services"
       ref={sectionRef}
-      className="relative w-full min-h-screen overflow-hidden py-32"
+      className="relative w-full min-h-fit overflow-hidden py-12 md:py-16"
       style={{ backgroundColor: 'var(--bg-deep)' }}
     >
       <style>{`
@@ -291,7 +308,7 @@ const Services = () => {
       <div className="container mx-auto px-8 md:px-16 relative z-10">
 
         {/* ── Section Header ── */}
-        <div className="mb-16 md:mb-20">
+        <div className="mb-8 md:mb-10">
           <div className="flex items-center gap-3 mb-4" style={{ color: 'var(--scarlet-primary)' }}>
             <div className="w-1.5 h-1.5 rounded-full bg-current" style={{ animation: 'svcPulse 2s ease-in-out infinite' }} />
             <span className="text-[11px] uppercase tracking-[3px] font-bold">SERVICES OFFERED</span>
@@ -300,14 +317,14 @@ const Services = () => {
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <h2 className="text-white text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05]" style={{ fontFamily: 'var(--font-heading)' }}>
+              <h2 className="text-white text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[1.05]" style={{ fontFamily: 'var(--font-heading)' }}>
                 WHAT WE<br />
                 <span style={{ color: 'var(--scarlet-primary)' }}>DELIVER</span>
               </h2>
             </div>
 
             {/* Live status HUD */}
-            <div className="flex flex-col items-start md:items-end gap-2 mb-1">
+            <div className="flex flex-col items-start md:items-end gap-2 mb-0">
               <div
                 className="px-4 py-2 flex items-center gap-2"
                 style={{ border: '1px solid rgba(0,217,255,0.2)', backgroundColor: 'rgba(0,217,255,0.04)', backdropFilter: 'blur(8px)' }}
@@ -321,7 +338,7 @@ const Services = () => {
         </div>
 
         {/* ── Service Cards Grid ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {services.map((svc, i) => {
             const isHov = hoveredCard === svc.id;
             const isVis = visibleCards.includes(i);
@@ -330,7 +347,7 @@ const Services = () => {
                 key={svc.id}
                 ref={cardRefCallback}
                 data-idx={i}
-                className={`svc-card relative p-6 cursor-pointer overflow-hidden ${isVis ? 'revealed' : ''}`}
+                className={`svc-card relative p-5 cursor-pointer overflow-hidden ${isVis ? 'revealed' : ''}`}
                 style={{
                   '--svc-color': svc.color,
                   '--svc-glow-shadow': `0 0 35px ${svc.color}50, inset 0 0 25px ${svc.color}15`,
@@ -383,7 +400,7 @@ const Services = () => {
                 </div>
 
                 {/* Header row */}
-                <div className="flex items-start justify-between mb-5">
+                <div className="flex items-start justify-between mb-3">
                   <div className="flex flex-col gap-2">
                     {/* Code */}
                     <span className="text-[9px] font-bold uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>SVC_{svc.code}</span>
@@ -405,17 +422,17 @@ const Services = () => {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-white text-[17px] font-black uppercase tracking-wide leading-tight mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
+                <h3 className="text-white text-[17px] font-black uppercase tracking-wide leading-tight mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
                   {svc.title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-[12px] leading-[1.7] mb-5" style={{ color: 'var(--text-secondary)' }}>
+                <p className="text-[12px] leading-[1.7] mb-3" style={{ color: 'var(--text-secondary)' }}>
                   {svc.desc}
                 </p>
 
                 {/* Deliverables */}
-                <div className="flex flex-wrap gap-2 mb-5">
+                <div className="flex flex-wrap gap-2 mb-3">
                   {svc.deliverables.map(d => (
                     <span
                       key={d}
@@ -428,7 +445,7 @@ const Services = () => {
                 </div>
 
                 {/* Footer: turnaround */}
-                <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="flex items-center justify-between pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                   <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>TURNAROUND</span>
                   <span className="text-[10px] font-black uppercase tracking-[1px]" style={{ color: isHov ? svc.color : 'var(--text-secondary)' }}>{svc.turnaround}</span>
                 </div>
@@ -439,7 +456,7 @@ const Services = () => {
 
         {/* ── Bottom CTA Strip ── */}
         <div
-          className="relative mt-16 p-8 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6"
+          className="relative mt-10 p-6 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6"
           style={{ border: '1px solid rgba(255,255,255,0.06)', backgroundColor: 'rgba(13,13,13,0.5)', backdropFilter: 'blur(20px)' }}
         >
           {/* Corner brackets */}
