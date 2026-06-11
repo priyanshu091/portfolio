@@ -141,6 +141,8 @@ const DomainPage = () => {
   const navigate = useNavigate();
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videoAspect, setVideoAspect] = useState(16 / 9);
+  const [isCustomBuffering, setIsCustomBuffering] = useState(false);
+  const [bufferProgress, setBufferProgress] = useState(0);
   const [cmsVideos, setCmsVideos] = useState([]);
   
   const data = domainData[domainId];
@@ -167,6 +169,8 @@ const DomainPage = () => {
   // Reset aspect ratio when a new video is selected
   const handleSelectVideo = (project) => {
     setVideoAspect(16 / 9); // default until metadata loads
+    setIsCustomBuffering(true);
+    setBufferProgress(0);
     setSelectedVideo(project);
   };
 
@@ -375,7 +379,24 @@ const DomainPage = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Video or IFrame element */}
-            <div className="w-full h-full bg-black">
+            <div className="w-full h-full bg-black relative">
+              {/* Custom Buffering Overlay */}
+              {isCustomBuffering && !getEmbedUrl(selectedVideo.videoUrl) && (
+                <div 
+                  className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/75 backdrop-blur-sm"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="w-10 h-10 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: `${data.color} transparent transparent transparent`, borderWidth: '3px' }}></div>
+                    <div className="text-center">
+                      <p className="text-white text-[11px] font-bold uppercase tracking-[3px] mb-1">STABILIZING STREAM</p>
+                      <p className="text-[10px] uppercase tracking-[1.5px]" style={{ color: 'var(--text-secondary)' }}>
+                        BUFFERED {bufferProgress}%
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               {getEmbedUrl(selectedVideo.videoUrl) ? (
                 <iframe 
                   src={getEmbedUrl(selectedVideo.videoUrl)} 
@@ -398,6 +419,80 @@ const DomainPage = () => {
                     const v = e.target;
                     if (v.videoWidth && v.videoHeight) {
                       setVideoAspect(v.videoWidth / v.videoHeight);
+                    }
+                  }}
+                  onProgress={(e) => {
+                    const video = e.target;
+                    if (video.buffered.length > 0) {
+                      const currentTime = video.currentTime;
+                      let bufferedEnd = currentTime;
+                      for (let i = 0; i < video.buffered.length; i++) {
+                        const start = video.buffered.start(i);
+                        const end = video.buffered.end(i);
+                        if (currentTime >= start && currentTime <= end) {
+                          bufferedEnd = end;
+                          break;
+                        }
+                      }
+                      const gap = bufferedEnd - currentTime;
+                      const duration = video.duration;
+                      const targetGap = Math.min(12, duration - currentTime);
+                      
+                      if (gap < 3 && currentTime < duration - 1 && !video.paused && !video.seeking) {
+                        video.pause();
+                        setIsCustomBuffering(true);
+                      } else if (isCustomBuffering && (gap >= targetGap || bufferedEnd >= duration - 0.5)) {
+                        video.play().catch(() => {});
+                        setIsCustomBuffering(false);
+                      }
+                      
+                      if (duration > 0) {
+                        setBufferProgress(Math.round((bufferedEnd / duration) * 100));
+                      }
+                    }
+                  }}
+                  onTimeUpdate={(e) => {
+                    const video = e.target;
+                    if (video.buffered.length > 0) {
+                      const currentTime = video.currentTime;
+                      let bufferedEnd = currentTime;
+                      for (let i = 0; i < video.buffered.length; i++) {
+                        const start = video.buffered.start(i);
+                        const end = video.buffered.end(i);
+                        if (currentTime >= start && currentTime <= end) {
+                          bufferedEnd = end;
+                          break;
+                        }
+                      }
+                      const gap = bufferedEnd - currentTime;
+                      if (gap < 2 && currentTime < video.duration - 1 && !video.paused && !video.seeking) {
+                        video.pause();
+                        setIsCustomBuffering(true);
+                      }
+                    }
+                  }}
+                  onWaiting={() => setIsCustomBuffering(true)}
+                  onPlaying={() => setIsCustomBuffering(false)}
+                  onSeeking={() => setIsCustomBuffering(true)}
+                  onSeeked={(e) => {
+                    const video = e.target;
+                    if (video.buffered.length > 0) {
+                      const currentTime = video.currentTime;
+                      let bufferedEnd = currentTime;
+                      for (let i = 0; i < video.buffered.length; i++) {
+                        const start = video.buffered.start(i);
+                        const end = video.buffered.end(i);
+                        if (currentTime >= start && currentTime <= end) {
+                          bufferedEnd = end;
+                          break;
+                        }
+                      }
+                      const gap = bufferedEnd - currentTime;
+                      if (gap >= Math.min(6, video.duration - currentTime)) {
+                        setIsCustomBuffering(false);
+                      }
+                    } else {
+                      setIsCustomBuffering(true);
                     }
                   }}
                 />
