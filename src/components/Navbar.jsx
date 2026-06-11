@@ -154,10 +154,9 @@ const Navbar = () => {
 
         {/* Glassmorphic Nav Panel */}
         <div
-          className="hidden md:flex items-center p-1 rounded-full border backdrop-blur-md gap-3 mr-12"
+          className="hidden md:flex items-center p-1 rounded-full backdrop-blur-md gap-3 mr-12"
           style={{
             backgroundColor: 'rgba(13, 13, 13, 0.4)',
-            borderColor: 'var(--border-subtle)',
             perspective: '1000px',
             transformStyle: 'preserve-3d',
           }}
