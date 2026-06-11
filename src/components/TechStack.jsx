@@ -78,86 +78,41 @@ const TechStack = () => {
   const descRef = useRef(null);
 
   useEffect(() => {
-    const headingText = "MY EDITING TOOLKIT.";
-    const descText = "The same apps used by top creators and studios — now working for you.";
     const hoverText = "👉 Hover any icon to see exactly what it does for your project.";
 
-    // Immediately set the initial invisible text layout to prevent layout shifts or flashes
+    // Set full text immediately — no letter-by-letter typing
     if (headingRef.current) {
-      headingRef.current.innerHTML = `<span style="opacity: 0">MY EDITING </span><span style="opacity: 0.6">_</span><br/><span style="color: var(--scarlet-primary); opacity: 0">TOOLKIT.</span>`;
+      headingRef.current.innerHTML = `MY EDITING <br/><span style="color: var(--scarlet-primary)">TOOLKIT.</span>`;
     }
     if (descRef.current) {
-      descRef.current.innerHTML = `<span style="opacity: 0">${descText}</span><span class="block mt-4 text-xs opacity-75 tracking-wider uppercase" style="color: var(--cyan-primary); opacity: 0">${hoverText}</span>`;
+      descRef.current.innerHTML = `The same apps used by top creators and studios — now working for you.<span class="block mt-4 text-xs opacity-75 tracking-wider uppercase" style="color: var(--cyan-primary)">${hoverText}</span>`;
     }
 
-    const textObj = { headingLen: 0, descLen: 0, hoverLen: 0 };
-
-    // Scroll-scrubbed timeline to trigger typing sequential letters on scroll
+    // Simple fade-in + slide-up when section enters viewport (no pin, no scrub)
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: 'top top',   // Start typing when section completely fills the viewport
-        end: '+=800',       // Pin the section and scrub typing over 800px scroll
-        pin: true,          // Pin section so it doesn't scroll off during typing
-        scrub: 0.5,         // Smooth scroll scrub
-        anticipatePin: 1
+        start: 'top 80%',  // Trigger when top of section hits 80% of viewport
+        once: true,         // Play only once, don't reverse
       }
     });
 
-    tl.to(textObj, {
-      headingLen: headingText.length,
-      duration: 1.5,
-      ease: 'none',
-      onUpdate: () => {
-        if (headingRef.current) {
-          const wordBreak = "MY EDITING ".length;
-          const currentLen = Math.ceil(textObj.headingLen);
-          
-          if (currentLen <= wordBreak) {
-            const visibleFirst = headingText.slice(0, currentLen);
-            const invisibleFirst = headingText.slice(currentLen, wordBreak);
-            const invisibleSecond = headingText.slice(wordBreak);
-            headingRef.current.innerHTML = `${visibleFirst}<span style="opacity: 0">${invisibleFirst}</span><span style="opacity: 0.6">_</span><br/><span style="color: var(--scarlet-primary); opacity: 0">${invisibleSecond}</span>`;
-          } else {
-            const firstPart = headingText.slice(0, wordBreak);
-            const visibleSecond = headingText.slice(wordBreak, currentLen);
-            const invisibleSecond = headingText.slice(currentLen);
-            headingRef.current.innerHTML = `${firstPart}<br/><span style="color: var(--scarlet-primary)">${visibleSecond}</span><span style="opacity: 0.6">_</span><span style="color: var(--scarlet-primary); opacity: 0">${invisibleSecond}</span>`;
-          }
-        }
-      }
+    // Start hidden
+    gsap.set([headingRef.current, descRef.current], { opacity: 0, y: 40 });
+
+    // Animate in together with slight stagger
+    tl.to(headingRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: 'power3.out',
     })
-    .to(textObj, {
-      descLen: descText.length,
-      duration: 2.0,
-      ease: 'none',
-      onUpdate: () => {
-        if (descRef.current) {
-          const currentLen = Math.ceil(textObj.descLen);
-          const visibleDesc = descText.slice(0, currentLen);
-          const invisibleDesc = descText.slice(currentLen);
-          const cursor = currentLen < descText.length ? '<span style="opacity: 0.6">_</span>' : '';
-          const hoverHtml = `<span class="block mt-4 text-xs opacity-75 tracking-wider uppercase" style="color: var(--cyan-primary); opacity: 0">${hoverText}</span>`;
-          
-          descRef.current.innerHTML = `${visibleDesc}<span style="opacity: 0">${invisibleDesc}</span>${cursor}${hoverHtml}`;
-        }
-      }
-    })
-    .to(textObj, {
-      hoverLen: hoverText.length,
-      duration: 1.5,
-      ease: 'none',
-      onUpdate: () => {
-        if (descRef.current) {
-          const currentLen = Math.ceil(textObj.hoverLen);
-          const visibleHover = hoverText.slice(0, currentLen);
-          const invisibleHover = hoverText.slice(currentLen);
-          const cursor = currentLen < hoverText.length ? '<span style="opacity: 0.6">_</span>' : '';
-          
-          descRef.current.innerHTML = `${descText}<span class="block mt-4 text-xs opacity-75 tracking-wider uppercase" style="color: var(--cyan-primary)">${visibleHover}<span style="opacity: 0">${invisibleHover}</span>${cursor}</span>`;
-        }
-      }
-    });
+    .to(descRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: 'power3.out',
+    }, '-=0.5');  // overlap with heading animation for smoother feel
 
     return () => {
       if (tl.scrollTrigger) tl.scrollTrigger.kill(true);
