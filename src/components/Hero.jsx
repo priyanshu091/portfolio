@@ -332,6 +332,8 @@ const Hero = () => {
 
     return () => {
       gsap.ticker.remove(renderReveal);
+      ScrollTrigger.getAll().forEach(st => st.kill(true));
+      gsap.killTweensOf(canvasRef.current);
       if (stickyViewport) {
         stickyViewport.removeEventListener('mousemove', handleMouseMove);
         stickyViewport.removeEventListener('mouseleave', handleMouseLeave);

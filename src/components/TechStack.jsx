@@ -160,8 +160,9 @@ const TechStack = () => {
     });
 
     return () => {
-      if (tl.scrollTrigger) tl.scrollTrigger.kill();
+      if (tl.scrollTrigger) tl.scrollTrigger.kill(true);
       tl.kill();
+      ScrollTrigger.getAll().forEach(st => st.kill(true));
     };
   }, []);
 
