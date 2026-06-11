@@ -51,152 +51,68 @@ const About = () => {
   const clients = useCounter(60, 1200, triggered);
 
   useEffect(() => {
-    const headingText = "I DON'T JUST MAKE CLIPS I BUILD ENGAGEMENT";
-    const subText = "DIVYANSH VISHWAKARMA // CREATIVE VIDEO EDITOR";
-    const p1Text = "I turn raw footage into polished, professional videos that connect with viewers. My focus is on clean cuts, great rhythm, and a visual style that matches your voice. No matter the platform, I make sure your videos are easy to watch, professional, and engaging.";
-    const p2Text = "Based in India, helping brands and creators stand out worldwide. My standard turnaround time is 48 hours.";
-
-    const getHeadingHTML = (currentLen) => {
-      const p1 = "I DON'T JUST";
-      const p2 = "MAKE CLIPS";
-      const p3 = "I BUILD";
-      const p4 = "ENGAGEMENT";
-      
-      const segments = [
-        { text: p1, style: "" },
-        { text: p2, style: "color: var(--scarlet-primary)" },
-        { text: p3, style: "" },
-        { text: p4, style: "" }
-      ];
-      
-      let currentPos = 0;
-      let htmlSegments = [];
-      let cursorPlaced = false;
-      
-      const totalLen = segments.reduce((sum, s) => sum + s.text.length, 0);
-      const roundedLen = Math.ceil(currentLen);
-      
-      for (let i = 0; i < segments.length; i++) {
-        const seg = segments[i];
-        const start = currentPos;
-        const end = currentPos + seg.text.length;
-        
-        let segHTML = "";
-        if (roundedLen <= start) {
-          segHTML = `<span style="opacity: 0; ${seg.style}">${seg.text}</span>`;
-        } else if (roundedLen >= end) {
-          segHTML = `<span style="${seg.style}">${seg.text}</span>`;
-        } else {
-          const visibleCount = roundedLen - start;
-          const visibleText = seg.text.slice(0, visibleCount);
-          const invisibleText = seg.text.slice(visibleCount);
-          segHTML = `<span style="${seg.style}">${visibleText}</span><span style="opacity: 0.6">_</span><span style="opacity: 0; ${seg.style}">${invisibleText}</span>`;
-          cursorPlaced = true;
-        }
-        htmlSegments.push(segHTML);
-        currentPos = end;
-      }
-      
-      if (!cursorPlaced) {
-        if (roundedLen === 0) {
-          htmlSegments[0] = `<span style="opacity: 0.6">_</span>` + htmlSegments[0];
-        }
-      }
-      
-      return htmlSegments.join("<br/>");
-    };
-
-    // Immediately set initial state to prevent flash of empty/incorrect text
+    // Set full text immediately — no letter-by-letter typing
     if (headingRef.current) {
-      headingRef.current.innerHTML = getHeadingHTML(0);
+      headingRef.current.innerHTML = `I DON'T JUST<br/><span style="color: var(--scarlet-primary)">MAKE CLIPS</span><br/>I BUILD<br/>ENGAGEMENT`;
     }
     if (subRef.current) {
-      subRef.current.innerHTML = `<span style="opacity: 0">${subText}</span>`;
+      subRef.current.textContent = "DIVYANSH VISHWAKARMA // CREATIVE VIDEO EDITOR";
     }
     if (p1Ref.current) {
-      p1Ref.current.innerHTML = `<span style="opacity: 0">${p1Text}</span>`;
+      p1Ref.current.textContent = "I turn raw footage into polished, professional videos that connect with viewers. My focus is on clean cuts, great rhythm, and a visual style that matches your voice. No matter the platform, I make sure your videos are easy to watch, professional, and engaging.";
     }
     if (p2Ref.current) {
-      p2Ref.current.innerHTML = `<span style="opacity: 0">${p2Text}</span>`;
+      p2Ref.current.textContent = "Based in India, helping brands and creators stand out worldwide. My standard turnaround time is 48 hours.";
     }
 
+    // Start hidden
+    gsap.set([headingRef.current, subRef.current, p1Ref.current, p2Ref.current], { opacity: 0, y: 30 });
     gsap.set('.about-trait-card', { opacity: 0, y: 24 });
 
-    const textObj = { headingLen: 0, subLen: 0, p1Len: 0, p2Len: 0 };
-
+    // Simple fade-in + slide-up when section enters viewport (no pin, no scrub)
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top top',
-        end: '+=800',
-        pin: true,
-        scrub: 0.5,
-        anticipatePin: 1,
+        start: 'top 75%',
+        once: true,
         onEnter: () => {
           setTriggered(true);
         }
       }
     });
 
-    tl.to(textObj, {
-      headingLen: 39, // sum of length of segments (12+10+7+10)
-      duration: 1.5,
-      ease: 'none',
-      onUpdate: () => {
-        if (headingRef.current) {
-          headingRef.current.innerHTML = getHeadingHTML(textObj.headingLen);
-        }
-      }
+    // Staggered fade-in for all text elements
+    tl.to(headingRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.7,
+      ease: 'power3.out',
     })
-    .to(textObj, {
-      subLen: subText.length,
-      duration: 1.0,
-      ease: 'none',
-      onUpdate: () => {
-        if (subRef.current) {
-          const currentLen = Math.ceil(textObj.subLen);
-          const visibleSub = subText.slice(0, currentLen);
-          const invisibleSub = subText.slice(currentLen);
-          const cursor = currentLen < subText.length ? '<span style="opacity: 0.6">_</span>' : '';
-          subRef.current.innerHTML = `${visibleSub}<span style="opacity: 0">${invisibleSub}</span>${cursor}`;
-        }
-      }
-    })
-    .to(textObj, {
-      p1Len: p1Text.length,
-      duration: 2.5,
-      ease: 'none',
-      onUpdate: () => {
-        if (p1Ref.current) {
-          const currentLen = Math.ceil(textObj.p1Len);
-          const visibleP1 = p1Text.slice(0, currentLen);
-          const invisibleP1 = p1Text.slice(currentLen);
-          const cursor = currentLen < p1Text.length ? '<span style="opacity: 0.6">_</span>' : '';
-          p1Ref.current.innerHTML = `${visibleP1}<span style="opacity: 0">${invisibleP1}</span>${cursor}`;
-        }
-      }
-    })
-    .to(textObj, {
-      p2Len: p2Text.length,
-      duration: 1.5,
-      ease: 'none',
-      onUpdate: () => {
-        if (p2Ref.current) {
-          const currentLen = Math.ceil(textObj.p2Len);
-          const visibleP2 = p2Text.slice(0, currentLen);
-          const invisibleP2 = p2Text.slice(currentLen);
-          const cursor = currentLen < p2Text.length ? '<span style="opacity: 0.6">_</span>' : '';
-          p2Ref.current.innerHTML = `${visibleP2}<span style="opacity: 0">${invisibleP2}</span>${cursor}`;
-        }
-      }
-    })
+    .to(subRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      ease: 'power3.out',
+    }, '-=0.4')
+    .to(p1Ref.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      ease: 'power3.out',
+    }, '-=0.3')
+    .to(p2Ref.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      ease: 'power3.out',
+    }, '-=0.3')
     .to('.about-trait-card', {
       opacity: 1,
       y: 0,
-      duration: 1.2,
-      stagger: 0.15,
+      duration: 0.5,
+      stagger: 0.1,
       ease: 'power2.out'
-    });
+    }, '-=0.3');
 
     return () => {
       if (tl.scrollTrigger) tl.scrollTrigger.kill(true);
