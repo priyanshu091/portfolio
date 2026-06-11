@@ -351,13 +351,43 @@ function Dashboard({ onLogout }) {
           <p style={styles.dashSub}>{videos.length} videos across {SECTIONS.length} sections</p>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <button onClick={() => setShowUpload(true)} style={styles.uploadBtn}>
+          <button 
+            onClick={() => setShowUpload(true)} 
+            style={styles.uploadBtn}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+              e.currentTarget.style.background = '#FF4F46';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 59, 48, 0.6)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'none';
+              e.currentTarget.style.background = '#FF3B30';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}>
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
             UPLOAD VIDEO
           </button>
-          <button onClick={onLogout} style={styles.logoutBtn}>LOGOUT</button>
+          <button 
+            onClick={onLogout} 
+            style={styles.logoutBtn}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+              e.currentTarget.style.borderColor = '#888';
+              e.currentTarget.style.color = '#fff';
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'none';
+              e.currentTarget.style.borderColor = '#333';
+              e.currentTarget.style.color = '#888';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            LOGOUT
+          </button>
         </div>
       </header>
 
@@ -369,21 +399,64 @@ function Dashboard({ onLogout }) {
             ...styles.tab,
             ...(activeSection === 'all' ? styles.tabActive : {}),
           }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
+            e.currentTarget.style.borderColor = '#FF3B30';
+            e.currentTarget.style.color = '#FF3B30';
+            e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 59, 48, 0.45)';
+            e.currentTarget.style.background = 'rgba(255, 59, 48, 0.12)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'none';
+            e.currentTarget.style.boxShadow = 'none';
+            if (activeSection !== 'all') {
+              e.currentTarget.style.borderColor = '#222';
+              e.currentTarget.style.color = '#555';
+              e.currentTarget.style.background = 'transparent';
+            } else {
+              e.currentTarget.style.borderColor = '#FF3B30';
+              e.currentTarget.style.color = '#FF3B30';
+              e.currentTarget.style.background = 'rgba(255, 59, 48, 0.08)';
+            }
+          }}
         >
           ALL ({videos.length})
         </button>
-        {SECTIONS.map(s => (
-          <button
-            key={s.id}
-            onClick={() => setActiveSection(s.id)}
-            style={{
-              ...styles.tab,
-              ...(activeSection === s.id ? { ...styles.tabActive, borderColor: s.color, color: s.color } : {}),
-            }}
-          >
-            {s.label.toUpperCase()} ({sectionCounts[s.id] || 0})
-          </button>
-        ))}
+        {SECTIONS.map(s => {
+          const isActive = activeSection === s.id;
+          return (
+            <button
+              key={s.id}
+              onClick={() => setActiveSection(s.id)}
+              style={{
+                ...styles.tab,
+                ...(isActive ? { ...styles.tabActive, borderColor: s.color, color: s.color, background: `${s.color}14` } : {}),
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
+                e.currentTarget.style.borderColor = s.color;
+                e.currentTarget.style.color = s.color;
+                e.currentTarget.style.boxShadow = `0 0 15px ${s.color}55`;
+                e.currentTarget.style.background = `${s.color}24`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = 'none';
+                if (!isActive) {
+                  e.currentTarget.style.borderColor = '#222';
+                  e.currentTarget.style.color = '#555';
+                  e.currentTarget.style.background = 'transparent';
+                } else {
+                  e.currentTarget.style.borderColor = s.color;
+                  e.currentTarget.style.color = s.color;
+                  e.currentTarget.style.background = `${s.color}14`;
+                }
+              }}
+            >
+              {s.label.toUpperCase()} ({sectionCounts[s.id] || 0})
+            </button>
+          );
+        })}
       </div>
 
       {/* Video Grid */}
@@ -684,6 +757,7 @@ const styles = {
     fontWeight: 700,
     letterSpacing: '2px',
     cursor: 'pointer',
+    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
   },
   logoutBtn: {
     padding: '10px 20px',
@@ -695,6 +769,7 @@ const styles = {
     fontWeight: 700,
     letterSpacing: '2px',
     cursor: 'pointer',
+    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
   },
 
   /* Tabs */
@@ -716,7 +791,7 @@ const styles = {
     fontWeight: 700,
     letterSpacing: '1px',
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
     flexShrink: 0,
   },
   tabActive: {
