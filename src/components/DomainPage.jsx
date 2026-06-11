@@ -237,7 +237,7 @@ const DomainPage = () => {
             {/* Video First-Frame Thumbnail Background */}
             <video
               src={project.videoUrl}
-              className="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:opacity-40 transition-opacity duration-500 z-0 pointer-events-none"
+              className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-85 transition-opacity duration-500 z-0 pointer-events-none"
               preload="metadata"
               muted
               playsInline

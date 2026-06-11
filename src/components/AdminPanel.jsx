@@ -409,7 +409,27 @@ function Dashboard({ onLogout }) {
             const sectionInfo = SECTIONS.find(s => s.id === video.section);
             const isPlaying = playingId === video.id;
             return (
-              <div key={video.id} style={styles.videoCard}>
+              <div 
+                key={video.id} 
+                style={{
+                  ...styles.videoCard,
+                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
+                  e.currentTarget.style.borderColor = sectionInfo?.color || '#FF3B30';
+                  e.currentTarget.style.boxShadow = `0 15px 35px rgba(0, 0, 0, 0.6), 0 0 15px ${sectionInfo?.color || '#FF3B30'}33`;
+                  const videoEl = e.currentTarget.querySelector('.preview-video-element');
+                  if (videoEl) videoEl.style.opacity = '0.85';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.borderColor = '#1A1A1A';
+                  e.currentTarget.style.boxShadow = 'none';
+                  const videoEl = e.currentTarget.querySelector('.preview-video-element');
+                  if (videoEl) videoEl.style.opacity = '0.6';
+                }}
+              >
                  {/* Video Preview */}
                 <div style={styles.videoPreview}>
                   {isPlaying ? (
@@ -424,7 +444,8 @@ function Dashboard({ onLogout }) {
                     <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setPlayingId(video.id)}>
                       <video
                         src={video.videoUrl}
-                        style={{ ...styles.videoThumb, opacity: 0.35 }}
+                        className="preview-video-element"
+                        style={{ ...styles.videoThumb, opacity: 0.6, transition: 'opacity 0.4s' }}
                         preload="metadata"
                         muted
                         playsInline
