@@ -337,7 +337,7 @@ const DomainPage = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Video or IFrame element */}
-            <div className="relative w-full" style={{ aspectRatio: `${videoAspect}` }}>
+            <div className="relative w-full" style={{ aspectRatio: `${videoAspect}`, maxHeight: '75vh' }}>
               {getEmbedUrl(selectedVideo.videoUrl) ? (
                 <iframe 
                   src={getEmbedUrl(selectedVideo.videoUrl)} 
