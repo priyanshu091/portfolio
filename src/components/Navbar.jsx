@@ -16,6 +16,7 @@ const Navbar = () => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
+  // Keep global website navbar visible on all routes including /admin
   const navLinks = ['WORK', 'ABOUT', 'SERVICES', 'CONTACT'];
 
   // Handle nav link click - navigate to homepage + scroll to section
@@ -111,7 +112,7 @@ const Navbar = () => {
   return (
     <nav
       ref={navRef}
-      className="fixed top-0 left-0 w-full h-[90px] z-[100] flex items-center justify-between px-8 md:px-16 bg-transparent pointer-events-none"
+      className="fixed top-0 left-0 w-full h-[90px] z-[100] flex items-center justify-between px-8 md:px-16 bg-[#0A0A0A]/95 border-b border-white/5 backdrop-blur-md pointer-events-auto"
     >
       <style>{`
         @keyframes navActivePulse {

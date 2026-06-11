@@ -125,7 +125,7 @@ const Work = () => {
   return (
     <section 
       id="work" 
-      className="relative w-full py-12 md:py-16 overflow-hidden"
+      className="relative w-full py-12 md:py-16 overflow-hidden scroll-mt-24"
       style={{ backgroundColor: 'var(--bg-deep)' }}
     >
       <style>{`

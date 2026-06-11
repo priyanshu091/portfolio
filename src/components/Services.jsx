@@ -189,7 +189,7 @@ const Services = () => {
     <section
       id="services"
       ref={sectionRef}
-      className="relative w-full min-h-fit overflow-hidden py-12 md:py-16"
+      className="relative w-full min-h-fit overflow-hidden py-12 md:py-16 scroll-mt-24"
       style={{ backgroundColor: 'var(--bg-deep)' }}
     >
       <style>{`

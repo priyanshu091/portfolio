@@ -300,6 +300,7 @@ function Dashboard({ onLogout }) {
   const [activeSection, setActiveSection] = useState('all');
   const [showUpload, setShowUpload] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [playingId, setPlayingId] = useState(null);
 
   const fetchVideos = async () => {
     setLoading(true);
@@ -406,23 +407,55 @@ function Dashboard({ onLogout }) {
         <div style={styles.videoGrid}>
           {filtered.map(video => {
             const sectionInfo = SECTIONS.find(s => s.id === video.section);
+            const isPlaying = playingId === video.id;
             return (
               <div key={video.id} style={styles.videoCard}>
-                {/* Video Preview */}
+                 {/* Video Preview */}
                 <div style={styles.videoPreview}>
-                  <video
-                    src={video.videoUrl}
-                    style={styles.videoThumb}
-                    muted
-                    preload="metadata"
-                    onMouseEnter={e => e.target.play()}
-                    onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }}
-                  />
-                  <div style={styles.videoOverlay}>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
-                      <polygon points="5,3 19,12 5,21"/>
-                    </svg>
-                  </div>
+                  {isPlaying ? (
+                    <video
+                      src={video.videoUrl}
+                      style={styles.videoThumb}
+                      controls
+                      autoPlay
+                      preload="auto"
+                    />
+                  ) : (
+                    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setPlayingId(video.id)}>
+                      <video
+                        src={video.videoUrl}
+                        style={{ ...styles.videoThumb, opacity: 0.35 }}
+                        preload="metadata"
+                        muted
+                        playsInline
+                      />
+                      <div style={styles.videoOverlay}>
+                        <div 
+                          style={{
+                            width: '52px',
+                            height: '52px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: 'rgba(13,13,13,0.5)',
+                            border: `1.5px solid ${sectionInfo?.color || '#FF3B30'}`,
+                            boxShadow: `0 0 15px ${(sectionInfo?.color || '#FF3B30')}40`,
+                            transition: 'transform 0.2s',
+                          }}
+                        >
+                          <div style={{
+                            width: 0,
+                            height: 0,
+                            borderStyle: 'solid',
+                            borderWidth: '6px 0 6px 10px',
+                            borderColor: 'transparent transparent transparent #fff',
+                            marginLeft: '3px',
+                          }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 {/* Info */}
                 <div style={styles.videoInfo}>
@@ -447,6 +480,11 @@ function Dashboard({ onLogout }) {
                       </svg>
                     </button>
                   </div>
+                  {video.createdAt && (
+                    <div style={{ color: '#666', fontSize: 10, marginTop: 8, fontFamily: 'monospace' }}>
+                      UPLOADED: {new Date(video.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                    </div>
+                  )}
                 </div>
 
                 {/* Delete Confirm */}
@@ -500,7 +538,8 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     background: '#0A0A0A',
-    padding: 20,
+    padding: '110px 20px 20px',
+    boxSizing: 'border-box',
   },
   loginCard: {
     width: '100%',
@@ -588,7 +627,8 @@ const styles = {
   dashboard: {
     minHeight: '100vh',
     background: '#0A0A0A',
-    padding: '0 24px 40px',
+    padding: '100px 24px 40px',
+    boxSizing: 'border-box',
   },
   dashHeader: {
     display: 'flex',
@@ -690,7 +730,7 @@ const styles = {
   videoThumb: {
     width: '100%',
     height: '100%',
-    objectFit: 'cover',
+    objectFit: 'contain',
   },
   videoOverlay: {
     position: 'absolute',

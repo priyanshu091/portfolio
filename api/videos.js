@@ -69,6 +69,65 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       const data = await readMetadata();
+      
+      // Auto-discover any orphaned/unlisted video blobs on Azure
+      try {
+        const container = getContainerClient();
+        const accountName = process.env.AZURE_STORAGE_ACCOUNT;
+        const containerName = process.env.AZURE_STORAGE_CONTAINER || 'portfolio-media';
+        
+        const blobs = [];
+        for await (const blob of container.listBlobsFlat()) {
+          // Exclude the metadata json itself and non-video assets
+          const lowerName = blob.name.toLowerCase();
+          if (blob.name !== METADATA_BLOB && (
+            lowerName.endsWith('.mp4') || 
+            lowerName.endsWith('.mov') || 
+            lowerName.endsWith('.webm') || 
+            lowerName.endsWith('.png') || 
+            lowerName.endsWith('.jpg') || 
+            lowerName.endsWith('.jpeg') || 
+            lowerName.endsWith('.webp')
+          )) {
+            blobs.push({ name: blob.name, createdOn: blob.properties?.createdOn });
+          }
+        }
+        
+        // Find blobs that are NOT referenced in metadata
+        const metadataUrls = new Set(data.videos.map(v => v.videoUrl));
+        
+        for (const blobInfo of blobs) {
+          const blobUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${blobInfo.name}`;
+          if (!metadataUrls.has(blobUrl)) {
+            // Guess section from filename
+            let section = 'doc'; // default
+            const lowerName = blobInfo.name.toLowerCase();
+            if (lowerName.startsWith('reels') || lowerName.includes('reels')) section = 'reels';
+            else if (lowerName.startsWith('comm') || lowerName.includes('commercial')) section = 'comm';
+            else if (lowerName.startsWith('beat') || lowerName.includes('travel')) section = 'beat';
+            else if (lowerName.startsWith('long') || lowerName.includes('podcast')) section = 'long';
+            else if (lowerName.startsWith('ai') || lowerName.includes('stock')) section = 'ai';
+            else if (lowerName.startsWith('wed') || lowerName.includes('wedding')) section = 'wed';
+            else if (lowerName.startsWith('motion') || lowerName.includes('graphics') || lowerName.includes('anim')) section = 'motion';
+            
+            // Clean title from filename
+            const cleanTitle = blobInfo.name.substring(0, blobInfo.name.lastIndexOf('.')).replace(/[-_]/g, ' ').toUpperCase();
+            
+            data.videos.push({
+              id: `unlisted:${blobInfo.name}`,
+              section,
+              title: cleanTitle || blobInfo.name.toUpperCase(),
+              tag: 'UNLISTED AZURE BLOB',
+              videoUrl: blobUrl,
+              createdAt: blobInfo.createdOn || new Date().toISOString(),
+              isUnlisted: true
+            });
+          }
+        }
+      } catch (azureErr) {
+        console.warn('Azure blob autodiscover warning:', azureErr.message);
+      }
+      
       return res.status(200).json(data);
     } catch (err) {
       console.error('Read metadata error:', err);
@@ -115,6 +174,14 @@ export default async function handler(req, res) {
     }
 
     try {
+      // If it's an unlisted Azure blob, delete directly from Azure
+      if (id.startsWith('unlisted:')) {
+        const blobName = id.replace('unlisted:', '');
+        const container = getContainerClient();
+        await container.getBlockBlobClient(blobName).deleteIfExists();
+        return res.status(200).json({ deleted: id });
+      }
+
       const data = await readMetadata();
       const index = data.videos.findIndex(v => v.id === id);
       if (index === -1) {

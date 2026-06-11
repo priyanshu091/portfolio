@@ -112,7 +112,7 @@ const Contact = () => {
   return (
     <section
       id="contact"
-      className="relative w-full min-h-fit overflow-hidden flex items-center justify-center py-12 md:py-16"
+      className="relative w-full min-h-fit overflow-hidden flex items-center justify-center py-12 md:py-16 scroll-mt-24"
       style={{ backgroundColor: 'var(--bg-deep)' }}
     >
       {/* ── Keyframes ── */}

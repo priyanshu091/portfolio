@@ -234,6 +234,15 @@ const DomainPage = () => {
               <div className="absolute w-24 h-24 rounded-full blur-2xl opacity-10" style={{ backgroundColor: data.color }}></div>
             </div>
 
+            {/* Video First-Frame Thumbnail Background */}
+            <video
+              src={project.videoUrl}
+              className="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:opacity-40 transition-opacity duration-500 z-0 pointer-events-none"
+              preload="metadata"
+              muted
+              playsInline
+            />
+
             {/* Central Play Icon */}
             <div className="absolute inset-0 flex items-center justify-center z-20">
               <div 

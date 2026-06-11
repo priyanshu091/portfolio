@@ -105,21 +105,24 @@ const Hero = () => {
     
     // High-DPI Retina Support
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
+    const parentWidth = canvas.parentElement?.clientWidth || window.innerWidth;
+    const parentHeight = canvas.parentElement?.clientHeight || window.innerHeight;
+    
+    canvas.width = parentWidth * dpr;
+    canvas.height = parentHeight * dpr;
     
     if (revealCanvasRef.current) {
-      revealCanvasRef.current.width = window.innerWidth * dpr;
-      revealCanvasRef.current.height = window.innerHeight * dpr;
+      revealCanvasRef.current.width = parentWidth * dpr;
+      revealCanvasRef.current.height = parentHeight * dpr;
     }
     if (revealMaskCanvasRef.current) {
-      revealMaskCanvasRef.current.width = window.innerWidth * dpr;
-      revealMaskCanvasRef.current.height = window.innerHeight * dpr;
+      revealMaskCanvasRef.current.width = parentWidth * dpr;
+      revealMaskCanvasRef.current.height = parentHeight * dpr;
       // Pre-fill mask with black so it starts fully hidden
       const maskCtx = revealMaskCanvasRef.current.getContext('2d');
       if (maskCtx) {
         maskCtx.fillStyle = 'black';
-        maskCtx.fillRect(0, 0, window.innerWidth * dpr, window.innerHeight * dpr);
+        maskCtx.fillRect(0, 0, parentWidth * dpr, parentHeight * dpr);
       }
     }
     
@@ -343,7 +346,7 @@ const Hero = () => {
   }, { scope: containerRef, dependencies: [isLoaded] });
 
   return (
-    <section ref={containerRef} className="relative h-[400vh] w-full" style={{ backgroundColor: 'var(--bg-deep)' }}>
+    <section ref={containerRef} className="relative h-[400vh] w-full pt-[90px]" style={{ backgroundColor: 'var(--bg-deep)' }}>
       
       {/* Premium GSAP 6-Panel Preloader */}
       {!preloaderComplete && (
@@ -365,7 +368,7 @@ const Hero = () => {
 
       {/* Sticky Viewport */}
       <div 
-        className="sticky top-0 h-screen w-full overflow-hidden"
+        className="sticky top-[90px] h-[calc(100vh-90px)] w-full overflow-hidden"
       >
         
         {/* Canvas Background */}
