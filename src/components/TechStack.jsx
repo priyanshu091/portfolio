@@ -78,14 +78,12 @@ const TechStack = () => {
   const descRef = useRef(null);
 
   useEffect(() => {
-    const hoverText = "👉 Hover any icon to see exactly what it does for your project.";
-
     // Set full text immediately — no letter-by-letter typing
     if (headingRef.current) {
       headingRef.current.innerHTML = `MY EDITING <br/><span style="color: var(--scarlet-primary)">TOOLKIT.</span>`;
     }
     if (descRef.current) {
-      descRef.current.innerHTML = `The same apps used by top creators and studios — now working for you.<span class="block mt-4 text-xs opacity-75 tracking-wider uppercase" style="color: var(--cyan-primary)">${hoverText}</span>`;
+      descRef.current.innerHTML = `The same apps used by top creators and studios — now working for you.<span class="block mt-4 text-[11px] opacity-40 tracking-wider" style="color: var(--text-secondary); text-transform: none;">Tap or hover to explore each tool.</span>`;
     }
 
     // Simple fade-in + slide-up when section enters viewport (no pin, no scrub)
@@ -174,7 +172,7 @@ const TechStack = () => {
               <div className="relative z-10 flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] uppercase tracking-[2px]" style={{ color: hoveredTool.color }}>{hoveredTool.category}</span>
-                  <span className="text-[10px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)' }}>SYS_OK</span>
+                  <span className="text-[10px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)' }}>ACTIVE</span>
                 </div>
                 <h3 className="text-2xl font-bold text-white tracking-widest">{hoveredTool.name}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>

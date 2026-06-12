@@ -239,7 +239,7 @@ const Contact = () => {
             {/* HUD top bar */}
             <div className="flex items-center gap-3 mb-2">
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1))' }} />
-              <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>SYS::CHANNEL_LIST</span>
+              <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>CONNECT</span>
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
             </div>
 
@@ -290,7 +290,7 @@ const Contact = () => {
             {/* Form HUD top label */}
             <div className="flex items-center gap-3 mb-2">
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1))' }} />
-              <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>SYS::TRANSMIT_FORM</span>
+              <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>SEND A MESSAGE</span>
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
             </div>
 
@@ -330,10 +330,10 @@ const Contact = () => {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-white text-xl font-bold tracking-widest uppercase mb-2">TRANSMISSION SENT</p>
+                    <p className="text-white text-xl font-bold tracking-widest uppercase mb-2">MESSAGE SENT</p>
                     <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>We'll get back to you within 48 hours.</p>
                   </div>
-                  <span className="text-[9px] uppercase tracking-[3px] font-bold" style={{ color: '#00FF88', fontFamily: 'var(--font-mono)' }}>// SYS_OK :: MSG_QUEUED</span>
+                  <span className="text-[9px] uppercase tracking-[3px] font-bold" style={{ color: '#00FF88', fontFamily: 'var(--font-mono)' }}>MESSAGE DELIVERED</span>
                 </div>
               ) : (
                 /* ── Form ── */
@@ -456,7 +456,7 @@ const Contact = () => {
                     <span className="relative z-10 mr-3 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: sending ? '#00FF88' : 'var(--scarlet-primary)', boxShadow: `0 0 6px ${sending ? '#00FF88' : 'var(--scarlet-primary)'}`, animation: 'contactBlink 1s ease-in-out infinite' }} />
 
                     <span className="relative z-10 text-[11px] font-bold uppercase tracking-[3px]" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'var(--font-heading)' }}>
-                      {sending ? 'TRANSMITTING...' : 'SEND TRANSMISSION'}
+                      {sending ? 'SENDING...' : 'SEND MESSAGE'}
                     </span>
 
                     {!sending && (
@@ -477,7 +477,7 @@ const Contact = () => {
             <span className="text-[10px] uppercase tracking-[3px] font-bold" style={{ color: 'var(--text-muted)' }}>DIVYANSH VISHWAKARMA</span>
           </div>
           <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-            © 2025 — ALL RIGHTS RESERVED // BUILD_v1.0
+            © 2025 — ALL RIGHTS RESERVED
           </span>
           <div className="flex items-center gap-5">
             {/* Instagram */}

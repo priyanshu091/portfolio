@@ -466,7 +466,7 @@ const Services = () => {
           <span className="absolute bottom-2 right-2 w-4 h-4 border-b border-r" style={{ borderColor: 'rgba(255,45,85,0.3)' }} />
 
           <div>
-            <div className="text-[9px] uppercase tracking-[2px] mb-2 font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>// CUSTOM_PROJECT_INQUIRY</div>
+            <div className="text-[9px] uppercase tracking-[2px] mb-2 font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>CUSTOM PROJECT</div>
             <p className="text-white font-bold text-lg uppercase tracking-wide">Need something not listed?</p>
             <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>Every great project starts with a conversation.</p>
           </div>

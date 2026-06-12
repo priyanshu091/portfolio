@@ -346,7 +346,7 @@ const About = () => {
               <span className="absolute bottom-2 left-2 w-4 h-4 border-b border-l pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.4)' }} />
               <span className="absolute bottom-2 right-2 w-4 h-4 border-b border-r pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.4)' }} />
 
-              <div className="text-[9px] uppercase tracking-[2px] mb-4 font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>// CAREER_METRICS</div>
+              <div className="text-[9px] uppercase tracking-[2px] mb-4 font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>BY THE NUMBERS</div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="flex flex-col gap-1">
@@ -383,7 +383,7 @@ const About = () => {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1))' }} />
-                <span className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>SYS::CAREER_LOG</span>
+                <span className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>THE JOURNEY</span>
                 <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
               </div>
 

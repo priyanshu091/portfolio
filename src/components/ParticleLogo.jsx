@@ -12,7 +12,7 @@ const ParticleLogo = () => {
   const teaseTimerRef = useRef(null);
 
   const [hasHovered, setHasHovered] = useState(false);
-  const [timecode, setTimecode] = useState('00:00:00');
+  const timecode = '00:00:00';
   const [isGlitching, setIsGlitching] = useState(false);
   const [chromaticOffset, setChromaticOffset] = useState({ rx: -1, ry: 0, cx: 1, cy: 0 });
 
@@ -227,15 +227,7 @@ const ParticleLogo = () => {
       }
     }, TEASE_INTERVAL);
 
-    // TIMECODE COUNTER
-    const startTime = Date.now();
-    const timecodeInterval = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      const hrs = String(Math.floor(elapsed / 3600)).padStart(2, '0');
-      const mins = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
-      const secs = String(elapsed % 60).padStart(2, '0');
-      setTimecode(`${hrs}:${mins}:${secs}`);
-    }, 1000);
+
 
     // CHROMATIC ABERRATION — smooth drift
     const chromaticInterval = setInterval(() => {
@@ -257,7 +249,7 @@ const ParticleLogo = () => {
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       if (teaseTimerRef.current) clearInterval(teaseTimerRef.current);
-      clearInterval(timecodeInterval);
+
       clearInterval(chromaticInterval);
       clearInterval(glitchInterval);
     };
