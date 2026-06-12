@@ -349,7 +349,15 @@ const DomainPage = () => {
       {/* HEADER SECTION */}
       <div className="mb-16">
         <button 
-          onClick={() => navigate('/')}
+          onClick={() => {
+            navigate('/');
+            setTimeout(() => {
+              const el = document.getElementById('work');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }, 100);
+          }}
           className="flex items-center gap-2 text-sm uppercase tracking-widest mb-8 transition-colors duration-300 hover:text-white"
           style={{ color: 'var(--text-secondary)' }}
         >
