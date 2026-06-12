@@ -134,7 +134,7 @@ const TechStack = () => {
            }}
       />
 
-      <div className="container mx-auto px-8 md:px-16 relative z-10 flex flex-col lg:flex-row items-center justify-between h-full">
+      <div className="w-full px-8 md:px-16 relative z-10 flex flex-col lg:flex-row items-center justify-between h-full">
         
         {/* LEFT: Text & HUD Panel */}
         <div className="w-full lg:w-1/3 z-20 pointer-events-none mb-8 lg:mb-0">

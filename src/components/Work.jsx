@@ -144,7 +144,7 @@ const Work = () => {
           animation: cardEntry 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
       `}</style>
-      <div className="container mx-auto px-8 md:px-16">
+      <div className="w-full px-8 md:px-16">
         
         {/* Dynamic Title Block based on Tab */}
         <div className="mb-8 flex flex-col items-center text-center">

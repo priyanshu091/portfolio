@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 const platformOptions = [
   { id: 'youtube', label: 'YouTube', color: '#FF0000', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> },
   { id: 'instagram', label: 'Instagram', color: '#E1306C', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12s.014 3.668.072 4.948c.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24s3.668-.014 4.948-.072c4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg> },
-  { id: 'tiktok', label: 'TikTok', color: '#00F2EA', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg> },
+
   { id: 'linkedin', label: 'LinkedIn', color: '#0A66C2', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> },
   { id: 'website', label: 'Website', color: '#00D9FF', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> },
 ];
@@ -11,7 +11,7 @@ const platformOptions = [
 const Contact = () => {
   const [focusedField, setFocusedField] = useState(null);
   const [formData, setFormData] = useState({
-    name: '', email: '', service: '', platforms: [],
+    name: '', email: '', mobile: '', service: '', platforms: [],
     deadline: '', duration: '', budget: '', reference: '', details: '',
   });
   const [submitted, setSubmitted] = useState(false);
@@ -72,13 +72,50 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
-      setSubmitted(true);
-    }, 1800);
+
+    // Map internal service keys to Google Form dropdown values
+    const serviceNames = {
+      documentary: 'Documentary & Fact Style',
+      reels: 'Podcast Reels / Short Form',
+      commercial: 'Commercial & Brand',
+      beat: 'Beat Sync & Travel',
+      'long-form': 'Long Format Podcast',
+      wedding: 'Wedding & Event',
+      graphics: 'Graphic Designing',
+      motion: 'Motion Graphics',
+      other: 'Other',
+    };
+
+    // Build Google Form submission data
+    const googleFormURL = 'https://docs.google.com/forms/d/e/1FAIpQLSc_n1V1wPLgwjrpIiK3Lf6E52Zp3p2KKfIIzF68OwA0gNsu-w/formResponse';
+    const params = new URLSearchParams();
+    params.append('entry.1990602108', formData.name);
+    params.append('entry.1181205584', formData.email);
+    params.append('entry.581123435', formData.mobile);
+    params.append('entry.547102629', serviceNames[formData.service] || formData.service);
+    params.append('entry.857528850', formData.platforms.map(p => platformOptions.find(o => o.id === p)?.label).join(', '));
+    params.append('entry.2039104366', formData.deadline);
+    params.append('entry.2046493657', formData.duration);
+    params.append('entry.1598111379', formData.budget);
+    params.append('entry.2004920983', formData.reference);
+    params.append('entry.1944229631', formData.details);
+
+    try {
+      await fetch(googleFormURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString(),
+      });
+    } catch (err) {
+      // no-cors mode may throw but data is still submitted
+    }
+
+    setSending(false);
+    setSubmitted(true);
   };
 
   // --- Field focus style (cyan theme) ---
@@ -105,6 +142,7 @@ const Contact = () => {
     const entries = [];
     if (formData.name.trim()) entries.push({ label: 'Name', value: formData.name });
     if (formData.email.trim()) entries.push({ label: 'Email', value: formData.email });
+    if (formData.mobile.trim()) entries.push({ label: 'Mobile', value: formData.mobile });
     if (formData.service) {
       const serviceNames = {
         documentary: 'Documentary & Fact Style', reels: 'Podcast Reels', commercial: 'Commercial & Brand',
@@ -135,6 +173,7 @@ const Contact = () => {
       label: 'EMAIL',
       value: 'thedivyanshfx@gmail.com',
       href: 'mailto:thedivyanshfx@gmail.com',
+      color: '#EA4335',
     },
     {
       icon: (
@@ -147,6 +186,7 @@ const Contact = () => {
       label: 'INSTAGRAM',
       value: '@its_divyansh.x',
       href: 'https://www.instagram.com/its_divyansh.x/',
+      color: '#E1306C',
     },
     {
       icon: (
@@ -159,17 +199,18 @@ const Contact = () => {
       label: 'LINKEDIN',
       value: 'Divyansh Vishwakarma',
       href: 'https://www.linkedin.com/in/divyansh-vishwakarma-9a84533a8/',
+      color: '#0A66C2',
     },
     {
       icon: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
-          <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
         </svg>
       ),
-      label: 'YOUTUBE',
-      value: '@Divyansh_Uncovered',
-      href: 'https://www.youtube.com/@Divyansh_Uncovered',
+      label: 'WHATSAPP',
+      value: '+91 93690 97211',
+      href: 'https://wa.me/919369097211',
+      color: '#25D366',
     },
   ];
 
@@ -181,7 +222,7 @@ const Contact = () => {
   return (
     <section
       id="contact"
-      className="relative w-full min-h-fit overflow-hidden flex items-center justify-center py-12 md:py-16 scroll-mt-24"
+      className="relative w-full min-h-fit overflow-hidden flex items-center justify-center py-6 md:py-8 scroll-mt-24"
       style={{ backgroundColor: 'var(--bg-deep)' }}
     >
       {/* ── Keyframes ── */}
@@ -303,41 +344,43 @@ const Contact = () => {
         />
       </div>
 
-      <div className="container mx-auto px-8 md:px-16 relative z-10">
-
-        {/* ── Section Header ── */}
-        <div className="mb-8 md:mb-10">
-          <div className="flex items-center gap-3 mb-4" style={{ color: 'var(--cyan-primary)' }}>
-            <div className="w-1.5 h-1.5 rounded-full bg-current" style={{ animation: 'contactPulse 2s ease-in-out infinite' }} />
-            <span className="text-[11px] uppercase tracking-[3px] font-bold">INITIATE CONTACT</span>
-            <div className="flex-1 h-[1px]" style={{ background: 'linear-gradient(90deg, var(--cyan-primary), transparent)' }} />
-          </div>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <h2 className="text-white text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[1.05]" style={{ fontFamily: 'var(--font-heading)' }}>
-              LET'S CREATE<br />
-              <span style={{ color: 'var(--scarlet-primary)' }}>SOMETHING</span><br />
-              REMARKABLE.
-            </h2>
-            {/* Live status HUD */}
-            <div className="flex flex-col items-start md:items-end gap-2 mb-2">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#00FF88', boxShadow: '0 0 8px #00FF88', animation: 'contactBlink 1.4s ease-in-out infinite' }} />
-                <span className="text-[10px] uppercase tracking-[2px] font-bold" style={{ color: '#00FF88' }}>AVAILABLE FOR PROJECTS</span>
-              </div>
-              <span className="text-[10px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)' }}>TURNAROUND: 48 HR</span>
-              <span className="text-[10px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)' }}>TIMEZONE: IST UTC+5:30</span>
-            </div>
-          </div>
-        </div>
+      <div className="w-full px-8 md:px-16 relative z-10">
 
         {/* ── Main Grid ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6 lg:gap-8">
 
-          {/* LEFT — Info Panel */}
+          {/* LEFT — Info Panel & Header */}
           <div className="lg:col-span-2 flex flex-col gap-3">
+            
+            {/* ── Section Header ── */}
+            <div className="mb-2">
+              <div className="flex items-center gap-3 mb-3" style={{ color: 'var(--cyan-primary)' }}>
+                <div className="w-1.5 h-1.5 rounded-full bg-current" style={{ animation: 'contactPulse 2s ease-in-out infinite' }} />
+                <span className="text-[11px] uppercase tracking-[3px] font-bold">INITIATE CONTACT</span>
+                <div className="flex-1 h-[1px]" style={{ background: 'linear-gradient(90deg, var(--cyan-primary), transparent)' }} />
+              </div>
+              
+              <h2 className="text-white text-4xl lg:text-5xl font-black uppercase tracking-tight leading-[1.05] mb-5" style={{ fontFamily: 'var(--font-heading)' }}>
+                LET'S CREATE<br />
+                <span style={{ color: 'var(--scarlet-primary)' }}>SOMETHING</span><br />
+                REMARKABLE.
+              </h2>
+              
+              {/* Live status HUD */}
+              <div className="flex flex-col items-start gap-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#00FF88', boxShadow: '0 0 8px #00FF88', animation: 'contactBlink 1.4s ease-in-out infinite' }} />
+                  <span className="text-[10px] uppercase tracking-[2px] font-bold" style={{ color: '#00FF88' }}>AVAILABLE FOR PROJECTS</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="text-[10px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)' }}>TURNAROUND: 48 HR</span>
+                  <span className="text-[10px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)' }}>IST UTC+5:30</span>
+                </div>
+              </div>
+            </div>
 
             {/* HUD top bar */}
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-1 mt-4">
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1))' }} />
               <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>CONNECT</span>
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
@@ -350,7 +393,7 @@ const Contact = () => {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="contact-info-card group flex items-center gap-4 p-3 transition-all duration-400 cursor-pointer"
+                className="contact-info-card group flex items-center gap-3 p-2 transition-all duration-400 cursor-pointer"
                 style={{
                   border: '1px solid rgba(255,255,255,0.06)',
                   backgroundColor: 'rgba(13,13,13,0.4)',
@@ -358,7 +401,7 @@ const Contact = () => {
                   transition: 'border-color 0.35s ease, background 0.35s ease',
                 }}
               >
-                <div className="info-icon w-8 h-8 flex items-center justify-center flex-shrink-0 transition-colors duration-300" style={{ color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.08)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                <div className="info-icon w-8 h-8 flex items-center justify-center flex-shrink-0 transition-colors duration-300" style={{ color: item.color, border: `1px solid ${item.color}40`, backgroundColor: `${item.color}15` }}>
                   {item.icon}
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -405,7 +448,7 @@ const Contact = () => {
             {/* Glassmorphic form card */}
             <div
               ref={formCardRef}
-              className={`relative p-5 md:p-7 overflow-hidden ${isHighlighted ? 'form-highlight' : ''}`}
+              className={`relative p-4 md:p-5 overflow-hidden ${isHighlighted ? 'form-highlight' : ''}`}
               style={{
                 border: '1px solid rgba(255,255,255,0.07)',
                 backgroundColor: 'rgba(13,13,13,0.5)',
@@ -448,15 +491,13 @@ const Contact = () => {
                 /* ── Project Brief Form ── */
                 <div className="relative z-10">
                   {/* Form header with progress ring */}
-                  <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-start justify-between mb-3">
                     <div>
                       <div className="flex items-center gap-2 mb-2">
                         <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--scarlet-primary)', boxShadow: '0 0 6px var(--scarlet-primary)' }} />
                         <span className="text-[10px] uppercase tracking-[3px] font-bold" style={{ color: 'var(--scarlet-primary)' }}>START A PROJECT</span>
                       </div>
-                      <h3 className="text-white text-xl md:text-2xl font-bold leading-tight mb-1" style={{ fontFamily: 'var(--font-heading)' }}>
-                        Let's build your next video.
-                      </h3>
+
                       <p className="text-[12px] max-w-sm" style={{ color: 'var(--text-muted)' }}>
                         Fill the brief below — watch your estimate update live, and I'll reply within 24 hours.
                       </p>
@@ -483,15 +524,15 @@ const Contact = () => {
                   </div>
 
                   {/* Form header divider */}
-                  <div className="flex items-center gap-3 mb-5">
+                  <div className="flex items-center gap-3 mb-3">
                     <span className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>PROJECT BRIEF</span>
                     <div className="flex-1 h-[1px]" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.08), transparent)' }} />
                   </div>
 
-                  <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
 
                     {/* Row 1: Name + Email */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-1.5">
                         <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('name')}>
                           <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'name' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
@@ -503,7 +544,7 @@ const Contact = () => {
                           value={formData.name} onChange={handleChange}
                           onFocus={() => setFocusedField('name')}
                           onBlur={() => setFocusedField(null)}
-                          className="contact-field w-full px-4 py-2.5"
+                          className="contact-field w-full px-4 py-1.5"
                           style={fieldStyle('name')}
                         />
                       </div>
@@ -518,37 +559,54 @@ const Contact = () => {
                           value={formData.email} onChange={handleChange}
                           onFocus={() => setFocusedField('email')}
                           onBlur={() => setFocusedField(null)}
-                          className="contact-field w-full px-4 py-2.5"
+                          className="contact-field w-full px-4 py-1.5"
                           style={fieldStyle('email')}
                         />
                       </div>
                     </div>
 
-                    {/* Row 2: Service Type (full width) */}
-                    <div className="flex flex-col gap-1.5">
-                      <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('service')}>
-                        <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'service' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
-                        WHAT DO YOU NEED?
-                      </label>
-                      <select
-                        name="service" required
-                        value={formData.service} onChange={handleChange}
-                        onFocus={() => setFocusedField('service')}
-                        onBlur={() => setFocusedField(null)}
-                        className="contact-field w-full px-4 py-2.5"
-                        style={{ ...fieldStyle('service'), cursor: 'pointer' }}
-                      >
-                        <option value="" style={{ backgroundColor: '#0D0D0D' }}>Select a service...</option>
-                        <option value="documentary" style={{ backgroundColor: '#0D0D0D' }}>Documentary & Fact Style</option>
-                        <option value="reels" style={{ backgroundColor: '#0D0D0D' }}>Podcast Reels / Short Form</option>
-                        <option value="commercial" style={{ backgroundColor: '#0D0D0D' }}>Commercial & Brand</option>
-                        <option value="beat" style={{ backgroundColor: '#0D0D0D' }}>Beat Sync & Travel</option>
-                        <option value="long-form" style={{ backgroundColor: '#0D0D0D' }}>Long Format Podcast</option>
-                        <option value="wedding" style={{ backgroundColor: '#0D0D0D' }}>Wedding & Event</option>
-                        <option value="graphics" style={{ backgroundColor: '#0D0D0D' }}>Graphic Designing</option>
-                        <option value="motion" style={{ backgroundColor: '#0D0D0D' }}>Motion Graphics</option>
-                        <option value="other" style={{ backgroundColor: '#0D0D0D' }}>Other</option>
-                      </select>
+                    {/* Row 2: Mobile + Service Type */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-1.5">
+                        <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('mobile')}>
+                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'mobile' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
+                          MOBILE NUMBER <span style={{ color: 'var(--text-muted)', fontSize: '8px' }}>(OPTIONAL)</span>
+                        </label>
+                        <input
+                          name="mobile" type="tel"
+                          placeholder="+91 98765 43210"
+                          value={formData.mobile} onChange={handleChange}
+                          onFocus={() => setFocusedField('mobile')}
+                          onBlur={() => setFocusedField(null)}
+                          className="contact-field w-full px-4 py-1.5"
+                          style={fieldStyle('mobile')}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('service')}>
+                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'service' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
+                          WHAT DO YOU NEED?
+                        </label>
+                        <select
+                          name="service" required
+                          value={formData.service} onChange={handleChange}
+                          onFocus={() => setFocusedField('service')}
+                          onBlur={() => setFocusedField(null)}
+                          className="contact-field w-full px-4 py-1.5"
+                          style={{ ...fieldStyle('service'), cursor: 'pointer' }}
+                        >
+                          <option value="" style={{ backgroundColor: '#0D0D0D' }}>Select a service...</option>
+                          <option value="documentary" style={{ backgroundColor: '#0D0D0D' }}>Documentary & Fact Style</option>
+                          <option value="reels" style={{ backgroundColor: '#0D0D0D' }}>Podcast Reels / Short Form</option>
+                          <option value="commercial" style={{ backgroundColor: '#0D0D0D' }}>Commercial & Brand</option>
+                          <option value="beat" style={{ backgroundColor: '#0D0D0D' }}>Beat Sync & Travel</option>
+                          <option value="long-form" style={{ backgroundColor: '#0D0D0D' }}>Long Format Podcast</option>
+                          <option value="wedding" style={{ backgroundColor: '#0D0D0D' }}>Wedding & Event</option>
+                          <option value="graphics" style={{ backgroundColor: '#0D0D0D' }}>Graphic Designing</option>
+                          <option value="motion" style={{ backgroundColor: '#0D0D0D' }}>Motion Graphics</option>
+                          <option value="other" style={{ backgroundColor: '#0D0D0D' }}>Other</option>
+                        </select>
+                      </div>
                     </div>
 
                     {/* Row 3: Platform Chips */}
@@ -582,7 +640,7 @@ const Contact = () => {
                     </div>
 
                     {/* Row 4: Deadline + Duration */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-1.5">
                         <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('deadline')}>
                           <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'deadline' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
@@ -593,7 +651,7 @@ const Contact = () => {
                           value={formData.deadline} onChange={handleChange}
                           onFocus={() => setFocusedField('deadline')}
                           onBlur={() => setFocusedField(null)}
-                          className="contact-field w-full px-4 py-2.5"
+                          className="contact-field w-full px-4 py-1.5"
                           style={{ ...fieldStyle('deadline'), cursor: 'pointer' }}
                         >
                           <option value="" style={{ backgroundColor: '#0D0D0D' }}>Select...</option>
@@ -614,7 +672,7 @@ const Contact = () => {
                           value={formData.duration} onChange={handleChange}
                           onFocus={() => setFocusedField('duration')}
                           onBlur={() => setFocusedField(null)}
-                          className="contact-field w-full px-4 py-2.5"
+                          className="contact-field w-full px-4 py-1.5"
                           style={{ ...fieldStyle('duration'), cursor: 'pointer' }}
                         >
                           <option value="" style={{ backgroundColor: '#0D0D0D' }}>Select...</option>
@@ -627,7 +685,7 @@ const Contact = () => {
                     </div>
 
                     {/* Row 5: Budget + Reference */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex flex-col gap-1.5">
                         <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('budget')}>
                           <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'budget' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
@@ -638,7 +696,7 @@ const Contact = () => {
                           value={formData.budget} onChange={handleChange}
                           onFocus={() => setFocusedField('budget')}
                           onBlur={() => setFocusedField(null)}
-                          className="contact-field w-full px-4 py-2.5"
+                          className="contact-field w-full px-4 py-1.5"
                           style={{ ...fieldStyle('budget'), cursor: 'pointer' }}
                         >
                           <option value="" style={{ backgroundColor: '#0D0D0D' }}>Select budget...</option>
@@ -660,7 +718,7 @@ const Contact = () => {
                           value={formData.reference} onChange={handleChange}
                           onFocus={() => setFocusedField('reference')}
                           onBlur={() => setFocusedField(null)}
-                          className="contact-field w-full px-4 py-2.5"
+                          className="contact-field w-full px-4 py-1.5"
                           style={fieldStyle('reference')}
                         />
                       </div>
@@ -673,12 +731,12 @@ const Contact = () => {
                         PROJECT DETAILS
                       </label>
                       <textarea
-                        name="details" rows={3}
+                        name="details" rows={2}
                         placeholder="What's the goal? What footage do you have? Any style or mood you're going for?"
                         value={formData.details} onChange={handleChange}
                         onFocus={() => setFocusedField('details')}
                         onBlur={() => setFocusedField(null)}
-                        className="contact-field w-full px-4 py-2.5 resize-none"
+                        className="contact-field w-full px-4 py-1.5 resize-none"
                         style={fieldStyle('details')}
                       />
                     </div>
@@ -687,7 +745,7 @@ const Contact = () => {
                     <button
                       type="submit"
                       disabled={sending}
-                      className="contact-submit relative inline-flex items-center justify-center px-10 py-3.5 overflow-hidden w-full mt-1 cursor-pointer"
+                      className="contact-submit relative inline-flex items-center justify-center px-10 py-2 overflow-hidden w-full mt-1 cursor-pointer"
                       style={{
                         border: '1px solid rgba(255,45,85,0.3)',
                         backgroundColor: 'rgba(255,45,85,0.06)',
@@ -760,9 +818,9 @@ const Contact = () => {
               href="https://www.instagram.com/its_divyansh.x/"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: 'var(--text-muted)', transition: 'color 0.3s ease, filter 0.3s ease' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#E1306C'; e.currentTarget.style.filter = 'drop-shadow(0 0 8px #E1306C88)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.filter = 'none'; }}
+              style={{ color: '#E1306C', transition: 'all 0.3s ease' }}
+              onMouseEnter={e => { e.currentTarget.style.filter = 'drop-shadow(0 0 8px #E1306C88) brightness(1.3)'; }}
+              onMouseLeave={e => { e.currentTarget.style.filter = 'none'; }}
               title="Instagram"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -770,18 +828,18 @@ const Contact = () => {
               </svg>
             </a>
 
-            {/* YouTube */}
+            {/* WhatsApp */}
             <a
-              href="https://www.youtube.com/@Divyansh_Uncovered"
+              href="https://wa.me/919369097211"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: 'var(--text-muted)', transition: 'color 0.3s ease, filter 0.3s ease' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#FF0000'; e.currentTarget.style.filter = 'drop-shadow(0 0 8px #FF000088)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.filter = 'none'; }}
-              title="YouTube"
+              style={{ color: '#25D366', transition: 'all 0.3s ease' }}
+              onMouseEnter={e => { e.currentTarget.style.filter = 'drop-shadow(0 0 8px #25D36688) brightness(1.3)'; }}
+              onMouseLeave={e => { e.currentTarget.style.filter = 'none'; }}
+              title="WhatsApp"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
               </svg>
             </a>
 
@@ -790,9 +848,9 @@ const Contact = () => {
               href="https://www.linkedin.com/in/divyansh-vishwakarma-9a84533a8/"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: 'var(--text-muted)', transition: 'color 0.3s ease, filter 0.3s ease' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#0A66C2'; e.currentTarget.style.filter = 'drop-shadow(0 0 8px #0A66C288)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.filter = 'none'; }}
+              style={{ color: '#0A66C2', transition: 'all 0.3s ease' }}
+              onMouseEnter={e => { e.currentTarget.style.filter = 'drop-shadow(0 0 8px #0A66C288) brightness(1.3)'; }}
+              onMouseLeave={e => { e.currentTarget.style.filter = 'none'; }}
               title="LinkedIn"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">

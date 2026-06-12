@@ -281,7 +281,7 @@ const About = () => {
         />
       </div>
 
-      <div className="container mx-auto px-8 md:px-16 relative z-10 w-full">
+      <div className="w-full px-8 md:px-16 relative z-10">
 
         {/* ── Section label ── */}
         <div className="flex items-center gap-3 mb-8">

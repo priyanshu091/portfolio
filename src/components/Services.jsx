@@ -305,7 +305,7 @@ const Services = () => {
         />
       </div>
 
-      <div className="container mx-auto px-8 md:px-16 relative z-10">
+      <div className="w-full px-8 md:px-16 relative z-10">
 
         {/* ── Section Header ── */}
         <div className="mb-8 md:mb-10">
