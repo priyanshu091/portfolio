@@ -224,7 +224,7 @@ const Contact = () => {
   return (
     <section
       id="contact"
-      className="relative w-full min-h-fit overflow-hidden flex items-center justify-center py-6 md:py-8 scroll-mt-24"
+      className="relative w-full min-h-fit overflow-hidden flex items-center justify-center py-6 md:py-8 scroll-mt-20 md:scroll-mt-24"
       style={{ backgroundColor: 'var(--bg-deep)' }}
     >
       {/* ── Keyframes ── */}
@@ -346,7 +346,7 @@ const Contact = () => {
         />
       </div>
 
-      <div className="w-full px-8 md:px-16 relative z-10">
+      <div className="w-full px-5 md:px-16 relative z-10">
 
         {/* ── Main Grid ── */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6 lg:gap-8">
