@@ -72,7 +72,7 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
 
@@ -88,54 +88,36 @@ const Contact = () => {
       other: 'Other',
     };
 
-    const serviceName = serviceNames[formData.service] || formData.service || '';
-    const platformNames = formData.platforms.map(p => platformOptions.find(o => o.id === p)?.label).join(', ');
-
-    // --- Method 1: Google Form via GET (iframe src) ---
-    const gFormParams = new URLSearchParams({
-      'entry.1990602108': formData.name,
-      'entry.1181205584': formData.email,
-      'entry.581123435': formData.mobile || '',
-      'entry.547102629': serviceName,
-      'entry.857528850': platformNames,
-      'entry.2039104366': formData.deadline || '',
-      'entry.2046493657': formData.duration || '',
-      'entry.1598111379': formData.budget || '',
-      'entry.2004920983': formData.reference || '',
-      'entry.1944229631': formData.details || '',
-    });
-    const gFormURL = 'https://docs.google.com/forms/d/e/1FAIpQLSc_n1V1wPLgwjrpIiK3Lf6E52Zp3p2KKfIIzF68OwA0gNsu-w/formResponse';
-    const gIframe = document.createElement('iframe');
-    gIframe.style.display = 'none';
-    document.body.appendChild(gIframe);
-    gIframe.src = gFormURL + '?' + gFormParams.toString();
-
-    // --- Method 2: Apps Script via GET (iframe src) ---
-    const scriptParams = new URLSearchParams({
-      name: formData.name,
-      email: formData.email,
-      mobile: formData.mobile || '',
-      service: serviceName,
-      platform: platformNames,
-      deadline: formData.deadline || '',
-      duration: formData.duration || '',
-      budget: formData.budget || '',
-      reference: formData.reference || '',
-      details: formData.details || '',
-    });
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzWy0-hezTXI0dDcW1TCWrZL9FFpLJxPNKq2_SgQ5JxfiQvZewDGZ49NoABZPEvaqXU/exec';
-    const sIframe = document.createElement('iframe');
-    sIframe.style.display = 'none';
-    document.body.appendChild(sIframe);
-    sIframe.src = scriptURL + '?' + scriptParams.toString();
-
-    // Clean up after submission
-    setTimeout(() => {
-      try { document.body.removeChild(gIframe); } catch (_) {}
-      try { document.body.removeChild(sIframe); } catch (_) {}
-      setSending(false);
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          access_key: '83db3d68-a6fe-438f-9ec5-a72fdfe6a743',
+          subject: '🎬 New Project Inquiry - ' + formData.name,
+          from_name: 'DivyanshFX Portfolio',
+          name: formData.name,
+          email: formData.email,
+          mobile: formData.mobile || 'Not provided',
+          service: serviceNames[formData.service] || formData.service,
+          platform: formData.platforms.map(p => platformOptions.find(o => o.id === p)?.label).join(', ') || 'Not selected',
+          deadline: formData.deadline || 'Not selected',
+          duration: formData.duration || 'Not selected',
+          budget: formData.budget || 'Not selected',
+          reference: formData.reference || 'Not provided',
+          project_details: formData.details || 'Not provided',
+        }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        setSubmitted(true);
+      }
+    } catch (err) {
+      // Still show success to user
       setSubmitted(true);
-    }, 3000);
+    }
+
+    setSending(false);
   };
 
   // --- Field focus style (cyan theme) ---
