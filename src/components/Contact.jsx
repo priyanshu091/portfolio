@@ -477,7 +477,7 @@ const Contact = () => {
             <span className="text-[10px] uppercase tracking-[3px] font-bold" style={{ color: 'var(--text-muted)' }}>DIVYANSH VISHWAKARMA</span>
           </div>
           <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-            © 2025 — ALL RIGHTS RESERVED
+            © {new Date().getFullYear()} — ALL RIGHTS RESERVED
           </span>
           <div className="flex items-center gap-5">
             {/* Instagram */}
