@@ -72,7 +72,7 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setSending(true);
 
@@ -89,33 +89,52 @@ const Contact = () => {
       other: 'Other',
     };
 
-    // Build Google Form submission data
     const googleFormURL = 'https://docs.google.com/forms/d/e/1FAIpQLSc_n1V1wPLgwjrpIiK3Lf6E52Zp3p2KKfIIzF68OwA0gNsu-w/formResponse';
-    const params = new URLSearchParams();
-    params.append('entry.1990602108', formData.name);
-    params.append('entry.1181205584', formData.email);
-    params.append('entry.581123435', formData.mobile);
-    params.append('entry.547102629', serviceNames[formData.service] || formData.service);
-    params.append('entry.857528850', formData.platforms.map(p => platformOptions.find(o => o.id === p)?.label).join(', '));
-    params.append('entry.2039104366', formData.deadline);
-    params.append('entry.2046493657', formData.duration);
-    params.append('entry.1598111379', formData.budget);
-    params.append('entry.2004920983', formData.reference);
-    params.append('entry.1944229631', formData.details);
 
-    try {
-      await fetch(googleFormURL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params.toString(),
-      });
-    } catch (err) {
-      // no-cors mode may throw but data is still submitted
-    }
+    // Create hidden iframe to receive the form response (avoids CORS)
+    const iframe = document.createElement('iframe');
+    iframe.name = 'googleFormIframe';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
 
-    setSending(false);
-    setSubmitted(true);
+    // Create a real hidden HTML form targeting the iframe
+    const hiddenForm = document.createElement('form');
+    hiddenForm.method = 'POST';
+    hiddenForm.action = googleFormURL;
+    hiddenForm.target = 'googleFormIframe';
+    hiddenForm.style.display = 'none';
+
+    const fields = {
+      'entry.1990602108': formData.name,
+      'entry.1181205584': formData.email,
+      'entry.581123435': formData.mobile,
+      'entry.547102629': serviceNames[formData.service] || formData.service,
+      'entry.857528850': formData.platforms.map(p => platformOptions.find(o => o.id === p)?.label).join(', '),
+      'entry.2039104366': formData.deadline,
+      'entry.2046493657': formData.duration,
+      'entry.1598111379': formData.budget,
+      'entry.2004920983': formData.reference,
+      'entry.1944229631': formData.details,
+    };
+
+    Object.entries(fields).forEach(([name, value]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      input.value = value || '';
+      hiddenForm.appendChild(input);
+    });
+
+    document.body.appendChild(hiddenForm);
+    hiddenForm.submit();
+
+    // Clean up and show success after submission
+    setTimeout(() => {
+      document.body.removeChild(hiddenForm);
+      document.body.removeChild(iframe);
+      setSending(false);
+      setSubmitted(true);
+    }, 2000);
   };
 
   // --- Field focus style (cyan theme) ---
