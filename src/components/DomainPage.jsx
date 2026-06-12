@@ -289,10 +289,21 @@ const DomainPage = () => {
     };
   }, [selectedVideo]);
 
-  // Scroll to top, update title & meta description on mount
+  const containerRef = useRef(null);
+
+  // Lock body scroll and scroll modal to top on mount
   useEffect(() => {
-    window.scrollTo(0, 0);
-    
+    if (containerRef.current) {
+      containerRef.current.scrollTo(0, 0);
+    }
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
+  // Update title & meta description on mount
+  useEffect(() => {
     if (data) {
       // Store previous values
       const prevTitle = document.title;
@@ -344,20 +355,16 @@ const DomainPage = () => {
   }
 
   return (
-    <div className="min-h-screen w-full pt-32 pb-24 px-8 md:px-16" style={{ backgroundColor: 'var(--bg-deep)' }}>
+    <div 
+      ref={containerRef}
+      className="fixed inset-0 z-[90] w-full h-full overflow-y-auto pt-32 pb-24 px-8 md:px-16" 
+      style={{ backgroundColor: 'var(--bg-deep)' }}
+    >
       
       {/* HEADER SECTION */}
       <div className="mb-16">
         <button 
-          onClick={() => {
-            navigate('/');
-            setTimeout(() => {
-              const el = document.getElementById('work');
-              if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
-            }, 100);
-          }}
+          onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-sm uppercase tracking-widest mb-8 transition-colors duration-300 hover:text-white"
           style={{ color: 'var(--text-secondary)' }}
         >
