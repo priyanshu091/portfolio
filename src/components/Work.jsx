@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const projects = [
@@ -8,7 +8,7 @@ const projects = [
     tag: 'DEEP DIVE', 
     gridClasses: 'col-span-1 md:col-span-2 row-span-1 md:row-span-2',
     color: '#FF2D55', // Using hex for ThreeJS
-    model: 'doc'
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4'
   },
   { 
     id: 'reels', 
@@ -16,7 +16,7 @@ const projects = [
     tag: 'SHORT FORM', 
     gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-2',
     color: '#00D9FF',
-    model: 'reels'
+    videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/BBROs.mp4'
   },
   { 
     id: 'comm', 
@@ -24,7 +24,7 @@ const projects = [
     tag: 'ADVERTISING', 
     gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
     color: '#FFFFFF',
-    model: 'comm'
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-curvy-road-on-a-grassy-hill-42223-large.mp4'
   },
   { 
     id: 'beat', 
@@ -32,7 +32,7 @@ const projects = [
     tag: 'DYNAMIC', 
     gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
     color: '#FF5470',
-    model: 'beat'
+    videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/GARTANGGALI4.mp4'
   },
   { 
     id: 'long', 
@@ -40,7 +40,7 @@ const projects = [
     tag: 'RETENTION', 
     gridClasses: 'col-span-1 md:col-span-2 row-span-1 md:row-span-1',
     color: '#00D9FF',
-    model: 'long'
+    videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/BBROs.mp4'
   },
   { 
     id: 'ai', 
@@ -48,7 +48,7 @@ const projects = [
     tag: 'GENERATIVE', 
     gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
     color: '#00D9FF',
-    model: 'ai'
+    videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/aijaguar.mp4'
   },
   { 
     id: 'wed', 
@@ -56,7 +56,7 @@ const projects = [
     tag: 'CINEMATIC', 
     gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
     color: '#FF2D55',
-    model: 'wed'
+    imageUrl: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=800&auto=format&fit=crop'
   },
   { 
     id: 'motion', 
@@ -64,27 +64,63 @@ const projects = [
     tag: 'ANIMATION', 
     gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
     color: '#D998FF',
-    model: 'motion'
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4'
   }
 ];
 
 const shootedVideos = [
-  { id: 'shoot-1', title: 'ICELAND VOLCANIC ERUPTION', tag: 'TRAVEL // CINEMATIC', color: '#FF2D55' },
-  { id: 'shoot-2', title: 'ROADSIDE STORIES: TOKYO', tag: 'STREET // COLD STYLE', color: '#00D9FF' },
-  { id: 'shoot-3', title: 'CHASING LIGHT: AMSTERDAM', tag: 'TRAVEL // ARCHIVE', color: '#FFFFFF' },
-  { id: 'shoot-4', title: 'CYBERPUNK NEON RIDE', tag: 'CREATIVE // SHOTOVER', color: '#FF5470' },
-  { id: 'shoot-5', title: 'AESTHETIC FITNESS PROMO', tag: 'SPORTS // SPEC AD', color: '#00D9FF' },
-  { id: 'shoot-6', title: 'MOUNTAIN SUMMIT RETREAT', tag: 'CINEMATIC // DRONE', color: '#FF2D55' }
+  { id: 'shoot-1', title: 'ICELAND VOLCANIC ERUPTION', tag: 'TRAVEL // CINEMATIC', color: '#FF2D55', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-curvy-road-on-a-grassy-hill-42223-large.mp4' },
+  { id: 'shoot-2', title: 'ROADSIDE STORIES: TOKYO', tag: 'STREET // COLD STYLE', color: '#00D9FF', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4' },
+  { id: 'shoot-3', title: 'CHASING LIGHT: AMSTERDAM', tag: 'TRAVEL // ARCHIVE', color: '#FFFFFF', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' },
+  { id: 'shoot-4', title: 'CYBERPUNK NEON RIDE', tag: 'CREATIVE // SHOTOVER', color: '#FF5470', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/GARTANGGALI4.mp4' },
+  { id: 'shoot-5', title: 'AESTHETIC FITNESS PROMO', tag: 'SPORTS // SPEC AD', color: '#00D9FF', imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop' },
+  { id: 'shoot-6', title: 'MOUNTAIN SUMMIT RETREAT', tag: 'CINEMATIC // DRONE', color: '#FF2D55', imageUrl: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800&auto=format&fit=crop' }
 ];
 
 const graphicDesigns = [
-  { id: 'design-1', title: 'CINEMATIC KEY ART POSTER', tag: 'POSTER // KEY ART', color: '#FFCC00' },
-  { id: 'design-2', title: 'YOUTUBE THUMBNAIL SUITE', tag: 'THUMBNAIL // RETENTION', color: '#00D9FF' },
-  { id: 'design-3', title: 'GAMING STREAM OVERLAY PACK', tag: 'UI // STREAMING', color: '#FF2D55' },
-  { id: 'design-4', title: 'BRAND VISUAL IDENTITY SYSTEM', tag: 'BRANDING // IDENTITY', color: '#00FF9D' },
-  { id: 'design-5', title: 'MATTE PAINTING & CONCEPT ART', tag: 'CONCEPT // VFX', color: '#D998FF' },
-  { id: 'design-6', title: 'SOCIAL MEDIA MARKETING KIT', tag: 'PROMOTION // AD', color: '#FF5470' }
+  { id: 'design-1', title: 'CINEMATIC KEY ART POSTER', tag: 'POSTER // KEY ART', color: '#FFCC00', imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop' },
+  { id: 'design-2', title: 'YOUTUBE THUMBNAIL SUITE', tag: 'THUMBNAIL // RETENTION', color: '#00D9FF', imageUrl: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=800&auto=format&fit=crop' },
+  { id: 'design-3', title: 'GAMING STREAM OVERLAY PACK', tag: 'UI // STREAMING', color: '#FF2D55', imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop' },
+  { id: 'design-4', title: 'BRAND VISUAL IDENTITY SYSTEM', tag: 'BRANDING // IDENTITY', color: '#00FF9D', imageUrl: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=800&auto=format&fit=crop' },
+  { id: 'design-5', title: 'MATTE PAINTING & CONCEPT ART', tag: 'CONCEPT // VFX', color: '#D998FF', imageUrl: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=800&auto=format&fit=crop' },
+  { id: 'design-6', title: 'SOCIAL MEDIA MARKETING KIT', tag: 'PROMOTION // AD', color: '#FF5470', imageUrl: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=800&auto=format&fit=crop' }
 ];
+
+const BackgroundMedia = ({ videoUrl, imageUrl }) => {
+  const [visible, setVisible] = useState(false);
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="absolute inset-0 w-full h-full z-0 pointer-events-none opacity-40 group-hover:opacity-75 transition-opacity duration-500">
+      {visible && videoUrl && (
+        <video
+          src={`${videoUrl}#t=0.1`}
+          className="w-full h-full object-cover"
+          preload="metadata"
+          muted
+          playsInline
+        />
+      )}
+      {visible && !videoUrl && imageUrl && (
+        <img src={imageUrl} alt="thumbnail" className="w-full h-full object-cover" />
+      )}
+    </div>
+  );
+};
 
 const Work = () => {
   const navigate = useNavigate();
@@ -93,6 +129,18 @@ const Work = () => {
   const [hoveredTab, setHoveredTab] = useState(null); // 'edited' | 'shooted' | 'graphics' | null
   const [displayedTab, setDisplayedTab] = useState('edited');
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [domainThumbnails, setDomainThumbnails] = useState({});
+
+  useEffect(() => {
+    fetch('/api/videos')
+      .then(res => res.json())
+      .then(result => {
+        if (result && result.domainThumbnails) {
+          setDomainThumbnails(result.domainThumbnails);
+        }
+      })
+      .catch(err => console.error('Failed to fetch domain thumbnails:', err));
+  }, []);
 
   const handleTabChange = (newTab) => {
     if (newTab === activeTab || isTransitioning) return;
@@ -274,34 +322,41 @@ const Work = () => {
           {displayedTab === 'edited' ? (
             /* GRID FOR EDITED VIDEOS (matching the own shooted videos styling) */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
-              {projects.map((project, i) => (
-                <div 
-                  key={project.id}
-                  className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${
-                    isTransitioning ? 'card-exit' : 'card-entry'
-                  }`}
-                  style={{ 
-                    borderColor: 'var(--border-subtle)', 
-                    backgroundColor: 'var(--bg-surface)',
-                    animationDelay: isTransitioning ? '0s' : `${i * 0.08}s`
-                  }}
-                  onClick={() => navigate(`/work/${project.id}`)}
-                  onMouseEnter={(e) => { 
-                    e.currentTarget.style.borderColor = project.color; 
-                    e.currentTarget.style.boxShadow = `0 15px 40px ${project.color}22`; 
-                  }}
-                  onMouseLeave={(e) => { 
-                    e.currentTarget.style.borderColor = 'var(--border-subtle)'; 
-                    e.currentTarget.style.boxShadow = `0 0 0 rgba(0,0,0,0)`; 
-                  }}
-                >
-                  {/* Grainy Noise Background */}
-                  <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-10"></div>
-                  
-                  {/* Dynamic neon blur spotlight background */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-[#0D0D0D] via-[#191919] to-[#0D0D0D] z-0 flex items-center justify-center opacity-85">
-                    <div className="absolute w-24 h-24 rounded-full blur-2xl opacity-10" style={{ backgroundColor: project.color }}></div>
-                  </div>
+              {projects.map((project, i) => {
+                const customThumb = domainThumbnails[project.id];
+                const displayVideo = customThumb ? null : project.videoUrl;
+                const displayImage = customThumb || project.imageUrl;
+                return (
+                  <div 
+                    key={project.id}
+                    className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${
+                      isTransitioning ? 'card-exit' : 'card-entry'
+                    }`}
+                    style={{ 
+                      borderColor: 'var(--border-subtle)', 
+                      backgroundColor: 'var(--bg-surface)',
+                      animationDelay: isTransitioning ? '0s' : `${i * 0.08}s`
+                    }}
+                    onClick={() => navigate(`/work/${project.id}`)}
+                    onMouseEnter={(e) => { 
+                      e.currentTarget.style.borderColor = project.color; 
+                      e.currentTarget.style.boxShadow = `0 15px 40px ${project.color}22`; 
+                    }}
+                    onMouseLeave={(e) => { 
+                      e.currentTarget.style.borderColor = 'var(--border-subtle)'; 
+                      e.currentTarget.style.boxShadow = `0 0 0 rgba(0,0,0,0)`; 
+                    }}
+                  >
+                    {/* Grainy Noise Background */}
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-10"></div>
+                    
+                    {/* Dynamic neon blur spotlight background */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-[#0D0D0D] via-[#191919] to-[#0D0D0D] z-0 flex items-center justify-center opacity-85">
+                      <div className="absolute w-24 h-24 rounded-full blur-2xl opacity-10" style={{ backgroundColor: project.color }}></div>
+                    </div>
+
+                    {/* Thumbnail / Video Preview */}
+                    <BackgroundMedia videoUrl={displayVideo} imageUrl={displayImage} />
 
                   {/* Central Play Icon */}
                   <div className="absolute inset-0 flex items-center justify-center z-25">
@@ -322,7 +377,45 @@ const Work = () => {
                     <span className="text-[9px] uppercase tracking-[2px] mt-1" style={{ color: 'var(--text-muted)' }}>ENTER ARCHIVE ↗</span>
                   </div>
                 </div>
-              ))}
+              );
+            })}
+              
+              {/* Contact / Start a Conversation Card */}
+              <div 
+                className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl flex flex-col items-center justify-center ${
+                  isTransitioning ? 'card-exit' : 'card-entry'
+                }`}
+                style={{ 
+                  borderColor: 'var(--border-subtle)', 
+                  backgroundColor: 'var(--bg-surface)',
+                  animationDelay: isTransitioning ? '0s' : `${projects.length * 0.08}s`
+                }}
+                onClick={() => {
+                  const el = document.getElementById('contact');
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                onMouseEnter={(e) => { 
+                  e.currentTarget.style.borderColor = 'var(--scarlet-primary)'; 
+                  e.currentTarget.style.boxShadow = `0 15px 40px rgba(255,45,85,0.15)`; 
+                }}
+                onMouseLeave={(e) => { 
+                  e.currentTarget.style.borderColor = 'var(--border-subtle)'; 
+                  e.currentTarget.style.boxShadow = `0 0 0 rgba(0,0,0,0)`; 
+                }}
+              >
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-[#0D0D0D] via-[#191919] to-[#0D0D0D] z-0 opacity-80"></div>
+                
+                <div className="z-10 w-16 h-16 rounded-full border border-dashed border-[var(--text-muted)] group-hover:border-[var(--scarlet-primary)] flex items-center justify-center mb-4 transition-colors duration-500 bg-black/30 backdrop-blur-sm group-hover:bg-[rgba(255,45,85,0.05)]">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] group-hover:text-[var(--scarlet-primary)] transition-colors duration-500">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
+                
+                <span className="z-10 text-white text-md font-bold uppercase tracking-widest text-center">Start a<br/>Conversation</span>
+                <span className="z-10 text-[9px] uppercase tracking-[2px] mt-3" style={{ color: 'var(--text-muted)' }}>LET'S WORK TOGETHER ↗</span>
+              </div>
+
             </div>
           ) : displayedTab === 'shooted' ? (
             /* VIDEO GRID GALLERY FOR OWN SHOOTED VIDEOS */
@@ -355,6 +448,9 @@ const Work = () => {
                     <div className="absolute w-24 h-24 rounded-full blur-2xl opacity-10" style={{ backgroundColor: video.color }}></div>
                   </div>
 
+                  {/* Thumbnail / Video Preview */}
+                  <BackgroundMedia videoUrl={video.videoUrl} imageUrl={video.imageUrl} />
+
                   {/* Central Play Icon */}
                   <div className="absolute inset-0 flex items-center justify-center z-25">
                     <div 
@@ -375,6 +471,43 @@ const Work = () => {
                   </div>
                 </div>
               ))}
+              
+              {/* Contact / Start a Conversation Card */}
+              <div 
+                className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl flex flex-col items-center justify-center ${
+                  isTransitioning ? 'card-exit' : 'card-entry'
+                }`}
+                style={{ 
+                  borderColor: 'var(--border-subtle)', 
+                  backgroundColor: 'var(--bg-surface)',
+                  animationDelay: isTransitioning ? '0s' : `${shootedVideos.length * 0.08}s`
+                }}
+                onClick={() => {
+                  const el = document.getElementById('contact');
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                onMouseEnter={(e) => { 
+                  e.currentTarget.style.borderColor = 'var(--scarlet-primary)'; 
+                  e.currentTarget.style.boxShadow = `0 15px 40px rgba(255,45,85,0.15)`; 
+                }}
+                onMouseLeave={(e) => { 
+                  e.currentTarget.style.borderColor = 'var(--border-subtle)'; 
+                  e.currentTarget.style.boxShadow = `0 0 0 rgba(0,0,0,0)`; 
+                }}
+              >
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-[#0D0D0D] via-[#191919] to-[#0D0D0D] z-0 opacity-80"></div>
+                
+                <div className="z-10 w-16 h-16 rounded-full border border-dashed border-[var(--text-muted)] group-hover:border-[var(--scarlet-primary)] flex items-center justify-center mb-4 transition-colors duration-500 bg-black/30 backdrop-blur-sm group-hover:bg-[rgba(255,45,85,0.05)]">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] group-hover:text-[var(--scarlet-primary)] transition-colors duration-500">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
+                
+                <span className="z-10 text-white text-md font-bold uppercase tracking-widest text-center">Start a<br/>Conversation</span>
+                <span className="z-10 text-[9px] uppercase tracking-[2px] mt-3" style={{ color: 'var(--text-muted)' }}>LET'S WORK TOGETHER ↗</span>
+              </div>
+
             </div>
           ) : (
             /* GRAPHIC DESIGN GRID GALLERY */
@@ -407,6 +540,9 @@ const Work = () => {
                     <div className="absolute w-24 h-24 rounded-full blur-2xl opacity-10" style={{ backgroundColor: design.color }}></div>
                   </div>
 
+                  {/* Thumbnail / Video Preview */}
+                  <BackgroundMedia videoUrl={design.videoUrl} imageUrl={design.imageUrl} />
+
                   {/* Central Eye/View Icon */}
                   <div className="absolute inset-0 flex items-center justify-center z-25">
                     <div 
@@ -430,6 +566,43 @@ const Work = () => {
                   </div>
                 </div>
               ))}
+              
+              {/* Contact / Start a Conversation Card */}
+              <div 
+                className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl flex flex-col items-center justify-center ${
+                  isTransitioning ? 'card-exit' : 'card-entry'
+                }`}
+                style={{ 
+                  borderColor: 'var(--border-subtle)', 
+                  backgroundColor: 'var(--bg-surface)',
+                  animationDelay: isTransitioning ? '0s' : `${graphicDesigns.length * 0.08}s`
+                }}
+                onClick={() => {
+                  const el = document.getElementById('contact');
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                onMouseEnter={(e) => { 
+                  e.currentTarget.style.borderColor = 'var(--scarlet-primary)'; 
+                  e.currentTarget.style.boxShadow = `0 15px 40px rgba(255,45,85,0.15)`; 
+                }}
+                onMouseLeave={(e) => { 
+                  e.currentTarget.style.borderColor = 'var(--border-subtle)'; 
+                  e.currentTarget.style.boxShadow = `0 0 0 rgba(0,0,0,0)`; 
+                }}
+              >
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-[#0D0D0D] via-[#191919] to-[#0D0D0D] z-0 opacity-80"></div>
+                
+                <div className="z-10 w-16 h-16 rounded-full border border-dashed border-[var(--text-muted)] group-hover:border-[var(--scarlet-primary)] flex items-center justify-center mb-4 transition-colors duration-500 bg-black/30 backdrop-blur-sm group-hover:bg-[rgba(255,45,85,0.05)]">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] group-hover:text-[var(--scarlet-primary)] transition-colors duration-500">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
+                
+                <span className="z-10 text-white text-md font-bold uppercase tracking-widest text-center">Start a<br/>Conversation</span>
+                <span className="z-10 text-[9px] uppercase tracking-[2px] mt-3" style={{ color: 'var(--text-muted)' }}>LET'S WORK TOGETHER ↗</span>
+              </div>
+
             </div>
           )}
         </div>

@@ -99,7 +99,7 @@ const getEmbedUrl = (url) => {
   return null;
 };
 
-const LazyVideo = ({ src, className, isPaused }) => {
+const LazyVideo = ({ src, thumbnailUrl, className, isPaused }) => {
   const [visible, setVisible] = useState(false);
   const ref = useRef(null);
 
@@ -123,14 +123,23 @@ const LazyVideo = ({ src, className, isPaused }) => {
   return (
     <div ref={ref} className={className} style={{ position: 'absolute', inset: 0 }}>
       {visible && !isPaused && (
-        <video
-          src={`${src}#t=0.1`}
-          className="w-full h-full object-cover"
-          preload="metadata"
-          muted
-          playsInline
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
+        thumbnailUrl ? (
+          <img
+            src={thumbnailUrl}
+            alt="thumbnail"
+            className="w-full h-full object-cover"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <video
+            src={`${src}#t=0.1`}
+            className="w-full h-full object-cover"
+            preload="metadata"
+            muted
+            playsInline
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        )
       )}
     </div>
   );
@@ -155,7 +164,7 @@ const DomainPage = () => {
       .then(result => {
         const sectionVideos = (result.videos || [])
           .filter(v => v.section === domainId)
-          .map(v => ({ id: v.id, title: v.title, tag: v.tag, videoUrl: v.videoUrl }));
+          .map(v => ({ id: v.id, title: v.title, tag: v.tag, videoUrl: v.videoUrl, thumbnailUrl: v.thumbnailUrl }));
         setCmsVideos(sectionVideos);
       })
       .catch(() => setCmsVideos([])); // silently fail, hardcoded data is fallback
@@ -408,6 +417,7 @@ const DomainPage = () => {
             {/* Video First-Frame Thumbnail Background */}
             <LazyVideo
               src={project.videoUrl}
+              thumbnailUrl={project.thumbnailUrl}
               className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-85 transition-opacity duration-500 z-0 pointer-events-none"
               isPaused={selectedVideo !== null}
             />

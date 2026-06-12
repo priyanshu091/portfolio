@@ -126,6 +126,7 @@ function LoginScreen({ onLogin }) {
 /* ───────────────────── UPLOAD MODAL ───────────────────── */
 function UploadModal({ onClose, onUploaded, defaultSection }) {
   const [file, setFile] = useState(null);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
   const [title, setTitle] = useState('');
   const [tag, setTag] = useState('');
   const [section, setSection] = useState(defaultSection || 'doc');
@@ -133,7 +134,10 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
   const [status, setStatus] = useState('idle'); // idle | uploading | saving | done | error
   const [errorMsg, setErrorMsg] = useState('');
   const [dragOver, setDragOver] = useState(false);
+  const [thumbnailDragOver, setThumbnailDragOver] = useState(false);
+  
   const fileRef = useRef(null);
+  const thumbFileRef = useRef(null);
 
   const handleDrop = useCallback((e) => {
     e.preventDefault();
@@ -151,7 +155,37 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
     setErrorMsg('');
 
     try {
-      // Step 1: Get SAS upload URL from our API
+      let thumbnailUrl = null;
+
+      // Step 1: Upload custom thumbnail if selected
+      if (thumbnailFile) {
+        // Get SAS URL for thumbnail image
+        const sasRes = await fetch(`${API_BASE}/upload-url`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ filename: thumbnailFile.name }),
+        });
+        const sasData = await sasRes.json();
+        if (!sasRes.ok) throw new Error(sasData.error || 'Failed to get thumbnail upload URL');
+
+        // Upload directly to Azure
+        await new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('PUT', sasData.uploadUrl, true);
+          xhr.setRequestHeader('x-ms-blob-type', 'BlockBlob');
+          xhr.setRequestHeader('Content-Type', thumbnailFile.type || 'image/jpeg');
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) resolve();
+            else reject(new Error(`Thumbnail upload failed: ${xhr.status}`));
+          };
+          xhr.onerror = () => reject(new Error('Network error during thumbnail upload'));
+          xhr.send(thumbnailFile);
+        });
+        thumbnailUrl = sasData.publicUrl;
+      }
+
+      // Step 2: Get SAS upload URL for the video
       const sasRes = await fetch(`${API_BASE}/upload-url`, {
         method: 'POST',
         headers: authHeaders(),
@@ -160,7 +194,7 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
       const sasData = await sasRes.json();
       if (!sasRes.ok) throw new Error(sasData.error || 'Failed to get upload URL');
 
-      // Step 2: Upload directly to Azure using SAS URL
+      // Step 3: Upload video directly to Azure using SAS URL
       await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('PUT', sasData.uploadUrl, true);
@@ -181,7 +215,7 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
         xhr.send(file);
       });
 
-      // Step 3: Save metadata to our API
+      // Step 4: Save metadata to our API (including thumbnailUrl if any)
       setStatus('saving');
       const metaRes = await fetch(`${API_BASE}/videos`, {
         method: 'POST',
@@ -191,6 +225,7 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
           title,
           tag,
           videoUrl: sasData.publicUrl,
+          thumbnailUrl,
         }),
       });
       const metaData = await metaRes.json();
@@ -258,6 +293,80 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
           )}
         </div>
 
+        {/* Video Thumbnail (Optional) */}
+        <div style={{ marginTop: 16 }}>
+          <label style={styles.label}>CUSTOM VIDEO THUMBNAIL (OPTIONAL)</label>
+          <div
+            style={{
+              ...styles.thumbnailZone,
+              borderColor: thumbnailDragOver ? '#FF3B30' : thumbnailFile ? '#2D8B4E' : '#333',
+              background: thumbnailDragOver ? 'rgba(255,59,48,0.05)' : thumbnailFile ? 'rgba(45,139,78,0.05)' : 'transparent',
+            }}
+            onDragOver={(e) => { e.preventDefault(); setThumbnailDragOver(true); }}
+            onDragLeave={() => setThumbnailDragOver(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setThumbnailDragOver(false);
+              const dropped = e.dataTransfer.files[0];
+              if (dropped && dropped.type.startsWith('image/')) {
+                if (dropped.size > 819200) {
+                  setErrorMsg('Thumbnail image exceeds 800 KB limit. Please upload a smaller image.');
+                } else {
+                  setThumbnailFile(dropped);
+                  setErrorMsg('');
+                }
+              }
+            }}
+            onClick={() => thumbFileRef.current?.click()}
+          >
+            <input
+              ref={thumbFileRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const selected = e.target.files[0];
+                if (selected) {
+                  if (selected.size > 819200) {
+                    setErrorMsg('Thumbnail image exceeds 800 KB limit. Please upload a smaller image.');
+                  } else {
+                    setThumbnailFile(selected);
+                    setErrorMsg('');
+                  }
+                }
+              }}
+            />
+            {thumbnailFile ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D8B4E" strokeWidth="1.5">
+                  <path d="M9 12l2 2 4-4"/>
+                  <circle cx="12" cy="12" r="10"/>
+                </svg>
+                <div style={{ textAlign: 'left', flex: 1, overflow: 'hidden' }}>
+                  <p style={{ color: '#fff', fontSize: 13, fontWeight: 600, margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{thumbnailFile.name}</p>
+                  <p style={{ color: '#888', fontSize: 11, margin: '2px 0 0' }}>{(thumbnailFile.size / 1024).toFixed(0)} KB (Limit: 800 KB)</p>
+                </div>
+                <button
+                  type="button"
+                  style={{ background: 'transparent', border: 'none', color: '#ff3b30', fontSize: 16, cursor: 'pointer', marginLeft: 'auto' }}
+                  onClick={(e) => { e.stopPropagation(); setThumbnailFile(null); }}
+                >✕</button>
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.5">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <p style={{ color: '#888', fontSize: 12, margin: 0 }}>
+                  Drop custom thumbnail here or <span style={{ color: '#FF3B30', cursor: 'pointer' }}>browse</span> (Max 800KB)
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Form Fields */}
         <div style={styles.formGrid}>
           <div>
@@ -296,7 +405,7 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
           <div style={styles.progressWrap}>
             <div style={{ ...styles.progressBar, width: `${status === 'saving' ? 100 : progress}%` }} />
             <span style={styles.progressText}>
-              {status === 'saving' ? 'Saving metadata...' : `Uploading — ${progress}%`}
+              {status === 'saving' ? 'Saving metadata...' : thumbnailFile && progress === 0 ? 'Uploading thumbnail...' : `Uploading video — ${progress}%`}
             </span>
           </div>
         )}
@@ -330,12 +439,259 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
   );
 }
 
+/* ───────────────────── DOMAIN THUMBNAILS MODAL ───────────────────── */
+function DomainThumbnailsModal({ onClose, onUpdated, domainThumbnails }) {
+  const [uploadingDomainId, setUploadingDomainId] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [thumbnails, setThumbnails] = useState(domainThumbnails || {});
+  const fileInputRef = useRef(null);
+  const currentDomainIdRef = useRef(null);
+
+  const handleUploadImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 819200) {
+      setErrorMsg('Image file size exceeds the 800 KB performance limit.');
+      return;
+    }
+    setErrorMsg('');
+
+    const domainId = currentDomainIdRef.current;
+    if (!domainId) return;
+
+    setUploadingDomainId(domainId);
+    try {
+      // Step 1: Get SAS URL from our API
+      const sasRes = await fetch(`${API_BASE}/upload-url`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ filename: file.name }),
+      });
+      const sasData = await sasRes.json();
+      if (!sasRes.ok) throw new Error(sasData.error || 'Failed to get upload URL');
+
+      // Step 2: Upload directly to Azure using SAS URL
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', sasData.uploadUrl, true);
+        xhr.setRequestHeader('x-ms-blob-type', 'BlockBlob');
+        xhr.setRequestHeader('Content-Type', file.type || 'image/jpeg');
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) resolve();
+          else reject(new Error(`Upload failed: ${xhr.status}`));
+        };
+        xhr.onerror = () => reject(new Error('Network error during upload'));
+        xhr.send(file);
+      });
+
+      // Step 3: Save metadata to our API
+      const metaRes = await fetch(`${API_BASE}/videos`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          action: 'update_domain_thumbnail',
+          domainId,
+          imageUrl: sasData.publicUrl,
+        }),
+      });
+      const metaData = await metaRes.json();
+      if (!metaRes.ok) throw new Error(metaData.error || 'Failed to save metadata');
+
+      setThumbnails(metaData.domainThumbnails || {});
+      onUpdated();
+    } catch (err) {
+      setErrorMsg(err.message);
+    } finally {
+      setUploadingDomainId(null);
+    }
+  };
+
+  const handleRemoveImage = async (domainId) => {
+    setUploadingDomainId(domainId);
+    setErrorMsg('');
+    try {
+      const metaRes = await fetch(`${API_BASE}/videos`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          action: 'update_domain_thumbnail',
+          domainId,
+          imageUrl: null,
+        }),
+      });
+      const metaData = await metaRes.json();
+      if (!metaRes.ok) throw new Error(metaData.error || 'Failed to save metadata');
+
+      setThumbnails(metaData.domainThumbnails || {});
+      onUpdated();
+    } catch (err) {
+      setErrorMsg(err.message);
+    } finally {
+      setUploadingDomainId(null);
+    }
+  };
+
+  const triggerFileSelect = (domainId) => {
+    currentDomainIdRef.current = domainId;
+    fileInputRef.current?.click();
+  };
+
+  return (
+    <div style={styles.modalOverlay} onClick={onClose}>
+      <div style={{ ...styles.modalCard, maxWidth: 680 }} onClick={e => e.stopPropagation()}>
+        <div style={styles.modalHeader}>
+          <h2 style={styles.modalTitle}>MANAGE DOMAIN THUMBNAILS</h2>
+          <button onClick={onClose} style={styles.closeBtn}>✕</button>
+        </div>
+
+        <p style={{ color: '#888', fontSize: 12, marginBottom: 16, lineHeight: '1.5' }}>
+          Assign custom images to represent categories/domains on the homepage. Images must be <strong>JPEG, PNG, or WebP under 800 KB</strong> to protect performance.
+        </p>
+
+        {errorMsg && (
+          <div style={{ color: '#FF3B30', fontSize: 13, marginBottom: 16, textAlign: 'center', fontWeight: 'bold' }}>
+            ✕ {errorMsg}
+          </div>
+        )}
+
+        <input 
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleUploadImage}
+        />
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, maxHeight: '60vh', overflowY: 'auto', paddingRight: 4 }}>
+          {SECTIONS.map(s => {
+            const currentThumb = thumbnails[s.id];
+            const isUploading = uploadingDomainId === s.id;
+
+            return (
+              <div 
+                key={s.id} 
+                style={{ 
+                  background: '#1A1A1A', 
+                  borderRadius: 12, 
+                  border: '1px solid #2A2A2A', 
+                  padding: 12,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 10
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 12, fontWeight: 'bold', color: s.color }}>{s.label.toUpperCase()}</span>
+                  <span style={{ color: '#555', fontSize: 10, fontFamily: 'monospace' }}>ID: {s.id}</span>
+                </div>
+
+                {/* Thumbnail Preview Area */}
+                <div style={{ 
+                  width: '100%', 
+                  aspectRatio: '16/9', 
+                  background: '#0D0D0D', 
+                  borderRadius: 6, 
+                  overflow: 'hidden', 
+                  position: 'relative',
+                  border: '1px solid #222',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {currentThumb ? (
+                    <img 
+                      src={currentThumb} 
+                      alt={s.label} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    />
+                  ) : (
+                    <span style={{ color: '#444', fontSize: 11, textAlign: 'center', padding: 10 }}>
+                      No custom thumbnail<br/>(using video preview)
+                    </span>
+                  )}
+
+                  {isUploading && (
+                    <div style={{ 
+                      position: 'absolute', 
+                      inset: 0, 
+                      background: 'rgba(0,0,0,0.8)', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      color: '#fff',
+                      fontSize: 11,
+                      fontWeight: 'bold',
+                      letterSpacing: '1px'
+                    }}>
+                      PROCESSING...
+                    </div>
+                  )}
+                </div>
+
+                {/* Buttons */}
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button 
+                    disabled={isUploading}
+                    onClick={() => triggerFileSelect(s.id)}
+                    style={{ 
+                      flex: 1, 
+                      padding: '8px 10px', 
+                      background: 'transparent', 
+                      border: '1px solid #333', 
+                      borderRadius: 6, 
+                      color: '#fff', 
+                      fontSize: 11, 
+                      fontWeight: 'bold',
+                      cursor: 'pointer' 
+                    }}
+                  >
+                    UPLOAD
+                  </button>
+                  {currentThumb && (
+                    <button 
+                      disabled={isUploading}
+                      onClick={() => handleRemoveImage(s.id)}
+                      style={{ 
+                        padding: '8px 10px', 
+                        background: '#FF3B3015', 
+                        border: '1px solid #FF3B3050', 
+                        borderRadius: 6, 
+                        color: '#FF3B30', 
+                        fontSize: 11, 
+                        fontWeight: 'bold',
+                        cursor: 'pointer' 
+                      }}
+                    >
+                      REMOVE
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <button 
+          onClick={onClose}
+          style={{ ...styles.primaryBtn, marginTop: 20 }}
+        >
+          CLOSE
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ───────────────────── DASHBOARD ───────────────────── */
 function Dashboard({ onLogout }) {
   const [videos, setVideos] = useState([]);
+  const [domainThumbnails, setDomainThumbnails] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('all');
   const [showUpload, setShowUpload] = useState(false);
+  const [showDomainSettings, setShowDomainSettings] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [playingId, setPlayingId] = useState(null);
 
@@ -345,6 +701,7 @@ function Dashboard({ onLogout }) {
       const res = await fetch(`${API_BASE}/videos`);
       const data = await res.json();
       setVideos(data.videos || []);
+      setDomainThumbnails(data.domainThumbnails || {});
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
@@ -400,6 +757,26 @@ function Dashboard({ onLogout }) {
           <p style={styles.dashSub}>{videos.length} videos across {SECTIONS.length} sections</p>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
+          <button 
+            onClick={() => setShowDomainSettings(true)} 
+            style={{ ...styles.logoutBtn, borderColor: '#00D4FF', color: '#00D4FF', marginRight: 4 }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+              e.currentTarget.style.borderColor = '#00D4FF';
+              e.currentTarget.style.color = '#fff';
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 212, 255, 0.3)';
+              e.currentTarget.style.background = 'rgba(0, 212, 255, 0.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'none';
+              e.currentTarget.style.borderColor = '#00D4FF';
+              e.currentTarget.style.color = '#00D4FF';
+              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.background = 'transparent';
+            }}
+          >
+            DOMAINS
+          </button>
           <button 
             onClick={() => setShowUpload(true)} 
             style={styles.uploadBtn}
@@ -567,11 +944,19 @@ function Dashboard({ onLogout }) {
                     />
                   ) : (
                     <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setPlayingId(video.id)}>
-                      <LazyVideo
-                        src={video.videoUrl}
-                        style={styles.videoThumb}
-                        isPaused={playingId !== null}
-                      />
+                      {video.thumbnailUrl ? (
+                        <img
+                          src={video.thumbnailUrl}
+                          alt={video.title}
+                          style={{ ...styles.videoThumb, objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <LazyVideo
+                          src={video.videoUrl}
+                          style={styles.videoThumb}
+                          isPaused={playingId !== null}
+                        />
+                      )}
                       <div style={styles.videoOverlay}>
                         <div 
                           style={{
@@ -652,6 +1037,15 @@ function Dashboard({ onLogout }) {
           onClose={() => setShowUpload(false)}
           onUploaded={fetchVideos}
           defaultSection={activeSection !== 'all' ? activeSection : 'doc'}
+        />
+      )}
+
+      {/* Domain Thumbnails Modal */}
+      {showDomainSettings && (
+        <DomainThumbnailsModal
+          domainThumbnails={domainThumbnails}
+          onClose={() => setShowDomainSettings(false)}
+          onUpdated={fetchVideos}
         />
       )}
     </div>
@@ -1033,5 +1427,17 @@ const styles = {
     fontWeight: 600,
     textAlign: 'center',
     letterSpacing: '1px',
+  },
+  thumbnailZone: {
+    border: '1px dashed #333',
+    borderRadius: 8,
+    padding: '16px 20px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    minHeight: 56,
+    boxSizing: 'border-box',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 };

@@ -140,9 +140,35 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // POST — add a new video
+  // POST — add a new video or update domain thumbnail
   if (req.method === 'POST') {
-    const { section, title, tag, videoUrl } = req.body || {};
+    const { action, domainId, imageUrl } = req.body || {};
+    
+    // Check if updating a domain thumbnail
+    if (action === 'update_domain_thumbnail') {
+      if (!domainId) {
+        return res.status(400).json({ error: 'domainId is required' });
+      }
+      try {
+        const data = await readMetadata();
+        if (!data.domainThumbnails) {
+          data.domainThumbnails = {};
+        }
+        if (imageUrl) {
+          data.domainThumbnails[domainId] = imageUrl;
+        } else {
+          delete data.domainThumbnails[domainId];
+        }
+        await writeMetadata(data);
+        return res.status(200).json({ success: true, domainThumbnails: data.domainThumbnails });
+      } catch (err) {
+        console.error('Update domain thumbnail error:', err);
+        return res.status(500).json({ error: 'Failed to update domain thumbnail' });
+      }
+    }
+
+    // Standard video creation flow
+    const { section, title, tag, videoUrl, thumbnailUrl } = req.body || {};
     if (!section || !title || !tag || !videoUrl) {
       return res.status(400).json({ error: 'section, title, tag, videoUrl are required' });
     }
@@ -155,6 +181,7 @@ export default async function handler(req, res) {
         title: title.toUpperCase(),
         tag: tag.toUpperCase(),
         videoUrl,
+        thumbnailUrl: thumbnailUrl || null,
         createdAt: new Date().toISOString(),
       };
       data.videos.push(newVideo);
