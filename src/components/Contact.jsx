@@ -76,7 +76,6 @@ const Contact = () => {
     e.preventDefault();
     setSending(true);
 
-    // Map internal service keys to Google Form dropdown values
     const serviceNames = {
       documentary: 'Documentary & Fact Style',
       reels: 'Podcast Reels / Short Form',
@@ -89,52 +88,54 @@ const Contact = () => {
       other: 'Other',
     };
 
-    const googleFormURL = 'https://docs.google.com/forms/d/e/1FAIpQLSc_n1V1wPLgwjrpIiK3Lf6E52Zp3p2KKfIIzF68OwA0gNsu-w/formResponse';
+    const serviceName = serviceNames[formData.service] || formData.service || '';
+    const platformNames = formData.platforms.map(p => platformOptions.find(o => o.id === p)?.label).join(', ');
 
-    // Create hidden iframe to receive the form response (avoids CORS)
-    const iframe = document.createElement('iframe');
-    iframe.name = 'googleFormIframe';
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-
-    // Create a real hidden HTML form targeting the iframe
-    const hiddenForm = document.createElement('form');
-    hiddenForm.method = 'POST';
-    hiddenForm.action = googleFormURL;
-    hiddenForm.target = 'googleFormIframe';
-    hiddenForm.style.display = 'none';
-
-    const fields = {
+    // --- Method 1: Google Form via GET (iframe src) ---
+    const gFormParams = new URLSearchParams({
       'entry.1990602108': formData.name,
       'entry.1181205584': formData.email,
-      'entry.581123435': formData.mobile,
-      'entry.547102629': serviceNames[formData.service] || formData.service,
-      'entry.857528850': formData.platforms.map(p => platformOptions.find(o => o.id === p)?.label).join(', '),
-      'entry.2039104366': formData.deadline,
-      'entry.2046493657': formData.duration,
-      'entry.1598111379': formData.budget,
-      'entry.2004920983': formData.reference,
-      'entry.1944229631': formData.details,
-    };
-
-    Object.entries(fields).forEach(([name, value]) => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = name;
-      input.value = value || '';
-      hiddenForm.appendChild(input);
+      'entry.581123435': formData.mobile || '',
+      'entry.547102629': serviceName,
+      'entry.857528850': platformNames,
+      'entry.2039104366': formData.deadline || '',
+      'entry.2046493657': formData.duration || '',
+      'entry.1598111379': formData.budget || '',
+      'entry.2004920983': formData.reference || '',
+      'entry.1944229631': formData.details || '',
     });
+    const gFormURL = 'https://docs.google.com/forms/d/e/1FAIpQLSc_n1V1wPLgwjrpIiK3Lf6E52Zp3p2KKfIIzF68OwA0gNsu-w/formResponse';
+    const gIframe = document.createElement('iframe');
+    gIframe.style.display = 'none';
+    document.body.appendChild(gIframe);
+    gIframe.src = gFormURL + '?' + gFormParams.toString();
 
-    document.body.appendChild(hiddenForm);
-    hiddenForm.submit();
+    // --- Method 2: Apps Script via GET (iframe src) ---
+    const scriptParams = new URLSearchParams({
+      name: formData.name,
+      email: formData.email,
+      mobile: formData.mobile || '',
+      service: serviceName,
+      platform: platformNames,
+      deadline: formData.deadline || '',
+      duration: formData.duration || '',
+      budget: formData.budget || '',
+      reference: formData.reference || '',
+      details: formData.details || '',
+    });
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzWy0-hezTXI0dDcW1TCWrZL9FFpLJxPNKq2_SgQ5JxfiQvZewDGZ49NoABZPEvaqXU/exec';
+    const sIframe = document.createElement('iframe');
+    sIframe.style.display = 'none';
+    document.body.appendChild(sIframe);
+    sIframe.src = scriptURL + '?' + scriptParams.toString();
 
-    // Clean up and show success after submission
+    // Clean up after submission
     setTimeout(() => {
-      document.body.removeChild(hiddenForm);
-      document.body.removeChild(iframe);
+      try { document.body.removeChild(gIframe); } catch (_) {}
+      try { document.body.removeChild(sIframe); } catch (_) {}
       setSending(false);
       setSubmitted(true);
-    }, 2000);
+    }, 3000);
   };
 
   // --- Field focus style (cyan theme) ---
