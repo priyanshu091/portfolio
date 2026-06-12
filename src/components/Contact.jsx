@@ -1,8 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+
+const platformOptions = [
+  { id: 'youtube', label: 'YouTube', color: '#FF0000', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> },
+  { id: 'instagram', label: 'Instagram', color: '#E1306C', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12s.014 3.668.072 4.948c.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24s3.668-.014 4.948-.072c4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg> },
+  { id: 'tiktok', label: 'TikTok', color: '#00F2EA', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg> },
+  { id: 'linkedin', label: 'LinkedIn', color: '#0A66C2', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> },
+  { id: 'website', label: 'Website', color: '#00D9FF', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> },
+];
 
 const Contact = () => {
-  const [hoveredField, setHoveredField] = useState(null);
-  const [formData, setFormData] = useState({ name: '', email: '', project: '', message: '' });
+  const [focusedField, setFocusedField] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '', email: '', service: '', platforms: [],
+    deadline: '', duration: '', budget: '', reference: '', details: '',
+  });
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [isHighlighted, setIsHighlighted] = useState(false);
@@ -13,18 +24,15 @@ const Contact = () => {
     const handleServiceSelected = () => {
       const saved = localStorage.getItem('selectedService');
       if (!saved) return;
-      setFormData(prev => ({ ...prev, project: saved }));
+      setFormData(prev => ({ ...prev, service: saved }));
       localStorage.removeItem('selectedService');
 
-      // Slight delay so layout settles, then scroll form card to vertical center
       setTimeout(() => {
         if (formCardRef.current) {
           formCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-        // Trigger glow pulse after scroll animation finishes (~800ms)
         setTimeout(() => {
           setIsHighlighted(true);
-          // Remove class after 3 pulses (3 × 700ms = 2100ms + a little buffer)
           setTimeout(() => setIsHighlighted(false), 2300);
         }, 800);
       }, 150);
@@ -34,31 +42,87 @@ const Contact = () => {
     return () => window.removeEventListener('serviceSelected', handleServiceSelected);
   }, []);
 
+  // --- Progress Calculation ---
+  const totalFields = 9; // name, email, service, platforms(1+), deadline, duration, budget, reference, details
+  const completedCount = useMemo(() => {
+    let count = 0;
+    if (formData.name.trim()) count++;
+    if (formData.email.trim()) count++;
+    if (formData.service) count++;
+    if (formData.platforms.length > 0) count++;
+    if (formData.deadline) count++;
+    if (formData.duration) count++;
+    if (formData.budget) count++;
+    if (formData.reference.trim()) count++;
+    if (formData.details.trim()) count++;
+    return count;
+  }, [formData]);
+  const progressPercent = Math.round((completedCount / totalFields) * 100);
+
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const togglePlatform = (id) => {
+    setFormData(prev => ({
+      ...prev,
+      platforms: prev.platforms.includes(id)
+        ? prev.platforms.filter(p => p !== id)
+        : [...prev.platforms, id],
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setSending(true);
-    // Simulate async send
     setTimeout(() => {
       setSending(false);
       setSubmitted(true);
     }, 1800);
   };
 
+  // --- Field focus style (cyan theme) ---
   const fieldStyle = (name) => ({
-    backgroundColor: hoveredField === name ? 'rgba(255,45,85,0.04)' : 'rgba(13,13,13,0.6)',
-    border: `1px solid ${hoveredField === name ? 'rgba(255,45,85,0.5)' : 'rgba(255,255,255,0.08)'}`,
+    backgroundColor: focusedField === name ? 'rgba(0,217,255,0.04)' : 'rgba(255,255,255,0.04)',
+    border: `1px solid ${focusedField === name ? 'rgba(0,217,255,0.45)' : 'rgba(255,255,255,0.08)'}`,
     backdropFilter: 'blur(12px)',
     color: '#ffffff',
     outline: 'none',
     transition: 'border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease',
-    boxShadow: hoveredField === name ? '0 0 20px rgba(255,45,85,0.1), inset 0 0 12px rgba(255,45,85,0.04)' : 'none',
+    boxShadow: focusedField === name ? '0 0 20px rgba(0,217,255,0.08), inset 0 0 12px rgba(0,217,255,0.03)' : 'none',
     fontFamily: 'var(--font-body)',
     fontSize: '14px',
+    borderRadius: '6px',
   });
+
+  const labelStyle = (name) => ({
+    color: focusedField === name ? 'var(--cyan-primary)' : 'var(--text-muted)',
+    transition: 'color 0.3s ease',
+  });
+
+  // --- Brief summary entries ---
+  const briefEntries = useMemo(() => {
+    const entries = [];
+    if (formData.name.trim()) entries.push({ label: 'Name', value: formData.name });
+    if (formData.email.trim()) entries.push({ label: 'Email', value: formData.email });
+    if (formData.service) {
+      const serviceNames = {
+        documentary: 'Documentary & Fact Style', reels: 'Podcast Reels', commercial: 'Commercial & Brand',
+        beat: 'Beat Sync & Travel', 'long-form': 'Long Format Podcast', wedding: 'Wedding & Event',
+        graphics: 'Graphic Designing', motion: 'Motion Graphics', other: 'Other',
+      };
+      entries.push({ label: 'Service', value: serviceNames[formData.service] || formData.service });
+    }
+    if (formData.platforms.length > 0) {
+      entries.push({ label: 'Platforms', value: formData.platforms.map(p => platformOptions.find(o => o.id === p)?.label).join(', ') });
+    }
+    if (formData.deadline) entries.push({ label: 'Deadline', value: formData.deadline });
+    if (formData.duration) entries.push({ label: 'Duration', value: formData.duration });
+    if (formData.budget) entries.push({ label: 'Budget', value: formData.budget });
+    if (formData.reference.trim()) entries.push({ label: 'Reference', value: formData.reference });
+    if (formData.details.trim()) entries.push({ label: 'Details', value: formData.details.length > 60 ? formData.details.slice(0, 60) + '...' : formData.details });
+    return entries;
+  }, [formData]);
 
   const infoItems = [
     {
@@ -109,6 +173,11 @@ const Contact = () => {
     },
   ];
 
+  // --- SVG Progress Ring ---
+  const ringRadius = 16;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+  const ringOffset = ringCircumference - (progressPercent / 100) * ringCircumference;
+
   return (
     <section
       id="contact"
@@ -143,9 +212,27 @@ const Contact = () => {
           0%,100% { opacity: 0.04; }
           50% { opacity: 0.08; }
         }
-        .contact-field:focus { 
-          border-color: rgba(255,45,85,0.6) !important; 
-          box-shadow: 0 0 25px rgba(255,45,85,0.12), inset 0 0 15px rgba(255,45,85,0.05) !important;
+        @keyframes shimmerSweep {
+          0% { left: -100%; }
+          100% { left: 200%; }
+        }
+        @keyframes briefRowEntry {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes chipPop {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.08); }
+          100% { transform: scale(1); }
+        }
+        @keyframes progressRingPulse {
+          0%,100% { filter: drop-shadow(0 0 2px rgba(0,217,255,0.3)); }
+          50% { filter: drop-shadow(0 0 6px rgba(0,217,255,0.6)); }
+        }
+        .contact-field:focus {
+          border-color: rgba(0, 217, 255, 0.5) !important;
+          box-shadow: 0 0 20px rgba(0, 217, 255, 0.1), inset 0 0 12px rgba(0, 217, 255, 0.04) !important;
+          background-color: rgba(0, 217, 255, 0.03) !important;
         }
         .contact-submit:hover .submit-liquid { transform: translateY(0%) !important; }
         .contact-submit:hover .submit-sweep { left: 120% !important; opacity: 1 !important; }
@@ -164,7 +251,20 @@ const Contact = () => {
         .form-highlight {
           animation: formPulseGlow 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
-
+        .platform-chip {
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          cursor: pointer;
+          user-select: none;
+        }
+        .platform-chip:hover {
+          transform: translateY(-1px);
+        }
+        .platform-chip.selected {
+          animation: chipPop 0.3s ease-out;
+        }
+        .brief-row {
+          animation: briefRowEntry 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
       `}</style>
 
       {/* Background Grid (animated) */}
@@ -269,39 +369,48 @@ const Contact = () => {
               </a>
             ))}
 
-            {/* Decorative HUD bottom panel */}
-            <div className="mt-2 p-4 border border-dashed" style={{ borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(13,13,13,0.3)' }}>
+            {/* ── YOUR BRIEF SO FAR — Live Summary Panel ── */}
+            <div className="mt-2 p-4 border border-dashed" style={{ borderColor: briefEntries.length > 0 ? 'rgba(0,217,255,0.15)' : 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(13,13,13,0.3)', transition: 'border-color 0.5s ease' }}>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>RESPONSE_TIME</span>
-                <span className="text-[9px] uppercase tracking-[2px]" style={{ color: '#00FF88', fontFamily: 'var(--font-mono)' }}>FAST</span>
+                <span className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>YOUR BRIEF SO FAR</span>
+                <span className="text-[9px] uppercase tracking-[2px]" style={{ color: briefEntries.length > 0 ? 'var(--cyan-primary)' : 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                  {briefEntries.length} / {totalFields}
+                </span>
               </div>
-              <div className="w-full h-[2px] rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
-                <div className="h-full rounded-full" style={{ width: '85%', background: 'linear-gradient(90deg, var(--scarlet-primary), var(--cyan-primary))' }} />
-              </div>
-              <div className="flex justify-between mt-1.5">
-                <span className="text-[8px]" style={{ color: 'var(--text-muted)' }}>0HR</span>
-                <span className="text-[8px]" style={{ color: 'var(--text-muted)' }}>48HR</span>
-              </div>
+
+              {briefEntries.length === 0 ? (
+                <p className="text-[11px] italic" style={{ color: 'var(--text-muted)' }}>Start filling the form — your brief will appear here.</p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {briefEntries.map((entry, i) => (
+                    <div key={entry.label} className="brief-row flex items-start gap-2" style={{ animationDelay: `${i * 0.05}s` }}>
+                      <span className="text-[9px] uppercase tracking-[1.5px] font-bold flex-shrink-0 mt-[2px]" style={{ color: 'var(--cyan-primary)', fontFamily: 'var(--font-mono)', minWidth: '70px' }}>{entry.label}</span>
+                      <span className="text-[12px]" style={{ color: 'var(--text-secondary)' }}>{entry.value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* RIGHT — Contact Form */}
+          {/* RIGHT — Project Brief Form */}
           <div className="lg:col-span-3 relative">
             {/* Form HUD top label */}
             <div className="flex items-center gap-3 mb-2">
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1))' }} />
-              <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>SEND A MESSAGE</span>
+              <span className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>START A PROJECT</span>
               <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
             </div>
 
             {/* Glassmorphic form card */}
             <div
               ref={formCardRef}
-              className={`relative p-5 md:p-6 overflow-hidden ${isHighlighted ? 'form-highlight' : ''}`}
+              className={`relative p-5 md:p-7 overflow-hidden ${isHighlighted ? 'form-highlight' : ''}`}
               style={{
                 border: '1px solid rgba(255,255,255,0.07)',
                 backgroundColor: 'rgba(13,13,13,0.5)',
                 backdropFilter: 'blur(20px)',
+                borderRadius: '12px',
                 transition: 'border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease',
               }}
             >
@@ -316,10 +425,10 @@ const Contact = () => {
               </div>
 
               {/* Corner brackets */}
-              <span className="absolute top-2 left-2 w-4 h-4 border-t border-l pointer-events-none" style={{ borderColor: 'rgba(255,45,85,0.3)' }} />
-              <span className="absolute top-2 right-2 w-4 h-4 border-t border-r pointer-events-none" style={{ borderColor: 'rgba(255,45,85,0.3)' }} />
-              <span className="absolute bottom-2 left-2 w-4 h-4 border-b border-l pointer-events-none" style={{ borderColor: 'rgba(255,45,85,0.3)' }} />
-              <span className="absolute bottom-2 right-2 w-4 h-4 border-b border-r pointer-events-none" style={{ borderColor: 'rgba(255,45,85,0.3)' }} />
+              <span className="absolute top-2 left-2 w-4 h-4 border-t border-l pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.25)' }} />
+              <span className="absolute top-2 right-2 w-4 h-4 border-t border-r pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.25)' }} />
+              <span className="absolute bottom-2 left-2 w-4 h-4 border-b border-l pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.25)' }} />
+              <span className="absolute bottom-2 right-2 w-4 h-4 border-b border-r pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.25)' }} />
 
               {submitted ? (
                 /* ── Success State ── */
@@ -331,139 +440,305 @@ const Contact = () => {
                   </div>
                   <div>
                     <p className="text-white text-xl font-bold tracking-widest uppercase mb-2">MESSAGE SENT</p>
-                    <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>We'll get back to you within 48 hours.</p>
+                    <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>We'll get back to you within 24 hours.</p>
                   </div>
                   <span className="text-[9px] uppercase tracking-[3px] font-bold" style={{ color: '#00FF88', fontFamily: 'var(--font-mono)' }}>MESSAGE DELIVERED</span>
                 </div>
               ) : (
-                /* ── Form ── */
-                <form onSubmit={handleSubmit} className="flex flex-col gap-3 relative z-10">
-                  {/* Row 1: Name + Email */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                /* ── Project Brief Form ── */
+                <div className="relative z-10">
+                  {/* Form header with progress ring */}
+                  <div className="flex items-start justify-between mb-6">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--scarlet-primary)', boxShadow: '0 0 6px var(--scarlet-primary)' }} />
+                        <span className="text-[10px] uppercase tracking-[3px] font-bold" style={{ color: 'var(--scarlet-primary)' }}>START A PROJECT</span>
+                      </div>
+                      <h3 className="text-white text-xl md:text-2xl font-bold leading-tight mb-1" style={{ fontFamily: 'var(--font-heading)' }}>
+                        Let's build your next video.
+                      </h3>
+                      <p className="text-[12px] max-w-sm" style={{ color: 'var(--text-muted)' }}>
+                        Fill the brief below — watch your estimate update live, and I'll reply within 24 hours.
+                      </p>
+                    </div>
+
+                    {/* Progress Ring */}
+                    <div className="flex items-center gap-2 flex-shrink-0 mt-1">
+                      <span className="text-[11px] font-bold" style={{ color: 'var(--cyan-primary)', fontFamily: 'var(--font-mono)' }}>{progressPercent}%</span>
+                      <svg width="40" height="40" viewBox="0 0 40 40" style={{ animation: progressPercent > 0 ? 'progressRingPulse 2s ease-in-out infinite' : 'none' }}>
+                        {/* Background ring */}
+                        <circle cx="20" cy="20" r={ringRadius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+                        {/* Progress ring */}
+                        <circle
+                          cx="20" cy="20" r={ringRadius} fill="none"
+                          stroke="var(--cyan-primary)"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeDasharray={ringCircumference}
+                          strokeDashoffset={ringOffset}
+                          style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%', transition: 'stroke-dashoffset 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }}
+                        />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Form header divider */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <span className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>PROJECT BRIEF</span>
+                    <div className="flex-1 h-[1px]" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.08), transparent)' }} />
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+                    {/* Row 1: Name + Email */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('name')}>
+                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'name' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
+                          YOUR NAME
+                        </label>
+                        <input
+                          name="name" type="text" required
+                          placeholder="e.g. Priya Sharma"
+                          value={formData.name} onChange={handleChange}
+                          onFocus={() => setFocusedField('name')}
+                          onBlur={() => setFocusedField(null)}
+                          className="contact-field w-full px-4 py-2.5"
+                          style={fieldStyle('name')}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('email')}>
+                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'email' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
+                          EMAIL
+                        </label>
+                        <input
+                          name="email" type="email" required
+                          placeholder="priya@company.com"
+                          value={formData.email} onChange={handleChange}
+                          onFocus={() => setFocusedField('email')}
+                          onBlur={() => setFocusedField(null)}
+                          className="contact-field w-full px-4 py-2.5"
+                          style={fieldStyle('email')}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Row 2: Service Type (full width) */}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('service')}>
+                        <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'service' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
+                        WHAT DO YOU NEED?
+                      </label>
+                      <select
+                        name="service" required
+                        value={formData.service} onChange={handleChange}
+                        onFocus={() => setFocusedField('service')}
+                        onBlur={() => setFocusedField(null)}
+                        className="contact-field w-full px-4 py-2.5"
+                        style={{ ...fieldStyle('service'), cursor: 'pointer' }}
+                      >
+                        <option value="" style={{ backgroundColor: '#0D0D0D' }}>Select a service...</option>
+                        <option value="documentary" style={{ backgroundColor: '#0D0D0D' }}>Documentary & Fact Style</option>
+                        <option value="reels" style={{ backgroundColor: '#0D0D0D' }}>Podcast Reels / Short Form</option>
+                        <option value="commercial" style={{ backgroundColor: '#0D0D0D' }}>Commercial & Brand</option>
+                        <option value="beat" style={{ backgroundColor: '#0D0D0D' }}>Beat Sync & Travel</option>
+                        <option value="long-form" style={{ backgroundColor: '#0D0D0D' }}>Long Format Podcast</option>
+                        <option value="wedding" style={{ backgroundColor: '#0D0D0D' }}>Wedding & Event</option>
+                        <option value="graphics" style={{ backgroundColor: '#0D0D0D' }}>Graphic Designing</option>
+                        <option value="motion" style={{ backgroundColor: '#0D0D0D' }}>Motion Graphics</option>
+                        <option value="other" style={{ backgroundColor: '#0D0D0D' }}>Other</option>
+                      </select>
+                    </div>
+
+                    {/* Row 3: Platform Chips */}
                     <div className="flex flex-col gap-2">
-                      <label className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)' }}>YOUR NAME</label>
-                      <input
-                        name="name"
-                        type="text"
-                        required
-                        placeholder="John Doe"
-                        value={formData.name}
-                        onChange={handleChange}
-                        onFocus={() => setHoveredField('name')}
-                        onBlur={() => setHoveredField(null)}
-                        className="contact-field w-full px-4 py-2"
-                        style={{ ...fieldStyle('name'), '::placeholder': { color: 'var(--text-muted)' } }}
+                      <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={{ color: formData.platforms.length > 0 ? 'var(--cyan-primary)' : 'var(--text-muted)', transition: 'color 0.3s ease' }}>
+                        <span className="w-1 h-1 rounded-full" style={{ backgroundColor: formData.platforms.length > 0 ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
+                        TARGET PLATFORM
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {platformOptions.map(p => {
+                          const isSelected = formData.platforms.includes(p.id);
+                          return (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => togglePlatform(p.id)}
+                              className={`platform-chip inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[1px] ${isSelected ? 'selected' : ''}`}
+                              style={{
+                                border: `1px solid ${isSelected ? p.color + '60' : 'rgba(255,255,255,0.1)'}`,
+                                backgroundColor: isSelected ? p.color + '15' : 'rgba(255,255,255,0.02)',
+                                color: isSelected ? p.color : 'var(--text-muted)',
+                                boxShadow: isSelected ? `0 0 12px ${p.color}20` : 'none',
+                              }}
+                            >
+                              <span style={{ opacity: isSelected ? 1 : 0.5 }}>{p.icon}</span>
+                              {p.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Row 4: Deadline + Duration */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('deadline')}>
+                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'deadline' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
+                          DEADLINE
+                        </label>
+                        <select
+                          name="deadline"
+                          value={formData.deadline} onChange={handleChange}
+                          onFocus={() => setFocusedField('deadline')}
+                          onBlur={() => setFocusedField(null)}
+                          className="contact-field w-full px-4 py-2.5"
+                          style={{ ...fieldStyle('deadline'), cursor: 'pointer' }}
+                        >
+                          <option value="" style={{ backgroundColor: '#0D0D0D' }}>Select...</option>
+                          <option value="Flexible / ongoing" style={{ backgroundColor: '#0D0D0D' }}>Flexible / ongoing</option>
+                          <option value="This week" style={{ backgroundColor: '#0D0D0D' }}>This week</option>
+                          <option value="Within 2 weeks" style={{ backgroundColor: '#0D0D0D' }}>Within 2 weeks</option>
+                          <option value="Within 1 month" style={{ backgroundColor: '#0D0D0D' }}>Within 1 month</option>
+                          <option value="ASAP" style={{ backgroundColor: '#0D0D0D' }}>ASAP</option>
+                        </select>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('duration')}>
+                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'duration' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
+                          DURATION
+                        </label>
+                        <select
+                          name="duration"
+                          value={formData.duration} onChange={handleChange}
+                          onFocus={() => setFocusedField('duration')}
+                          onBlur={() => setFocusedField(null)}
+                          className="contact-field w-full px-4 py-2.5"
+                          style={{ ...fieldStyle('duration'), cursor: 'pointer' }}
+                        >
+                          <option value="" style={{ backgroundColor: '#0D0D0D' }}>Select...</option>
+                          <option value="Under 60 seconds" style={{ backgroundColor: '#0D0D0D' }}>Under 60 seconds</option>
+                          <option value="1-5 minutes" style={{ backgroundColor: '#0D0D0D' }}>1-5 minutes</option>
+                          <option value="5-15 minutes" style={{ backgroundColor: '#0D0D0D' }}>5-15 minutes</option>
+                          <option value="15+ minutes" style={{ backgroundColor: '#0D0D0D' }}>15+ minutes</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Row 5: Budget + Reference */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('budget')}>
+                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'budget' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
+                          BUDGET RANGE
+                        </label>
+                        <select
+                          name="budget"
+                          value={formData.budget} onChange={handleChange}
+                          onFocus={() => setFocusedField('budget')}
+                          onBlur={() => setFocusedField(null)}
+                          className="contact-field w-full px-4 py-2.5"
+                          style={{ ...fieldStyle('budget'), cursor: 'pointer' }}
+                        >
+                          <option value="" style={{ backgroundColor: '#0D0D0D' }}>Select budget...</option>
+                          <option value="₹2,000 – ₹5,000" style={{ backgroundColor: '#0D0D0D' }}>₹2,000 – ₹5,000</option>
+                          <option value="₹5,000 – ₹15,000" style={{ backgroundColor: '#0D0D0D' }}>₹5,000 – ₹15,000</option>
+                          <option value="₹15,000 – ₹30,000" style={{ backgroundColor: '#0D0D0D' }}>₹15,000 – ₹30,000</option>
+                          <option value="₹30,000+" style={{ backgroundColor: '#0D0D0D' }}>₹30,000+</option>
+                          <option value="Let's discuss" style={{ backgroundColor: '#0D0D0D' }}>Let's discuss</option>
+                        </select>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('reference')}>
+                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'reference' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
+                          REFERENCE <span className="opacity-50">(OPT.)</span>
+                        </label>
+                        <input
+                          name="reference" type="text"
+                          placeholder="A style you like"
+                          value={formData.reference} onChange={handleChange}
+                          onFocus={() => setFocusedField('reference')}
+                          onBlur={() => setFocusedField(null)}
+                          className="contact-field w-full px-4 py-2.5"
+                          style={fieldStyle('reference')}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Row 6: Project Details (full width textarea) */}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="flex items-center gap-1.5 text-[9px] uppercase tracking-[2px] font-bold" style={labelStyle('details')}>
+                        <span className="w-1 h-1 rounded-full" style={{ backgroundColor: focusedField === 'details' ? 'var(--cyan-primary)' : 'rgba(255,255,255,0.2)' }} />
+                        PROJECT DETAILS
+                      </label>
+                      <textarea
+                        name="details" rows={3}
+                        placeholder="What's the goal? What footage do you have? Any style or mood you're going for?"
+                        value={formData.details} onChange={handleChange}
+                        onFocus={() => setFocusedField('details')}
+                        onBlur={() => setFocusedField(null)}
+                        className="contact-field w-full px-4 py-2.5 resize-none"
+                        style={fieldStyle('details')}
                       />
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <label className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)' }}>EMAIL ADDRESS</label>
-                      <input
-                        name="email"
-                        type="email"
-                        required
-                        placeholder="hello@brand.com"
-                        value={formData.email}
-                        onChange={handleChange}
-                        onFocus={() => setHoveredField('email')}
-                        onBlur={() => setHoveredField(null)}
-                        className="contact-field w-full px-4 py-2"
-                        style={fieldStyle('email')}
-                      />
-                    </div>
-                  </div>
 
-                  {/* Row 2: Project Type */}
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)' }}>PROJECT TYPE</label>
-                    <select
-                      name="project"
-                      required
-                      value={formData.project}
-                      onChange={handleChange}
-                      onFocus={() => setHoveredField('project')}
-                      onBlur={() => setHoveredField(null)}
-                      className="contact-field w-full px-4 py-2"
-                      style={{ ...fieldStyle('project'), cursor: 'pointer' }}
-                    >
-                      <option value="" style={{ backgroundColor: '#0D0D0D' }}>— Select project type —</option>
-                      <option value="documentary" style={{ backgroundColor: '#0D0D0D' }}>Documentary & Fact Style</option>
-                      <option value="reels" style={{ backgroundColor: '#0D0D0D' }}>Podcast Reels / Short Form</option>
-                      <option value="commercial" style={{ backgroundColor: '#0D0D0D' }}>Commercial & Brand</option>
-                      <option value="beat" style={{ backgroundColor: '#0D0D0D' }}>Beat Sync & Travel</option>
-                      <option value="long-form" style={{ backgroundColor: '#0D0D0D' }}>Long Format Podcast</option>
-                      <option value="wedding" style={{ backgroundColor: '#0D0D0D' }}>Wedding & Event</option>
-                      <option value="graphics" style={{ backgroundColor: '#0D0D0D' }}>Graphic Designing</option>
-                      <option value="motion" style={{ backgroundColor: '#0D0D0D' }}>Motion Graphics</option>
-                      <option value="other" style={{ backgroundColor: '#0D0D0D' }}>Other</option>
-                    </select>
-                  </div>
-
-                  {/* Row 3: Message */}
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)' }}>MESSAGE</label>
-                    <textarea
-                      name="message"
-                      required
-                      rows={4}
-                      placeholder="Describe your project, timeline, and goals..."
-                      value={formData.message}
-                      onChange={handleChange}
-                      onFocus={() => setHoveredField('message')}
-                      onBlur={() => setHoveredField(null)}
-                      className="contact-field w-full px-4 py-2 resize-none"
-                      style={fieldStyle('message')}
-                    />
-                  </div>
-
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={sending}
-                    className="contact-submit relative inline-flex items-center justify-center px-10 py-3 overflow-hidden w-full mt-1 cursor-pointer"
-                    style={{
-                      border: '1px solid rgba(255,255,255,0.12)',
-                      backgroundColor: 'rgba(13,13,13,0.7)',
-                      backdropFilter: 'blur(12px)',
-                      transition: 'border-color 0.5s ease, box-shadow 0.5s ease',
-                    }}
-                  >
-                    {/* Liquid fill */}
-                    <div
-                      className="submit-liquid absolute inset-0 pointer-events-none"
-                      style={{ transform: 'translateY(100%)', transition: 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)', backgroundColor: 'rgba(255,45,85,0.1)' }}
-                    >
-                      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, rgba(255,45,85,0.15) 0%, transparent 70%)' }} />
-                    </div>
-                    {/* Sweep orb */}
-                    <div
-                      className="submit-sweep absolute top-0 bottom-0 w-[80px] mix-blend-screen pointer-events-none"
+                    {/* Submit Button */}
+                    <button
+                      type="submit"
+                      disabled={sending}
+                      className="contact-submit relative inline-flex items-center justify-center px-10 py-3.5 overflow-hidden w-full mt-1 cursor-pointer"
                       style={{
-                        left: '-80%',
-                        background: 'linear-gradient(90deg, transparent, rgba(255,45,85,0.45), transparent)',
-                        filter: 'blur(10px)',
-                        opacity: 0,
-                        transition: 'left 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.1s',
+                        border: '1px solid rgba(255,45,85,0.3)',
+                        backgroundColor: 'rgba(255,45,85,0.06)',
+                        backdropFilter: 'blur(12px)',
+                        borderRadius: '8px',
+                        transition: 'border-color 0.5s ease, box-shadow 0.5s ease',
                       }}
-                    />
+                    >
+                      {/* Liquid fill */}
+                      <div
+                        className="submit-liquid absolute inset-0 pointer-events-none"
+                        style={{ transform: 'translateY(100%)', transition: 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)', backgroundColor: 'rgba(255,45,85,0.1)' }}
+                      >
+                        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, rgba(255,45,85,0.15) 0%, transparent 70%)' }} />
+                      </div>
 
-                    {/* Corner brackets */}
-                    <span className="absolute top-1 left-1 w-3 h-3 border-t border-l" style={{ borderColor: 'rgba(255,45,85,0.4)' }} />
-                    <span className="absolute top-1 right-1 w-3 h-3 border-t border-r" style={{ borderColor: 'rgba(255,45,85,0.4)' }} />
-                    <span className="absolute bottom-1 left-1 w-3 h-3 border-b border-l" style={{ borderColor: 'rgba(255,45,85,0.4)' }} />
-                    <span className="absolute bottom-1 right-1 w-3 h-3 border-b border-r" style={{ borderColor: 'rgba(255,45,85,0.4)' }} />
+                      {/* Continuous shimmer sweep */}
+                      <div
+                        className="absolute top-0 bottom-0 w-[80px] mix-blend-screen pointer-events-none"
+                        style={{
+                          background: 'linear-gradient(90deg, transparent, rgba(255,45,85,0.3), transparent)',
+                          filter: 'blur(10px)',
+                          animation: 'shimmerSweep 3s ease-in-out infinite',
+                        }}
+                      />
 
-                    {/* Status dot */}
-                    <span className="relative z-10 mr-3 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: sending ? '#00FF88' : 'var(--scarlet-primary)', boxShadow: `0 0 6px ${sending ? '#00FF88' : 'var(--scarlet-primary)'}`, animation: 'contactBlink 1s ease-in-out infinite' }} />
+                      {/* Sweep orb on hover */}
+                      <div
+                        className="submit-sweep absolute top-0 bottom-0 w-[80px] mix-blend-screen pointer-events-none"
+                        style={{
+                          left: '-80%',
+                          background: 'linear-gradient(90deg, transparent, rgba(255,45,85,0.45), transparent)',
+                          filter: 'blur(10px)',
+                          opacity: 0,
+                          transition: 'left 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.1s',
+                        }}
+                      />
 
-                    <span className="relative z-10 text-[11px] font-bold uppercase tracking-[3px]" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'var(--font-heading)' }}>
-                      {sending ? 'SENDING...' : 'SEND MESSAGE'}
-                    </span>
+                      {/* Status dot */}
+                      <span className="relative z-10 mr-3 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: sending ? '#00FF88' : 'var(--scarlet-primary)', boxShadow: `0 0 6px ${sending ? '#00FF88' : 'var(--scarlet-primary)'}`, animation: 'contactBlink 1s ease-in-out infinite' }} />
 
-                    {!sending && (
-                      <span className="relative z-10 ml-4 text-[16px]" style={{ color: 'var(--scarlet-primary)' }}>↗</span>
-                    )}
-                  </button>
-                </form>
+                      <span className="relative z-10 text-[11px] font-bold uppercase tracking-[3px]" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'var(--font-heading)' }}>
+                        {sending ? 'SENDING...' : 'SEND PROJECT BRIEF'}
+                      </span>
+
+                      {!sending && (
+                        <span className="relative z-10 ml-4 text-[16px]" style={{ color: 'var(--scarlet-primary)' }}>↗</span>
+                      )}
+                    </button>
+                  </form>
+                </div>
               )}
             </div>
           </div>
