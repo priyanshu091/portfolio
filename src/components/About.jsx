@@ -207,9 +207,9 @@ export default function About() {
                   </div>
 
                   {/* Portrait with focus brackets */}
-                  <div className="relative aspect-square w-full rounded-xl overflow-hidden mb-4" style={{ border: '1px solid rgba(255,255,255,0.08)', background: `linear-gradient(150deg, ${PINK}22, #0a0a0c)` }}>
+                  <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden mb-4" style={{ border: '1px solid rgba(255,255,255,0.08)', background: `linear-gradient(150deg, ${PINK}22, #0a0a0c)` }}>
                     {!portraitErr ? (
-                      <img src="/divyansh-portrait.jpg" onError={() => setPortraitErr(true)} alt="Portrait of Divyansh Vishwakarma" className="w-full h-full object-cover" />
+                      <img src="/divyansh-portrait.jpg" onError={() => setPortraitErr(true)} alt="Portrait of Divyansh Vishwakarma" className="w-full h-full object-cover" style={{ objectPosition: 'center 28%' }} />
                     ) : (
                       <div aria-hidden="true" className="w-full h-full flex items-center justify-center">
                         <span className="text-5xl font-black tracking-tight" style={{ color: PINK, fontFamily: 'var(--font-heading)', textShadow: `0 0 30px ${PINK}66` }}>DV</span>
