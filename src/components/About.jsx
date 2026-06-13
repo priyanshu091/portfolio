@@ -1,450 +1,325 @@
-import React, { useState, useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+/*
+ * About — single self-contained cinematic "editor dossier" card.
+ *
+ * Component choices (reimplemented inline, no shadcn CLI, no new deps — keeps this
+ * a one-file drop-in on a Vite+JSX project that has no shadcn/components.json):
+ *   • Border Beam   → rotating conic-gradient comet tracing the card edge (Framer).
+ *   • Number Ticker → count-up metrics driven by Framer `animate` + `useInView`.
+ *   • Meteors/grain → static SVG film grain + pink gradient-mesh texture.
+ * Stack: Vite + React + Framer Motion + lucide-react. Brand accent pink #ec4899.
+ *
+ * Layout: 3 columns on desktop (identity · pitch+metrics+traits · growth+clients+CTA),
+ * stacks on mobile. Natural block height (no pin/scrub) so it never overlaps adjacent
+ * sections while scrolling. All motion is whileInView/once and respects reduced-motion.
+ */
+import { useEffect, useRef, useState } from 'react';
+import { motion, useInView, useReducedMotion, animate } from 'framer-motion';
+import { Timer, Eye, TrendingUp, Music, Megaphone, Star, MapPin, ArrowUpRight } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
+// Site brand accent — scarlet (matches --scarlet-primary across the site).
+const PINK = '#FF2D55';
 
-// ── Animated counter hook ──
-function useCounter(end, duration = 1800, startTrigger = false) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    if (!startTrigger) return;
-    let startTime = null;
-    const step = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      const ease = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(ease * end));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [startTrigger, end, duration]);
-  return count;
-}
-
-const milestones = [
-  { year: '2020', label: 'STARTED JOURNEY', desc: 'First cinematic edit on After Effects — hooked instantly.' },
-  { year: '2021', label: 'FIRST CLIENT', desc: 'Landed first paid brand project. Delivered 3-day turnaround.' },
-  { year: '2022', label: '50+ PROJECTS', desc: 'Expanded into documentary & podcast long-form content.' },
-  { year: '2023', label: '5M+ VIEWS', desc: 'Client reels crossed 5 million organic views combined.' },
-  { year: '2024', label: '10M+ VIEWS', desc: 'Scale-up: 150+ projects, 48HR delivery standard established.' },
+const metrics = [
+  { value: 60, suffix: '+', label: 'CLIENTS', color: PINK },
+  { value: 150, suffix: '+', label: 'PROJECTS', color: '#00D9FF' },
+  { value: 10, suffix: 'M+', label: 'VIEWS GENERATED', color: '#00FF9D' },
 ];
 
 const traits = [
-  { icon: '🎬', label: 'Cinematic Vision', desc: 'Every frame is a deliberate creative choice.' },
-  { icon: '⚡', label: '48HR Turnaround', desc: 'Speed without compromising quality — always.' },
-  { icon: '🔊', label: 'Audio-First Edit', desc: 'Sound design and pacing drive the emotion.' },
-  { icon: '📈', label: 'Retention Focus', desc: 'Editing engineered to keep audiences watching.' },
+  { Icon: Timer, label: '48hr Turnaround' },
+  { Icon: Eye, label: 'Cinematic Eye' },
+  { Icon: TrendingUp, label: 'Retention Focused' },
+  { Icon: Music, label: 'Audio-First' },
+  { Icon: Megaphone, label: 'Brand Voice' },
+  { Icon: Star, label: '5.0 Avg Rating' },
 ];
 
-const About = () => {
-  const [activeYear, setActiveYear] = useState(null);
-  const [triggered, setTriggered] = useState(false);
-  const sectionRef = useRef(null);
-  const headingRef = useRef(null);
-  const subRef = useRef(null);
-  const p1Ref = useRef(null);
-  const p2Ref = useRef(null);
+const clients = [
+  { name: 'Upgency', slug: 'upgency', from: '#FF2D55', to: '#7c3aed' },
+  { name: 'Sikho App', slug: 'sikho-app', from: '#00D9FF', to: '#0ea5e9' },
+  { name: 'Kuku FM', slug: 'kuku-fm', from: '#FF2D55', to: '#f97316' },
+  { name: 'AssetPlus', slug: 'assetplus', from: '#00FF9D', to: '#10b981' },
+  { name: 'Choice Connect', slug: 'choice-connect', from: '#a78bfa', to: '#6366f1' },
+  { name: 'Smartmatic Detergent', slug: 'smartmatic-detergent', from: '#fbbf24', to: '#ef4444' },
+];
 
-  const projects = useCounter(150, 1600, triggered);
-  const views = useCounter(10, 1400, triggered);
-  const clients = useCounter(60, 1200, triggered);
+// Seven-point growth 2020 → 2026 (relative height %), 2026 = current/emphasized.
+const timeline = [
+  { year: 2020, h: 16 },
+  { year: 2021, h: 32 },
+  { year: 2022, h: 48 },
+  { year: 2023, h: 65 },
+  { year: 2024, h: 81 },
+  { year: 2025, h: 92 },
+  { year: 2026, h: 100 },
+];
+
+const initials = (name) => {
+  const w = name.trim().split(/\s+/);
+  return (w.length > 1 ? w[0][0] + w[1][0] : name.slice(0, 2)).toUpperCase();
+};
+
+// ── Count-up metric ──
+function NumberTicker({ value, suffix, color, reduced }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-40px' });
+  const [display, setDisplay] = useState(0);
 
   useEffect(() => {
-    // Set full text immediately — no letter-by-letter typing
-    if (headingRef.current) {
-      headingRef.current.innerHTML = `I DON'T JUST<br/><span style="color: var(--scarlet-primary)">MAKE CLIPS</span><br/>I BUILD<br/>ENGAGEMENT`;
-    }
-    if (subRef.current) {
-      subRef.current.textContent = "DIVYANSH VISHWAKARMA // CREATIVE VIDEO EDITOR";
-    }
-    if (p1Ref.current) {
-      p1Ref.current.textContent = "I turn raw footage into polished, professional videos that connect with viewers. My focus is on clean cuts, great rhythm, and a visual style that matches your voice. No matter the platform, I make sure your videos are easy to watch, professional, and engaging.";
-    }
-    if (p2Ref.current) {
-      p2Ref.current.textContent = "Based in India, helping brands and creators stand out worldwide. My standard turnaround time is 48 hours.";
-    }
-
-    // Start hidden
-    gsap.set([headingRef.current, subRef.current, p1Ref.current, p2Ref.current], { opacity: 0, y: 30 });
-    gsap.set('.about-trait-card', { opacity: 0, y: 24 });
-
-    // Simple fade-in + slide-up when section enters viewport (no pin, no scrub)
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: 'top 75%',
-        once: true,
-        onEnter: () => {
-          setTriggered(true);
-        }
-      }
+    if (!inView) return;
+    if (reduced) { setDisplay(value); return; }
+    const controls = animate(0, value, {
+      duration: 1.6,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => setDisplay(Math.floor(v)),
     });
-
-    // Staggered fade-in for all text elements
-    tl.to(headingRef.current, {
-      opacity: 1,
-      y: 0,
-      duration: 0.7,
-      ease: 'power3.out',
-    })
-    .to(subRef.current, {
-      opacity: 1,
-      y: 0,
-      duration: 0.6,
-      ease: 'power3.out',
-    }, '-=0.4')
-    .to(p1Ref.current, {
-      opacity: 1,
-      y: 0,
-      duration: 0.6,
-      ease: 'power3.out',
-    }, '-=0.3')
-    .to(p2Ref.current, {
-      opacity: 1,
-      y: 0,
-      duration: 0.6,
-      ease: 'power3.out',
-    }, '-=0.3')
-    .to('.about-trait-card', {
-      opacity: 1,
-      y: 0,
-      duration: 0.5,
-      stagger: 0.1,
-      ease: 'power2.out'
-    }, '-=0.3');
-
-    return () => {
-      if (tl.scrollTrigger) tl.scrollTrigger.kill(true);
-      tl.kill();
-      ScrollTrigger.getAll().forEach(st => st.kill(true));
-    };
-  }, []);
+    return () => controls.stop();
+  }, [inView, value, reduced]);
 
   return (
-    <section
-      id="about"
-      ref={sectionRef}
-      className="relative w-full min-h-fit overflow-hidden flex items-center py-12 md:py-16 scroll-mt-24"
-      style={{ backgroundColor: 'var(--bg-deep)' }}
-    >
+    <span ref={ref} className="text-3xl sm:text-4xl font-black leading-none" style={{ color, fontFamily: 'var(--font-heading)', fontVariantNumeric: 'tabular-nums' }}>
+      {display}
+      <span className="text-xl sm:text-2xl">{suffix}</span>
+    </span>
+  );
+}
+
+// ── Live HH:MM:SS:FF timecode (isolated re-render; static when reduced) ──
+function Timecode({ reduced }) {
+  const [tc, setTc] = useState('00:00:00:00');
+  const last = useRef('');
+  useEffect(() => {
+    if (reduced) { setTc('00:14:22:08'); return; }
+    const start = performance.now();
+    let raf = 0;
+    const pad = (n) => String(n).padStart(2, '0');
+    const loop = (now) => {
+      const frames = Math.floor(((now - start) / 1000) * 24);
+      const f = frames % 24;
+      const s = Math.floor(frames / 24) % 60;
+      const m = Math.floor(frames / 1440) % 60;
+      const h = Math.floor(frames / 86400) % 24;
+      const next = `${pad(h)}:${pad(m)}:${pad(s)}:${pad(f)}`;
+      if (next !== last.current) { last.current = next; setTc(next); }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [reduced]);
+  return <span>{tc}</span>;
+}
+
+// ── Client logo: SVG if present, gradient letter-mark fallback ──
+function ClientLogo({ c }) {
+  const [err, setErr] = useState(false);
+  return (
+    <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg" style={{ border: '1px solid rgba(255,255,255,0.06)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
+      {!err ? (
+        <img src={`/clients/${c.slug}.svg`} onError={() => setErr(true)} alt={`${c.name} logo`} className="w-7 h-7 object-contain flex-shrink-0" />
+      ) : (
+        <span aria-hidden="true" className="w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-black text-white flex-shrink-0" style={{ background: `linear-gradient(135deg, ${c.from}, ${c.to})` }}>
+          {initials(c.name)}
+        </span>
+      )}
+      <span className="text-[10px] font-bold uppercase tracking-wide leading-tight" style={{ color: 'var(--text-secondary)' }}>{c.name}</span>
+    </div>
+  );
+}
+
+export default function About() {
+  const reduced = useReducedMotion();
+  const [portraitErr, setPortraitErr] = useState(false);
+
+  const container = {
+    hidden: {},
+    show: { transition: { staggerChildren: reduced ? 0 : 0.08, delayChildren: 0.05 } },
+  };
+  const item = reduced
+    ? { hidden: { opacity: 1, y: 0 }, show: { opacity: 1, y: 0 } }
+    : { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } } };
+  const barVar = reduced
+    ? { hidden: { scaleY: 1 }, show: { scaleY: 1 } }
+    : { hidden: { scaleY: 0 }, show: (i) => ({ scaleY: 1, transition: { duration: 0.7, delay: 0.25 + i * 0.06, ease: [0.16, 1, 0.3, 1] } }) };
+
+  return (
+    <section id="about" className="relative w-full overflow-hidden py-16 md:py-24 scroll-mt-24" style={{ backgroundColor: 'var(--bg-deep)' }}>
       <style>{`
-        @keyframes aboutScan {
-          0% { transform: translateY(-100%); opacity: 0; }
-          15% { opacity: 1; }
-          85% { opacity: 1; }
-          100% { transform: translateY(4000%); opacity: 0; }
-        }
-        @keyframes aboutAurora1 {
-          0%,100% { transform: translate(0,0) scale(1); }
-          50% { transform: translate(50px,-40px) scale(1.12); }
-        }
-        @keyframes aboutAurora2 {
-          0%,100% { transform: translate(0,0) scale(1); }
-          50% { transform: translate(-40px,50px) scale(0.9); }
-        }
-        @keyframes aboutPulse {
-          0%,100% { opacity:0.4; transform:scale(1); }
-          50% { opacity:1; transform:scale(1.6); }
-        }
-        @keyframes aboutGridFade {
-          0%,100% { opacity:0.035; }
-          50% { opacity:0.07; }
-        }
-        @keyframes aboutBarFill {
-          from { width: 0%; }
-          to { width: var(--target-w); }
-        }
-        @keyframes traitCardIn {
-          from { opacity: 0; transform: translateY(24px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .about-trait-card {
-          transition: border-color 0.35s ease, background-color 0.35s ease;
-        }
-        .about-trait-card:hover {
-          border-color: rgba(255,45,85,0.4) !important;
-          background: rgba(255,45,85,0.04) !important;
-          transform: translateY(-4px) scale(1.02) !important;
-          transition: border-color 0.35s ease, background 0.35s ease, transform 0.35s ease !important;
-        }
-        .about-timeline-card {
-          border: 1px solid transparent;
-          border-radius: 8px;
-          background: transparent;
-          backdrop-filter: blur(0px);
-          transition:
-            background 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-            border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-            backdrop-filter 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-            box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-            transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .about-timeline-card:hover {
-          background: rgba(0, 217, 255, 0.04);
-          border-color: rgba(0, 217, 255, 0.18);
-          backdrop-filter: blur(14px);
-          box-shadow: 0 0 24px rgba(0, 217, 255, 0.06), inset 0 0 20px rgba(0, 217, 255, 0.03);
-          transform: translateX(4px);
-        }
-        .about-timeline-card:hover .card-label {
-          color: #ffffff !important;
-          letter-spacing: 3px;
-        }
-        .about-timeline-card:hover .card-year {
-          color: var(--cyan-primary) !important;
-        }
-        .card-label {
-          transition: color 0.4s ease, letter-spacing 0.4s ease;
-        }
-        .card-year {
-          transition: color 0.4s ease;
-        }
-        .about-stats-card {
-          transition:
-            border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-            background-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-            box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-            transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .about-stats-card:hover {
-          border-color: rgba(0, 217, 255, 0.22) !important;
-          background-color: rgba(0, 217, 255, 0.05) !important;
-          box-shadow: 0 0 32px rgba(0, 217, 255, 0.08), inset 0 0 24px rgba(0, 217, 255, 0.04);
-          transform: translateY(-3px);
-        }
-        @keyframes runwayGlow {
-          0% {
-            border-color: rgba(255, 255, 255, 0.12);
-            background-color: rgba(13, 13, 13, 0.8);
-            box-shadow: none;
-            color: var(--text-muted);
-          }
-          10% {
-            border-color: var(--cyan-primary);
-            background-color: rgba(0, 217, 255, 0.12);
-            box-shadow: 0 0 18px rgba(0, 217, 255, 0.4);
-            color: var(--cyan-primary);
-          }
-          20%, 100% {
-            border-color: rgba(255, 255, 255, 0.12);
-            background-color: rgba(13, 13, 13, 0.8);
-            box-shadow: none;
-            color: var(--text-muted);
-          }
-        }
-        .about-runway-dot {
-          animation: runwayGlow 10s ease-in-out infinite;
-          transition: none !important;
-        }
-        .about-runway-dot span {
-          transition: none !important;
-        }
-        .about-runway-dot-0 {
-          animation-delay: -10s;
-        }
-        .about-runway-dot-1 {
-          animation-delay: -8s;
-        }
-        .about-runway-dot-2 {
-          animation-delay: -6s;
-        }
-        .about-runway-dot-3 {
-          animation-delay: -4s;
-        }
-        .about-runway-dot-4 {
-          animation-delay: -2s;
+        @keyframes aboutShimmer { 0% { transform: translateX(-120%); } 100% { transform: translateX(220%); } }
+        @keyframes aboutRecBlink { 0%,100% { opacity:1; } 50% { opacity:0.25; } }
+        @media (prefers-reduced-motion: reduce) {
+          .about-shimmer, .about-beam, .about-rec { animation: none !important; }
         }
       `}</style>
 
-      {/* Background grid */}
-      <div className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)',
-          backgroundSize: '50px 50px',
-          animation: 'aboutGridFade 7s ease-in-out infinite',
-        }}
-      />
+      {/* Pink gradient-mesh ambience */}
+      <div aria-hidden="true" className="absolute -top-24 right-0 w-[520px] h-[520px] pointer-events-none z-0" style={{ background: `radial-gradient(circle, ${PINK}1f 0%, transparent 70%)`, filter: 'blur(80px)' }} />
+      <div aria-hidden="true" className="absolute -bottom-24 left-0 w-[420px] h-[420px] pointer-events-none z-0" style={{ background: 'radial-gradient(circle, rgba(0,217,255,0.10) 0%, transparent 70%)', filter: 'blur(70px)' }} />
 
-      {/* Aurora blobs */}
-      <div className="absolute top-1/4 right-0 w-[500px] h-[500px] pointer-events-none z-0"
-        style={{ background: 'radial-gradient(circle, rgba(255,45,85,0.07) 0%, transparent 70%)', filter: 'blur(70px)', animation: 'aboutAurora1 14s ease-in-out infinite' }}
-      />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] pointer-events-none z-0"
-        style={{ background: 'radial-gradient(circle, rgba(0,217,255,0.06) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'aboutAurora2 18s ease-in-out infinite' }}
-      />
+      <div className="w-full px-5 sm:px-8 md:px-16 relative z-10 flex justify-center">
+        {/* Section label */}
+        <motion.div
+          className="w-full max-w-6xl"
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-80px' }}
+        >
+          <motion.div variants={item} className="flex items-center gap-3 mb-5">
+            <span className="about-rec w-2 h-2 rounded-full" style={{ backgroundColor: PINK, boxShadow: `0 0 8px ${PINK}`, animation: 'aboutRecBlink 1.4s ease-in-out infinite' }} />
+            <span className="text-[11px] uppercase tracking-[3px] font-bold" style={{ color: PINK }}>ABOUT THE EDITOR</span>
+            <div className="flex-1 h-[1px]" style={{ background: `linear-gradient(90deg, ${PINK}, transparent)` }} />
+          </motion.div>
 
-      {/* Scan line */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute left-0 right-0 h-[1px]"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(0,217,255,0.25) 50%, transparent)', animation: 'aboutScan 7s ease-in-out infinite' }}
-        />
-      </div>
-
-      <div className="w-full px-8 md:px-16 relative z-10">
-
-        {/* ── Section label ── */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--cyan-primary)', animation: 'aboutPulse 2s ease-in-out infinite' }} />
-          <span className="text-[11px] uppercase tracking-[3px] font-bold" style={{ color: 'var(--cyan-primary)' }}>ABOUT THE EDITOR</span>
-          <div className="flex-1 h-[1px]" style={{ background: 'linear-gradient(90deg, var(--cyan-primary), transparent)' }} />
-        </div>
-
-        {/* ── Main two-column layout ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-12 items-start">
-
-          {/* LEFT — Headline + Bio + Traits */}
-          <div>
-            {/* Headline with glitch */}
-            <h2
-              ref={headingRef}
-              className="text-white text-4xl md:text-5xl xl:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            />
-
-            {/* HUD subtitle line */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-[1px] w-8" style={{ backgroundColor: 'var(--scarlet-primary)' }} />
-              <span ref={subRef} className="text-[10px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--scarlet-primary)', fontFamily: 'var(--font-mono)' }} />
+          {/* ── The card ── */}
+          <div className="relative rounded-2xl">
+            {/* Border beam */}
+            <div aria-hidden="true" className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+              <motion.div
+                className="about-beam absolute"
+                style={{
+                  width: '180%', height: '180%', top: '-40%', left: '-40%',
+                  background: `conic-gradient(from 0deg, transparent 0deg, transparent 300deg, ${PINK} 340deg, #FF6B85 352deg, transparent 360deg)`,
+                }}
+                animate={reduced ? {} : { rotate: 360 }}
+                transition={reduced ? {} : { duration: 7, repeat: Infinity, ease: 'linear' }}
+              />
             </div>
 
-            <p ref={p1Ref} className="text-[16px] leading-[1.8] mb-2" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }} />
-            <p ref={p2Ref} className="text-[15px] leading-[1.8] mb-6" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }} />
+            {/* Card body (1px inset reveals the beam as a thin ring) */}
+            <div className="relative m-px rounded-2xl overflow-hidden" style={{ backgroundColor: 'rgba(11,11,13,0.92)', backdropFilter: 'blur(20px)' }}>
+              {/* Film grain */}
+              <svg aria-hidden="true" className="absolute inset-0 w-full h-full pointer-events-none" style={{ mixBlendMode: 'overlay', opacity: 0.06 }}>
+                <filter id="about-grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" /></filter>
+                <rect width="100%" height="100%" filter="url(#about-grain)" />
+              </svg>
 
-            {/* Trait cards grid */}
-            <div className="grid grid-cols-2 gap-2">
-              {traits.map((t) => (
-                <div
-                  key={t.label}
-                  className="about-trait-card p-3 cursor-default"
-                  style={{
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    backgroundColor: 'rgba(13,13,13,0.4)',
-                    backdropFilter: 'blur(12px)',
-                    transition: 'border-color 0.35s ease, background 0.35s ease',
-                  }}
-                >
-                  <div className="text-2xl mb-2">{t.icon}</div>
-                  <div className="text-[11px] font-bold uppercase tracking-[1.5px] text-white mb-1">{t.label}</div>
-                  <div className="text-[11px] leading-[1.5]" style={{ color: 'var(--text-muted)' }}>{t.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+              <div className="relative grid grid-cols-1 lg:grid-cols-[260px_1fr_290px]">
 
-          {/* RIGHT — Stats + Timeline */}
-          <div className="flex flex-col gap-6">
-
-            {/* Animated stat counters */}
-            <div
-              className="about-stats-card relative p-6 overflow-hidden"
-              style={{ border: '1px solid rgba(255,255,255,0.07)', backgroundColor: 'rgba(13,13,13,0.5)', backdropFilter: 'blur(20px)' }}
-            >
-              {/* Corner brackets */}
-              <span className="absolute top-2 left-2 w-4 h-4 border-t border-l pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.4)' }} />
-              <span className="absolute top-2 right-2 w-4 h-4 border-t border-r pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.4)' }} />
-              <span className="absolute bottom-2 left-2 w-4 h-4 border-b border-l pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.4)' }} />
-              <span className="absolute bottom-2 right-2 w-4 h-4 border-b border-r pointer-events-none" style={{ borderColor: 'rgba(0,217,255,0.4)' }} />
-
-              <div className="text-[9px] uppercase tracking-[2px] mb-4 font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>BY THE NUMBERS</div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="flex flex-col gap-1">
-                  <div className="text-4xl font-black" style={{ color: 'var(--scarlet-primary)', fontFamily: 'var(--font-heading)' }}>
-                    {projects}<span className="text-2xl">+</span>
+                {/* ───────── LEFT · Identity ───────── */}
+                <motion.div variants={item} className="p-6 lg:p-7 border-b lg:border-b-0 lg:border-r" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
+                  {/* HUD: REC + timecode */}
+                  <div aria-hidden="true" className="flex items-center justify-between mb-4 font-mono text-[9px] tracking-[2px]" style={{ color: 'var(--text-muted)' }}>
+                    <span className="flex items-center gap-1.5" style={{ color: '#f87171' }}>
+                      <span className="about-rec w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#ef4444', boxShadow: '0 0 6px #ef4444', animation: 'aboutRecBlink 1.4s ease-in-out infinite' }} />
+                      REC
+                    </span>
+                    <Timecode reduced={reduced} />
                   </div>
-                  <div className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)' }}>PROJECTS</div>
-                  <div className="mt-2 h-[2px] rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
-                    <div className="h-full rounded-full" style={{ width: `${(projects / 150) * 100}%`, backgroundColor: 'var(--scarlet-primary)', transition: 'width 0.1s ease' }} />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <div className="text-4xl font-black" style={{ color: 'var(--cyan-primary)', fontFamily: 'var(--font-heading)' }}>
-                    {views}<span className="text-2xl">M+</span>
-                  </div>
-                  <div className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)' }}>VIEWS GEN.</div>
-                  <div className="mt-2 h-[2px] rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
-                    <div className="h-full rounded-full" style={{ width: `${(views / 10) * 100}%`, backgroundColor: 'var(--cyan-primary)', transition: 'width 0.1s ease' }} />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <div className="text-4xl font-black" style={{ color: '#00FF88', fontFamily: 'var(--font-heading)' }}>
-                    {clients}<span className="text-2xl">+</span>
-                  </div>
-                  <div className="text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--text-muted)' }}>CLIENTS</div>
-                  <div className="mt-2 h-[2px] rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
-                    <div className="h-full rounded-full" style={{ width: `${(clients / 60) * 100}%`, backgroundColor: '#00FF88', transition: 'width 0.1s ease' }} />
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Timeline */}
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1))' }} />
-                <span className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>THE JOURNEY</span>
-                <div className="h-[1px] flex-1" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
-              </div>
-
-              <div className="relative flex flex-col gap-0">
-                {/* Vertical line */}
-                <div className="absolute left-[19px] top-4 bottom-4 w-[1px]" style={{ background: 'linear-gradient(to bottom, var(--scarlet-primary), var(--scarlet-deep))' }} />
-
-                {milestones.map((m, i) => {
-                  const isActive = activeYear === i;
-                  return (
-                    <div
-                      key={m.year}
-                      className="about-timeline-card relative flex items-start gap-5 p-2 pl-3 cursor-pointer"
-                      onClick={() => setActiveYear(isActive ? null : i)}
-                    >
-                      {/* Dot */}
-                      <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 about-runway-dot about-runway-dot-${i}`}>
-                        <span className="text-[10px] font-black">
-                          {m.year.slice(2)}
-                        </span>
+                  {/* Portrait with focus brackets */}
+                  <div className="relative aspect-square w-full rounded-xl overflow-hidden mb-4" style={{ border: '1px solid rgba(255,255,255,0.08)', background: `linear-gradient(150deg, ${PINK}22, #0a0a0c)` }}>
+                    {!portraitErr ? (
+                      <img src="/divyansh-portrait.jpg" onError={() => setPortraitErr(true)} alt="Portrait of Divyansh Vishwakarma" className="w-full h-full object-cover" />
+                    ) : (
+                      <div aria-hidden="true" className="w-full h-full flex items-center justify-center">
+                        <span className="text-5xl font-black tracking-tight" style={{ color: PINK, fontFamily: 'var(--font-heading)', textShadow: `0 0 30px ${PINK}66` }}>DV</span>
                       </div>
-                      <div className="flex flex-col gap-1 pt-2 flex-1">
-                        <div className="flex items-center gap-3">
-                          <span className="card-label text-[10px] font-black uppercase tracking-[2px] text-white">{m.label}</span>
-                          <span className="card-year text-[9px] font-mono" style={{ color: 'var(--text-muted)' }}>{m.year}</span>
-                          {isActive && <span className="ml-auto text-[9px] uppercase tracking-[1px]" style={{ color: 'var(--scarlet-primary)' }}>EXPANDED</span>}
-                        </div>
-                        <div
-                          className="text-[12px] leading-relaxed overflow-hidden transition-all duration-500"
-                          style={{
-                            color: 'var(--text-muted)',
-                            maxHeight: isActive ? '80px' : '0px',
-                            opacity: isActive ? 1 : 0,
-                          }}
-                        >
-                          {m.desc}
-                        </div>
+                    )}
+                    {/* focus brackets */}
+                    {['top-2 left-2 border-t border-l', 'top-2 right-2 border-t border-r', 'bottom-2 left-2 border-b border-l', 'bottom-2 right-2 border-b border-r'].map((c) => (
+                      <span key={c} aria-hidden="true" className={`absolute w-4 h-4 ${c}`} style={{ borderColor: PINK }} />
+                    ))}
+                  </div>
+
+                  <h3 className="text-white text-xl font-black uppercase tracking-tight leading-tight" style={{ fontFamily: 'var(--font-heading)' }}>Divyansh Vishwakarma</h3>
+                  <p className="text-[12px] font-bold uppercase tracking-[2px] mt-1" style={{ color: PINK }}>Creative Video Editor</p>
+                  <p className="flex items-center gap-1.5 text-[11px] mt-2" style={{ color: 'var(--text-muted)' }}>
+                    <MapPin size={12} aria-hidden="true" /> India · Available remote worldwide
+                  </p>
+                </motion.div>
+
+                {/* ───────── CENTER · Pitch + Metrics + Traits ───────── */}
+                <div className="p-6 lg:p-8 flex flex-col gap-6 border-b lg:border-b-0 lg:border-r" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
+                  <motion.p variants={item} className="text-white text-lg sm:text-xl lg:text-2xl font-bold leading-[1.45]" style={{ fontFamily: 'var(--font-heading)' }}>
+                    I turn raw footage into polished, scroll-stopping videos that brands trust to drive engagement <span style={{ color: PINK }}>— from podcast reels to commercial spots.</span>
+                  </motion.p>
+
+                  {/* Metrics */}
+                  <motion.div variants={item} className="grid grid-cols-3 gap-3">
+                    {metrics.map((m) => (
+                      <div key={m.label} className="flex flex-col gap-1">
+                        <NumberTicker value={m.value} suffix={m.suffix} color={m.color} reduced={reduced} />
+                        <span className="text-[9px] font-bold uppercase tracking-[1.5px]" style={{ color: 'var(--text-muted)' }}>{m.label}</span>
+                        <span className="h-[2px] rounded-full mt-0.5" style={{ backgroundColor: m.color, opacity: 0.5 }} />
                       </div>
+                    ))}
+                  </motion.div>
+
+                  {/* Trait chips */}
+                  <motion.div variants={item} className="flex flex-wrap gap-2">
+                    {traits.map(({ Icon, label }) => (
+                      <span key={label} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide" style={{ border: '1px solid rgba(255,255,255,0.08)', backgroundColor: 'rgba(255,255,255,0.03)', color: 'var(--text-secondary)' }}>
+                        <Icon size={13} aria-hidden="true" style={{ color: PINK }} />
+                        {label}
+                      </span>
+                    ))}
+                  </motion.div>
+                </div>
+
+                {/* ───────── RIGHT · Growth + Clients + CTA ───────── */}
+                <motion.div variants={item} className="p-6 lg:p-7 flex flex-col gap-5">
+                  {/* Growth bars */}
+                  <div>
+                    <div className="text-[9px] font-bold uppercase tracking-[2px] mb-3 font-mono" style={{ color: 'var(--text-muted)' }}>GROWTH · 2020—2026</div>
+                    <div className="flex items-end justify-between gap-1.5 h-24">
+                      {timeline.map((t, i) => {
+                        const isNow = t.year === 2026;
+                        return (
+                          <div key={t.year} className="flex-1 flex flex-col items-center justify-end h-full gap-1.5">
+                            <div className="relative w-full flex items-end justify-center" style={{ height: '100%' }}>
+                              {isNow && (
+                                <span className="absolute -top-1 text-[7px] font-black px-1 py-0.5 rounded" style={{ color: '#fff', backgroundColor: PINK, letterSpacing: '1px' }}>NOW</span>
+                              )}
+                              <motion.span
+                                className="block w-full rounded-t-sm"
+                                style={{
+                                  height: `${t.h}%`,
+                                  transformOrigin: 'bottom',
+                                  background: isNow ? `linear-gradient(180deg, ${PINK}, #C2153B)` : 'rgba(255,255,255,0.14)',
+                                  boxShadow: isNow ? `0 0 14px ${PINK}88` : 'none',
+                                }}
+                                variants={barVar}
+                                custom={i}
+                              />
+                            </div>
+                            <span className="text-[8px] font-mono" style={{ color: isNow ? PINK : 'var(--text-muted)', fontWeight: isNow ? 800 : 400 }}>{String(t.year).slice(2)}</span>
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
+                  </div>
+
+                  {/* Client roster */}
+                  <div>
+                    <div className="text-[9px] font-bold uppercase tracking-[2px] mb-2.5 font-mono" style={{ color: 'var(--text-muted)' }}>TRUSTED BY</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {clients.map((c) => <ClientLogo key={c.slug} c={c} />)}
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <div className="mt-auto pt-1">
+                    <a
+                      href="#contact"
+                      className="about-cta group relative w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg overflow-hidden font-bold text-[12px] uppercase tracking-[2px] text-white"
+                      style={{ background: `linear-gradient(135deg, ${PINK}, #C2153B)`, boxShadow: `0 8px 24px ${PINK}44` }}
+                    >
+                      <span aria-hidden="true" className="about-shimmer absolute top-0 bottom-0 w-1/3" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)', animation: 'aboutShimmer 2.6s ease-in-out infinite' }} />
+                      <span className="relative">Start a project</span>
+                      <ArrowUpRight size={15} aria-hidden="true" className="relative transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </a>
+                    <p className="flex items-center justify-center gap-1.5 text-[10px] mt-2.5" style={{ color: 'var(--text-muted)' }}>
+                      <span className="about-rec w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#00FF9D', boxShadow: '0 0 6px #00FF9D', animation: 'aboutRecBlink 1.6s ease-in-out infinite' }} />
+                      Replies in under 2 hours
+                    </p>
+                  </div>
+                </motion.div>
+
               </div>
             </div>
-
-            {/* CTA pill */}
-            <a
-              href="#contact"
-              className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 overflow-hidden self-start"
-              style={{ border: '1px solid rgba(255,45,85,0.3)', backgroundColor: 'rgba(255,45,85,0.04)', backdropFilter: 'blur(12px)', transition: 'all 0.4s ease' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,45,85,0.7)'; e.currentTarget.style.backgroundColor = 'rgba(255,45,85,0.1)'; e.currentTarget.style.boxShadow = '0 0 30px rgba(255,45,85,0.2)'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,45,85,0.3)'; e.currentTarget.style.backgroundColor = 'rgba(255,45,85,0.04)'; e.currentTarget.style.boxShadow = 'none'; }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--scarlet-primary)', boxShadow: '0 0 6px var(--scarlet-primary)', animation: 'aboutPulse 2s ease-in-out infinite' }} />
-              <span className="text-[11px] font-bold uppercase tracking-[3px] text-white">LET'S COLLABORATE</span>
-              <span className="text-[16px] transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" style={{ color: 'var(--scarlet-primary)' }}>↗</span>
-            </a>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
-};
-
-export default About;
+}
