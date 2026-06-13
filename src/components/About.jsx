@@ -35,11 +35,11 @@ const traits = [
 ];
 
 const clients = [
-  { name: 'Upgency', slug: 'upgency', from: '#FF2D55', to: '#7c3aed' },
-  { name: 'Sikho App', slug: 'sikho-app', from: '#00D9FF', to: '#0ea5e9' },
-  { name: 'Kuku FM', slug: 'kuku-fm', from: '#FF2D55', to: '#f97316' },
-  { name: 'AssetPlus', slug: 'assetplus', from: '#00FF9D', to: '#10b981' },
-  { name: 'Choice Connect', slug: 'choice-connect', from: '#a78bfa', to: '#6366f1' },
+  { name: 'Upgency', slug: 'upgency', logo: '/clients/upgency.jpg', from: '#FF2D55', to: '#7c3aed' },
+  { name: 'Sikho App', slug: 'sikho-app', logo: '/clients/sikho-app.png', from: '#00D9FF', to: '#0ea5e9' },
+  { name: 'Kuku FM', slug: 'kuku-fm', logo: '/clients/kuku-fm.png', from: '#FF2D55', to: '#f97316' },
+  { name: 'AssetPlus', slug: 'assetplus', logo: '/clients/assetplus.png', from: '#00FF9D', to: '#10b981' },
+  { name: 'Choice Connect', slug: 'choice-connect', logo: '/clients/choice-connect.jpg', from: '#a78bfa', to: '#6366f1' },
   { name: 'Smartmatic Detergent', slug: 'smartmatic-detergent', from: '#fbbf24', to: '#ef4444' },
 ];
 
@@ -109,13 +109,21 @@ function Timecode({ reduced }) {
   return <span>{tc}</span>;
 }
 
-// ── Client logo: SVG if present, gradient letter-mark fallback ──
+// ── Client logo: Custom image or SVG fallback, then letter-mark fallback ──
 function ClientLogo({ c }) {
   const [err, setErr] = useState(false);
+  const hasLogo = !!(c.logo || c.slug);
+  const logoSrc = c.logo || `/clients/${c.slug}.svg`;
+
   return (
     <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg" style={{ border: '1px solid rgba(255,255,255,0.06)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-      {!err ? (
-        <img src={`/clients/${c.slug}.svg`} onError={() => setErr(true)} alt={`${c.name} logo`} className="w-7 h-7 object-contain flex-shrink-0" />
+      {hasLogo && !err ? (
+        <img 
+          src={logoSrc} 
+          onError={() => setErr(true)} 
+          alt={`${c.name} logo`} 
+          className="w-7 h-7 object-contain flex-shrink-0 rounded-md" 
+        />
       ) : (
         <span aria-hidden="true" className="w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-black text-white flex-shrink-0" style={{ background: `linear-gradient(135deg, ${c.from}, ${c.to})` }}>
           {initials(c.name)}

@@ -1029,6 +1029,23 @@ function Dashboard({ onLogout }) {
     }
   };
 
+  const handleChangeSection = async (videoId, newSection) => {
+    try {
+      await fetchJson(`${API_BASE}/videos`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          action: 'change_section',
+          videoId,
+          newSection,
+        }),
+      });
+      fetchVideos(); // Refresh the video list
+    } catch (err) {
+      console.error('Change section error:', err);
+    }
+  };
+
   const filtered = activeSection === 'all' 
     ? videos 
     : videos.filter(v => v.section === activeSection);
@@ -1318,9 +1335,37 @@ function Dashboard({ onLogout }) {
                   </span>
                   <h3 style={styles.videoTitle}>{video.title}</h3>
                   <div style={styles.videoMeta}>
-                    <span style={{ color: '#555', fontSize: 11 }}>
-                      {sectionInfo?.label || video.section}
-                    </span>
+                    <select
+                      value={video.section}
+                      onChange={(e) => handleChangeSection(video.id, e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        background: '#1A1A1A',
+                        color: sectionInfo?.color || '#888',
+                        border: '1px solid #2A2A2A',
+                        borderRadius: 4,
+                        fontSize: 10,
+                        fontWeight: 700,
+                        letterSpacing: '1px',
+                        padding: '3px 6px',
+                        cursor: 'pointer',
+                        outline: 'none',
+                        maxWidth: 160,
+                        appearance: 'auto',
+                      }}
+                    >
+                      {(() => {
+                        const secs = SECTIONS;
+                        const groups = [...new Set(secs.map(s => s.group))];
+                        return groups.map(group => (
+                          <optgroup key={group} label={group}>
+                            {secs.filter(s => s.group === group).map(s => (
+                              <option key={s.id} value={s.id}>{s.label}</option>
+                            ))}
+                          </optgroup>
+                        ));
+                      })()}
+                    </select>
                     <button
                       onClick={() => setDeleteConfirm(video.id)}
                       style={styles.deleteBtn}

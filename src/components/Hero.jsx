@@ -365,7 +365,7 @@ const Hero = () => {
   }, { scope: containerRef, dependencies: [isLoaded] });
 
   return (
-    <section ref={containerRef} className="relative w-full" style={{ backgroundColor: 'var(--bg-deep)', height: '400svh' }}>
+    <section ref={containerRef} className="relative w-full" style={{ backgroundColor: 'var(--bg-deep)', height: '400svh', paddingTop: '90px' }}>
       
       {/* Premium GSAP 6-Panel Preloader */}
       {!preloaderComplete && (
@@ -385,10 +385,10 @@ const Hero = () => {
         </div>
       )}
 
-      {/* Sticky Viewport — full screen, svh fixes the iOS address-bar jump */}
+      {/* Sticky Viewport — shifted down by the 90px Navbar height */}
       <div
-        className="sticky top-0 h-screen w-full overflow-hidden"
-        style={{ height: '100svh' }}
+        className="sticky w-full overflow-hidden"
+        style={{ top: '90px', height: 'calc(100svh - 90px)' }}
       >
         
         {/* Canvas Background */}
@@ -423,7 +423,7 @@ const Hero = () => {
         />
 
         {/* HUD Ring Design Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1]">
+        <div className="hidden lg:flex absolute inset-0 items-center justify-center pointer-events-none z-[1]">
           <div 
             ref={circleRef}
             className="relative flex items-center justify-center"

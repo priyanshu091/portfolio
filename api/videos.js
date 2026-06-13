@@ -142,7 +142,7 @@ export default async function handler(req, res) {
 
   // POST — add a new video or update domain thumbnail
   if (req.method === 'POST') {
-    const { action, domainId, imageUrl } = req.body || {};
+    const { action, domainId, imageUrl, videoId, newSection } = req.body || {};
     
     // Check if updating a domain thumbnail
     if (action === 'update_domain_thumbnail') {
@@ -244,6 +244,26 @@ export default async function handler(req, res) {
       } catch (err) {
         console.error('Delete section error:', err);
         return res.status(500).json({ error: 'Failed to delete section' });
+      }
+    }
+
+    // ── Change a video's section/category ──
+    if (action === 'change_section') {
+      if (!videoId || !newSection) {
+        return res.status(400).json({ error: 'videoId and newSection are required' });
+      }
+      try {
+        const data = await readMetadata();
+        const video = data.videos.find(v => v.id === videoId);
+        if (!video) {
+          return res.status(404).json({ error: 'Video not found' });
+        }
+        video.section = newSection;
+        await writeMetadata(data);
+        return res.status(200).json({ success: true, video });
+      } catch (err) {
+        console.error('Change section error:', err);
+        return res.status(500).json({ error: 'Failed to change video section' });
       }
     }
 
