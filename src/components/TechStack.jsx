@@ -184,8 +184,37 @@ const TechStack = () => {
           </div>
         </div>
 
-        {/* RIGHT: Holographic Orbit System */}
-        <div className="w-full lg:w-2/3 flex items-center justify-center relative h-[450px] lg:h-[600px]">
+        {/* MOBILE: Clean tool grid — orbital rings overflow on phones, so swap to a grid */}
+        <div className="grid grid-cols-3 gap-3 w-full md:hidden mt-2">
+          {tools.map((tool) => (
+            <div
+              key={`m-${tool.id}`}
+              className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl"
+              style={{
+                border: '1px solid rgba(255,255,255,0.08)',
+                backgroundColor: 'rgba(255,255,255,0.04)',
+              }}
+            >
+              <div
+                className="w-14 h-14 rounded-xl flex items-center justify-center"
+                style={{
+                  color: tool.color,
+                  border: `1px solid ${tool.color}30`,
+                  backgroundColor: `${tool.color}10`,
+                  filter: `drop-shadow(0 0 6px ${tool.color}40)`,
+                }}
+              >
+                {tool.icon}
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-center" style={{ color: 'var(--text-secondary)' }}>
+                {tool.name}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* RIGHT: Holographic Orbit System (desktop/tablet only) */}
+        <div className="hidden md:flex w-full lg:w-2/3 items-center justify-center relative h-[450px] lg:h-[600px]">
           
           {/* Inject Keyframes for orbit */}
           <style>{`

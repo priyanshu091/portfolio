@@ -23,9 +23,9 @@ const ParticleLogo = () => {
   const CYAN_GLOW = 'rgba(94, 238, 255, 0.6)';      // #5EEEFF
 
   // --- Configuration ---
-  const CANVAS_W = 64;
-  const CANVAS_H = 46;
-  const FONT_SIZE = 30;
+  const CANVAS_W = 42;
+  const CANVAS_H = 34;
+  const FONT_SIZE = 26;
   const SAMPLING_GAP = 1.8;
   const SCATTER_FORCE = 18;
   const SCATTER_RADIUS = 80;
@@ -331,6 +331,10 @@ const ParticleLogo = () => {
         .divyansh-wordmark:hover {
           filter: drop-shadow(0 0 8px rgba(255,45,85,0.6));
         }
+        /* Shrink the wordmark on phones so the logo pill stays compact */
+        @media (max-width: 640px) {
+          .divyansh-wordmark { font-size: 16px; }
+        }
       `}</style>
 
       {/* === MAIN LOGO CONTAINER === */}
@@ -390,8 +394,9 @@ const ParticleLogo = () => {
           )}
         </div>
 
-        {/* TIMECODE COUNTER — cyan accent */}
+        {/* TIMECODE COUNTER — cyan accent (hidden on phones to keep the logo pill compact) */}
         <span
+          className="hidden sm:inline-block"
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '10px',

@@ -10,6 +10,7 @@ const Navbar = () => {
   const linksRef = useRef([]);
   const [hoveredLink, setHoveredLink] = useState(null);
   const [activeLink, setActiveLink] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false); // mobile hamburger menu
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -106,7 +107,7 @@ const Navbar = () => {
   return (
     <nav
       ref={navRef}
-      className="fixed top-0 left-0 w-full h-[90px] z-[100] flex items-center justify-between px-8 md:px-16 bg-[#0A0A0A]/95 border-b border-white/5 backdrop-blur-md pointer-events-auto"
+      className="fixed top-0 left-0 w-full h-[90px] z-[100] flex items-center justify-between px-4 sm:px-8 md:px-16 bg-[#0A0A0A]/95 border-b border-white/5 backdrop-blur-md pointer-events-auto"
     >
       <style>{`
         @keyframes navActivePulse {
@@ -122,7 +123,7 @@ const Navbar = () => {
       {/* LEFT: Kinetic Particle Logo with Glassmorphic Wrapper */}
       <div 
         ref={logoRef} 
-        className="pointer-events-auto cursor-pointer px-4 py-1.5 rounded-full border backdrop-blur-md transition-all duration-300 flex items-center justify-center" 
+        className="pointer-events-auto cursor-pointer px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border backdrop-blur-md transition-all duration-300 flex items-center justify-center"
         onClick={handleLogoClick}
         style={{
           backgroundColor: 'rgba(13, 13, 13, 0.45)',
@@ -145,6 +146,19 @@ const Navbar = () => {
 
       {/* RIGHT SIDE */}
       <div className="relative z-10 flex items-center pointer-events-auto">
+
+        {/* Mobile Hamburger Button (hidden on md+) */}
+        <button
+          onClick={() => setMenuOpen(o => !o)}
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+          className="md:hidden flex flex-col items-center justify-center gap-[5px] w-10 h-10 rounded-lg border pointer-events-auto"
+          style={{ borderColor: 'rgba(255,255,255,0.1)', backgroundColor: 'rgba(13,13,13,0.45)' }}
+        >
+          <span className="block w-5 h-[2px] rounded-full bg-white transition-all duration-300" style={{ transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none' }} />
+          <span className="block w-5 h-[2px] rounded-full bg-white transition-all duration-300" style={{ opacity: menuOpen ? 0 : 1 }} />
+          <span className="block w-5 h-[2px] rounded-full bg-white transition-all duration-300" style={{ transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none' }} />
+        </button>
 
         {/* Glassmorphic Nav Panel */}
         <div
@@ -232,6 +246,29 @@ const Navbar = () => {
           })}
         </div>
       </div>
+
+      {/* Mobile Dropdown Menu */}
+      {menuOpen && (
+        <div
+          className="md:hidden absolute top-full left-0 w-full flex flex-col border-b backdrop-blur-md pointer-events-auto"
+          style={{ backgroundColor: 'rgba(10,10,10,0.97)', borderColor: 'rgba(255,255,255,0.08)' }}
+        >
+          {navLinks.map((link) => (
+            <a
+              key={link}
+              href={`#${link.toLowerCase()}`}
+              onClick={(e) => { handleNavClick(e, link); setMenuOpen(false); }}
+              className="px-8 py-4 text-[13px] font-bold uppercase tracking-widest border-t transition-colors duration-200"
+              style={{
+                color: activeLink === link ? 'var(--scarlet-primary)' : 'var(--text-secondary)',
+                borderColor: 'rgba(255,255,255,0.05)',
+              }}
+            >
+              {link}
+            </a>
+          ))}
+        </div>
+      )}
     </nav>
   );
 };

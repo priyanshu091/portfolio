@@ -58,3 +58,13 @@ html, body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
 }
+
+/* Mobile: force >=16px on form fields so iOS Safari doesn't auto-zoom on focus.
+   Beats Contact.jsx inline fontSize:14px via !important. */
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

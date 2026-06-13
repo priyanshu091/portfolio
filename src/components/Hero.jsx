@@ -91,12 +91,14 @@ const Hero = () => {
     // Clear previous frame
     context.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    // Scale image to fill full screen width
-    const scale = canvasWidth / img.width;
-    const x = 0; // Align to left edge
-    const y = (canvasHeight / 2) - (img.height / 2) * scale; // Center vertically
+    // Cover-scale image to fill the ENTIRE canvas (no crop bands, no blank space)
+    const scale = Math.max(canvasWidth / img.width, canvasHeight / img.height);
+    const dW = img.width * scale;
+    const dH = img.height * scale;
+    const x = (canvasWidth - dW) / 2;  // Center horizontally
+    const y = (canvasHeight - dH) / 2; // Center vertically
 
-    context.drawImage(img, x, y, img.width * scale, img.height * scale);
+    context.drawImage(img, x, y, dW, dH);
   };
 
   const handleResize = () => {
@@ -155,7 +157,18 @@ const Hero = () => {
 
     // Initial Render & Resize Listener
     handleResize();
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    // Orientation changes (mobile portrait <-> landscape) need a delayed
+    // resize + ScrollTrigger recalculation once the viewport settles.
+    const handleOrientation = () => {
+      setTimeout(() => {
+        handleResize();
+        ScrollTrigger.refresh();
+        renderFrame(currentFrameRef.current.index);
+      }, 350);
+    };
+    window.addEventListener('orientationchange', handleOrientation, { passive: true });
 
     const frameCount = 240;
 
@@ -303,13 +316,16 @@ const Hero = () => {
       // 3. Render final frame
       ctx.clearRect(0, 0, w, h);
       
-      // Draw the overlay image
+      // Draw the overlay image — cover-scaled to match the base frame exactly
       const img = heroOverlayObj.current;
-      const scale = w / img.width;
-      const imgY = (h / 2) - (img.height / 2) * scale;
-      
+      const scale = Math.max(w / img.width, h / img.height);
+      const dW = img.width * scale;
+      const dH = img.height * scale;
+      const imgX = (w - dW) / 2;
+      const imgY = (h - dH) / 2;
+
       ctx.globalCompositeOperation = 'source-over';
-      ctx.drawImage(img, 0, imgY, img.width * scale, img.height * scale);
+      ctx.drawImage(img, imgX, imgY, dW, dH);
       
       // Apply the mask (hides everything except where mouse revealed)
       ctx.globalCompositeOperation = 'destination-out';
@@ -344,11 +360,12 @@ const Hero = () => {
         stickyViewport.removeEventListener('mouseleave', handleMouseLeave);
       }
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleOrientation);
     };
   }, { scope: containerRef, dependencies: [isLoaded] });
 
   return (
-    <section ref={containerRef} className="relative h-[400vh] w-full pt-[90px]" style={{ backgroundColor: 'var(--bg-deep)' }}>
+    <section ref={containerRef} className="relative w-full" style={{ backgroundColor: 'var(--bg-deep)', height: '400svh' }}>
       
       {/* Premium GSAP 6-Panel Preloader */}
       {!preloaderComplete && (
@@ -368,9 +385,10 @@ const Hero = () => {
         </div>
       )}
 
-      {/* Sticky Viewport */}
-      <div 
-        className="sticky top-[90px] h-[calc(100vh-90px)] w-full overflow-hidden"
+      {/* Sticky Viewport — full screen, svh fixes the iOS address-bar jump */}
+      <div
+        className="sticky top-0 h-screen w-full overflow-hidden"
+        style={{ height: '100svh' }}
       >
         
         {/* Canvas Background */}
@@ -431,7 +449,10 @@ const Hero = () => {
 
         {/* NEW FINAL SCROLL CONTENT OVERLAY */}
         <div className="absolute inset-0 z-[10] pointer-events-auto overflow-hidden">
-          
+
+          {/* Mobile legibility scrim — darkens top/bottom so overlay text is readable over the character on phones */}
+          <div className="absolute inset-0 sm:hidden pointer-events-none" style={{ background: 'linear-gradient(180deg, rgba(13,13,13,0.6) 0%, rgba(13,13,13,0.15) 38%, rgba(13,13,13,0.4) 72%, rgba(13,13,13,0.9) 100%)' }} />
+
           {/* LEFT SIDEBAR: Socials */}
           <div className="hidden sm:flex absolute left-8 md:left-12 top-1/2 -translate-y-1/2 flex-col gap-8">
             {/* Instagram */}
@@ -451,29 +472,29 @@ const Hero = () => {
           </div>
 
           {/* MAIN CONTENT (Left Aligned) */}
-          <div className="absolute left-8 sm:left-24 md:left-32 top-1/2 -translate-y-1/2 max-w-xl pr-4 mt-8">
+          <div className="absolute left-5 right-5 top-[100px] translate-y-0 max-w-none pr-0 mt-0 sm:left-24 md:left-32 sm:right-auto sm:top-1/2 sm:-translate-y-1/2 sm:max-w-xl sm:pr-4 sm:mt-8">
             
             {/* Tag */}
-            <div className="hero-title-tag opacity-0 flex items-center gap-3 mb-6" style={{ color: 'var(--cyan-primary)' }}>
+            <div className="hero-title-tag opacity-0 flex items-center gap-3 mb-4 sm:mb-6" style={{ color: 'var(--cyan-primary)' }}>
               <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
               <span className="text-[11px] uppercase tracking-[3px] font-bold">VIDEO EDITOR</span>
               <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
             </div>
 
             {/* Headline */}
-            <h2 className="text-white text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05] mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
+            <h2 className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-[1.05] mb-4 sm:mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
               <span className="block hero-title-line opacity-0">WE TURN</span>
               <span className="block hero-title-line opacity-0">FOOTAGE</span>
               <span className="block hero-title-line opacity-0">INTO <span style={{ color: 'var(--scarlet-primary)' }}>IMPACT.</span></span>
             </h2>
 
             {/* Subtext */}
-            <p className="hero-subtitle opacity-0 text-[16px] md:text-[18px] leading-[1.5] max-w-sm md:max-w-md mb-12" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
+            <p className="hero-subtitle opacity-0 text-[16px] md:text-[18px] leading-[1.5] max-w-sm md:max-w-md mb-6 sm:mb-12" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
               Cinematic edits, powerful storytelling and content that keeps your audience hooked.
             </p>
 
             {/* Stats */}
-            <div className="hero-cta opacity-0 flex items-center gap-8 md:gap-12 mb-12">
+            <div className="hero-cta opacity-0 flex items-center gap-4 sm:gap-8 md:gap-12 mb-6 sm:mb-12">
               <div>
                 <div className="text-3xl md:text-4xl font-bold mb-1" style={{ color: 'var(--scarlet-primary)' }}>
                   <span ref={viewsRef}>0</span>M+
@@ -525,11 +546,11 @@ const Hero = () => {
               .tech-btn:hover { border-color: rgba(255,45,85,0.6) !important; box-shadow: 0 0 25px rgba(255,45,85,0.2), inset 0 0 25px rgba(255,45,85,0.04) !important; }
             `}</style>
 
-            <div className="hero-cta opacity-0 flex flex-col sm:flex-row gap-4 sm:gap-6 mt-8">
+            <div className="hero-cta opacity-0 flex flex-col sm:flex-row gap-3 sm:gap-6 mt-4 sm:mt-8">
               {/* Button 1: VIEW OUR WORK */}
               <a
                 href="#work"
-                className="tech-btn relative inline-flex items-center justify-center px-10 py-4 overflow-hidden cursor-pointer"
+                className="tech-btn relative inline-flex w-full sm:w-auto items-center justify-center px-10 py-3.5 sm:py-4 overflow-hidden cursor-pointer"
                 style={{
                   border: '1px solid rgba(255,255,255,0.12)',
                   backgroundColor: 'rgba(13,13,13,0.6)',
@@ -655,7 +676,7 @@ const Hero = () => {
                   e.preventDefault();
                   window.dispatchEvent(new CustomEvent('bookServices'));
                 }}
-                className="tech-btn relative inline-flex items-center justify-center px-10 py-4 overflow-hidden cursor-pointer"
+                className="tech-btn relative inline-flex w-full sm:w-auto items-center justify-center px-10 py-3.5 sm:py-4 overflow-hidden cursor-pointer"
                 style={{
                   border: '1px solid rgba(255,255,255,0.12)',
                   backgroundColor: 'rgba(13,13,13,0.6)',
@@ -821,7 +842,7 @@ const Hero = () => {
           </div>
 
           {/* BOTTOM CENTER: Cyberpunk Scroll Indicator */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center group cursor-pointer" onClick={() => window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })}>
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center group cursor-pointer" onClick={() => window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })}>
             
             <style>{`
               @keyframes cyberScrollTrack {
