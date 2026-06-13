@@ -3,6 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import ParticleLogo from './ParticleLogo';
+import { Menu, X, Briefcase, User, Settings, Mail } from 'lucide-react';
+
+// Icon per nav section for the mobile fluid menu.
+const NAV_ICONS = { WORK: Briefcase, ABOUT: User, SERVICES: Settings, CONTACT: Mail };
 
 const Navbar = () => {
   const navRef = useRef(null);
@@ -147,18 +151,89 @@ const Navbar = () => {
       {/* RIGHT SIDE */}
       <div className="relative z-10 flex items-center pointer-events-auto">
 
-        {/* Mobile Hamburger Button (hidden on md+) */}
-        <button
-          onClick={() => setMenuOpen(o => !o)}
-          aria-label="Toggle menu"
-          aria-expanded={menuOpen}
-          className="md:hidden flex flex-col items-center justify-center gap-[5px] w-10 h-10 rounded-lg border pointer-events-auto"
-          style={{ borderColor: 'rgba(255,255,255,0.1)', backgroundColor: 'rgba(13,13,13,0.45)' }}
-        >
-          <span className="block w-5 h-[2px] rounded-full bg-white transition-all duration-300" style={{ transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none' }} />
-          <span className="block w-5 h-[2px] rounded-full bg-white transition-all duration-300" style={{ opacity: menuOpen ? 0 : 1 }} />
-          <span className="block w-5 h-[2px] rounded-full bg-white transition-all duration-300" style={{ transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none' }} />
-        </button>
+        {/* Mobile Fluid Menu (hidden on md+) */}
+        <div className="md:hidden relative" style={{ width: 44, height: 44 }}>
+          <div
+            className="absolute top-0 right-0 flex flex-col items-center gap-1.5 p-1 rounded-full"
+            style={{
+              backgroundColor: 'rgba(13,13,13,0.85)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(14px)',
+              boxShadow: menuOpen
+                ? '0 14px 40px rgba(0,0,0,0.55), 0 0 24px rgba(255,45,85,0.14)'
+                : '0 8px 24px rgba(0,0,0,0.4)',
+              transition: 'box-shadow 0.4s ease',
+            }}
+          >
+            {/* Morphing toggle (Menu <-> X) */}
+            <button
+              onClick={() => setMenuOpen(o => !o)}
+              aria-label="Toggle menu"
+              aria-expanded={menuOpen}
+              className="relative w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{
+                backgroundColor: menuOpen ? 'var(--scarlet-primary)' : 'rgba(255,255,255,0.06)',
+                boxShadow: menuOpen ? '0 0 16px rgba(255,45,85,0.5)' : 'none',
+                transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+              }}
+            >
+              <Menu
+                size={18}
+                className="absolute text-white transition-all duration-300"
+                style={{ opacity: menuOpen ? 0 : 1, transform: menuOpen ? 'rotate(90deg) scale(0.4)' : 'rotate(0) scale(1)' }}
+              />
+              <X
+                size={18}
+                className="absolute text-white transition-all duration-300"
+                style={{ opacity: menuOpen ? 1 : 0, transform: menuOpen ? 'rotate(0) scale(1)' : 'rotate(-90deg) scale(0.4)' }}
+              />
+            </button>
+
+            {/* Fluid-reveal items */}
+            {navLinks.map((link, i) => {
+              const Icon = NAV_ICONS[link];
+              const isActive = activeLink === link;
+              return (
+                <div
+                  key={link}
+                  className="flex items-center justify-center"
+                  style={{
+                    maxHeight: menuOpen ? 40 : 0,
+                    opacity: menuOpen ? 1 : 0,
+                    transform: menuOpen ? 'translateY(0) scale(1)' : 'translateY(-10px) scale(0.4)',
+                    transition: `transform 0.35s cubic-bezier(0.16,1,0.3,1) ${menuOpen ? i * 0.05 + 0.05 : 0}s, opacity 0.3s ease ${menuOpen ? i * 0.05 + 0.05 : 0}s, max-height 0.35s ease`,
+                    pointerEvents: menuOpen ? 'auto' : 'none',
+                  }}
+                >
+                  <a
+                    href={`#${link.toLowerCase()}`}
+                    onClick={(e) => { handleNavClick(e, link); setMenuOpen(false); }}
+                    aria-label={link}
+                    className="group relative w-9 h-9 rounded-full flex items-center justify-center"
+                    style={{
+                      backgroundColor: isActive ? 'rgba(255,45,85,0.15)' : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${isActive ? 'rgba(255,45,85,0.5)' : 'rgba(255,255,255,0.07)'}`,
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    {/* Label chip slides in to the left */}
+                    <span
+                      className="absolute right-full mr-2 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest whitespace-nowrap pointer-events-none"
+                      style={{
+                        color: isActive ? '#fff' : 'var(--text-secondary)',
+                        backgroundColor: 'rgba(13,13,13,0.92)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                      }}
+                    >
+                      {link}
+                    </span>
+                    <Icon size={16} style={{ color: isActive ? 'var(--scarlet-primary)' : '#ffffff' }} />
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Glassmorphic Nav Panel */}
         <div
@@ -247,28 +322,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Dropdown Menu */}
-      {menuOpen && (
-        <div
-          className="md:hidden absolute top-full left-0 w-full flex flex-col border-b backdrop-blur-md pointer-events-auto"
-          style={{ backgroundColor: 'rgba(10,10,10,0.97)', borderColor: 'rgba(255,255,255,0.08)' }}
-        >
-          {navLinks.map((link) => (
-            <a
-              key={link}
-              href={`#${link.toLowerCase()}`}
-              onClick={(e) => { handleNavClick(e, link); setMenuOpen(false); }}
-              className="px-8 py-4 text-[13px] font-bold uppercase tracking-widest border-t transition-colors duration-200"
-              style={{
-                color: activeLink === link ? 'var(--scarlet-primary)' : 'var(--text-secondary)',
-                borderColor: 'rgba(255,255,255,0.05)',
-              }}
-            >
-              {link}
-            </a>
-          ))}
-        </div>
-      )}
     </nav>
   );
 };
