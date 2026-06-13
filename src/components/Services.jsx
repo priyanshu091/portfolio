@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ServicesAccordion from './ServicesAccordion';
 
 const services = [
   {
@@ -337,7 +338,13 @@ const Services = () => {
           </div>
         </div>
 
-        {/* ── Service Cards Grid ── */}
+        {/* ── MOBILE: expanding accordion ── */}
+        <div className="md:hidden">
+          <ServicesAccordion services={services} />
+        </div>
+
+        {/* ── DESKTOP: Service Cards Grid (untouched, hidden on mobile) ── */}
+        <div className="hidden md:block">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {services.map((svc, i) => {
             const isHov = hoveredCard === svc.id;
@@ -452,6 +459,7 @@ const Services = () => {
               </div>
             );
           })}
+        </div>
         </div>
 
         {/* ── Bottom CTA Strip ── */}
