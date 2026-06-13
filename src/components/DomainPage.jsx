@@ -75,6 +75,12 @@ const domainData = {
       { id: 'motion-1', title: 'CYBER TECH LOGO REVEAL', tag: 'LOGO ANIMATION', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4' },
       { id: 'motion-2', title: 'KINETIC TYPOGRAPHY PROMO', tag: 'KINETIC TEXT', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' }
     ]
+  },
+  'real-estate': { 
+    title: 'PROPERTY & REAL ESTATE', 
+    tag: 'ARCHITECTURE', 
+    color: '#00FF9D',
+    projects: []
   }
 };
 

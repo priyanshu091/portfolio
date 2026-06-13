@@ -65,6 +65,14 @@ const projects = [
     gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
     color: '#D998FF',
     videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4'
+  },
+  { 
+    id: 'real-estate', 
+    title: 'PROPERTY & REAL ESTATE', 
+    tag: 'ARCHITECTURE', 
+    gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
+    color: '#00FF9D',
+    imageUrl: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=800&auto=format&fit=crop'
   }
 ];
 
@@ -130,6 +138,8 @@ const Work = () => {
   const [displayedTab, setDisplayedTab] = useState('edited');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [domainThumbnails, setDomainThumbnails] = useState({});
+  const [cmsFullProduction, setCmsFullProduction] = useState([]);
+  const [cmsGraphicDesign, setCmsGraphicDesign] = useState([]);
 
   useEffect(() => {
     fetch('/api/videos')
@@ -138,8 +148,21 @@ const Work = () => {
         if (result && result.domainThumbnails) {
           setDomainThumbnails(result.domainThumbnails);
         }
+        // Extract CMS videos for Full Production & Graphic Designing tabs
+        if (result && result.videos) {
+          setCmsFullProduction(
+            result.videos
+              .filter(v => v.section === 'full-production')
+              .map(v => ({ id: v.id, title: v.title, tag: v.tag, color: '#FF2D55', videoUrl: v.videoUrl, imageUrl: v.thumbnailUrl || null }))
+          );
+          setCmsGraphicDesign(
+            result.videos
+              .filter(v => v.section === 'graphic-design')
+              .map(v => ({ id: v.id, title: v.title, tag: v.tag, color: '#FFCC00', videoUrl: v.videoUrl, imageUrl: v.thumbnailUrl || null }))
+          );
+        }
       })
-      .catch(err => console.error('Failed to fetch domain thumbnails:', err));
+      .catch(err => console.error('Failed to fetch CMS data:', err));
   }, []);
 
   const handleTabChange = (newTab) => {
@@ -380,47 +403,13 @@ const Work = () => {
               );
             })}
               
-              {/* Contact / Start a Conversation Card */}
-              <div 
-                className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl flex flex-col items-center justify-center ${
-                  isTransitioning ? 'card-exit' : 'card-entry'
-                }`}
-                style={{ 
-                  borderColor: 'var(--border-subtle)', 
-                  backgroundColor: 'var(--bg-surface)',
-                  animationDelay: isTransitioning ? '0s' : `${projects.length * 0.08}s`
-                }}
-                onClick={() => {
-                  const el = document.getElementById('contact');
-                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-                onMouseEnter={(e) => { 
-                  e.currentTarget.style.borderColor = 'var(--scarlet-primary)'; 
-                  e.currentTarget.style.boxShadow = `0 15px 40px rgba(255,45,85,0.15)`; 
-                }}
-                onMouseLeave={(e) => { 
-                  e.currentTarget.style.borderColor = 'var(--border-subtle)'; 
-                  e.currentTarget.style.boxShadow = `0 0 0 rgba(0,0,0,0)`; 
-                }}
-              >
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-10"></div>
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#0D0D0D] via-[#191919] to-[#0D0D0D] z-0 opacity-80"></div>
-                
-                <div className="z-10 w-16 h-16 rounded-full border border-dashed border-[var(--text-muted)] group-hover:border-[var(--scarlet-primary)] flex items-center justify-center mb-4 transition-colors duration-500 bg-black/30 backdrop-blur-sm group-hover:bg-[rgba(255,45,85,0.05)]">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--text-secondary)] group-hover:text-[var(--scarlet-primary)] transition-colors duration-500">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                </div>
-                
-                <span className="z-10 text-white text-md font-bold uppercase tracking-widest text-center">Start a<br/>Conversation</span>
-                <span className="z-10 text-[9px] uppercase tracking-[2px] mt-3" style={{ color: 'var(--text-muted)' }}>LET'S WORK TOGETHER ↗</span>
-              </div>
+
 
             </div>
           ) : displayedTab === 'shooted' ? (
             /* VIDEO GRID GALLERY FOR OWN SHOOTED VIDEOS */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
-              {shootedVideos.map((video, i) => (
+              {[...cmsFullProduction, ...shootedVideos].map((video, i) => (
                 <div 
                   key={video.id}
                   className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${
@@ -480,7 +469,7 @@ const Work = () => {
                 style={{ 
                   borderColor: 'var(--border-subtle)', 
                   backgroundColor: 'var(--bg-surface)',
-                  animationDelay: isTransitioning ? '0s' : `${shootedVideos.length * 0.08}s`
+                  animationDelay: isTransitioning ? '0s' : `${[...cmsFullProduction, ...shootedVideos].length * 0.08}s`
                 }}
                 onClick={() => {
                   const el = document.getElementById('contact');
@@ -512,7 +501,7 @@ const Work = () => {
           ) : (
             /* GRAPHIC DESIGN GRID GALLERY */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
-              {graphicDesigns.map((design, i) => (
+              {[...cmsGraphicDesign, ...graphicDesigns].map((design, i) => (
                 <div 
                   key={design.id}
                   className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${
@@ -575,7 +564,7 @@ const Work = () => {
                 style={{ 
                   borderColor: 'var(--border-subtle)', 
                   backgroundColor: 'var(--bg-surface)',
-                  animationDelay: isTransitioning ? '0s' : `${graphicDesigns.length * 0.08}s`
+                  animationDelay: isTransitioning ? '0s' : `${[...cmsGraphicDesign, ...graphicDesigns].length * 0.08}s`
                 }}
                 onClick={() => {
                   const el = document.getElementById('contact');

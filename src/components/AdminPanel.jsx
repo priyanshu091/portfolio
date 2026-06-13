@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-// Section config — matches portfolio categories
+// Section config — matches portfolio categories (all 3 main tabs)
 const SECTIONS = [
-  { id: 'doc',  label: 'Documentary & Fact', color: '#FF3B30' },
-  { id: 'reels', label: 'Podcast Reels', color: '#00D4FF' },
-  { id: 'comm', label: 'Commercial & Brand', color: '#FFFFFF' },
-  { id: 'beat', label: 'Beat Sync & Travel', color: '#FF6B3B' },
-  { id: 'long', label: 'Long Format Podcast', color: '#00D4FF' },
-  { id: 'ai',   label: 'AI & Stock Media', color: '#00D4FF' },
-  { id: 'wed',  label: 'Wedding & Event', color: '#FF3B30' },
-  { id: 'motion', label: 'Motion Graphics', color: '#D998FF' },
+  // ── Edited Videos (sub-categories / domains) ──
+  { id: 'doc',    label: 'Documentary & Fact',    color: '#FF3B30', group: 'Edited Videos' },
+  { id: 'reels',  label: 'Podcast Reels',         color: '#00D4FF', group: 'Edited Videos' },
+  { id: 'comm',   label: 'Commercial & Brand',    color: '#FFFFFF', group: 'Edited Videos' },
+  { id: 'beat',   label: 'Beat Sync & Travel',    color: '#FF6B3B', group: 'Edited Videos' },
+  { id: 'long',   label: 'Long Format Podcast',   color: '#00D4FF', group: 'Edited Videos' },
+  { id: 'ai',     label: 'AI & Stock Media',      color: '#00D4FF', group: 'Edited Videos' },
+  { id: 'wed',    label: 'Wedding & Event',       color: '#FF3B30', group: 'Edited Videos' },
+  { id: 'motion', label: 'Motion Graphics',       color: '#D998FF', group: 'Edited Videos' },
+  { id: 'real-estate', label: 'Property & Real Estate', color: '#00FF9D', group: 'Edited Videos' },
+  // ── Full Production ──
+  { id: 'full-production', label: 'Full Production', color: '#FF2D55', group: 'Full Production' },
+  // ── Graphic Designing ──
+  { id: 'graphic-design', label: 'Graphic Designing', color: '#FFCC00', group: 'Graphic Designing' },
 ];
 
 const API_BASE = '/api';
@@ -23,6 +29,27 @@ function authHeaders() {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${getToken()}`,
   };
+}
+
+async function fetchJson(url, options = {}) {
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    let errorMsg = `Server returned status ${res.status}`;
+    try {
+      const data = await res.json();
+      if (data && data.error) errorMsg = data.error;
+    } catch (_) {
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        errorMsg += '. (Note: If running locally via npm run dev, Vite does not execute Vercel serverless functions. Run "vercel dev" instead to access local APIs)';
+      }
+    }
+    throw new Error(errorMsg);
+  }
+  try {
+    return await res.json();
+  } catch (err) {
+    throw new Error('Failed to parse response as JSON');
+  }
 }
 
 const LazyVideo = ({ src, style, isPaused }) => {
@@ -67,19 +94,18 @@ function LoginScreen({ onLogin }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/auth`, {
+      const data = await fetchJson(`${API_BASE}/auth`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Login failed');
       sessionStorage.setItem('admin_token', data.token);
       onLogin();
     } catch (err) {
@@ -101,14 +127,47 @@ function LoginScreen({ onLogin }) {
         <h1 style={styles.loginTitle}>ADMIN CMS</h1>
         <p style={styles.loginSub}>Enter your password to manage videos</p>
         
-        <input
-          type="password"
-          placeholder="Admin Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={styles.input}
-          autoFocus
-        />
+        <div style={{ position: 'relative', width: '100%' }}>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Admin Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ ...styles.input, paddingRight: 44 }}
+            autoFocus
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              right: 12,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 4,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: showPassword ? '#FF3B30' : '#555',
+              transition: 'color 0.2s',
+            }}
+          >
+            {showPassword ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            )}
+          </button>
+        </div>
         
         {error && <p style={styles.error}>{error}</p>}
         
@@ -160,13 +219,11 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
       // Step 1: Upload custom thumbnail if selected
       if (thumbnailFile) {
         // Get SAS URL for thumbnail image
-        const sasRes = await fetch(`${API_BASE}/upload-url`, {
+        const sasData = await fetchJson(`${API_BASE}/upload-url`, {
           method: 'POST',
           headers: authHeaders(),
           body: JSON.stringify({ filename: thumbnailFile.name }),
         });
-        const sasData = await sasRes.json();
-        if (!sasRes.ok) throw new Error(sasData.error || 'Failed to get thumbnail upload URL');
 
         // Upload directly to Azure
         await new Promise((resolve, reject) => {
@@ -186,13 +243,11 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
       }
 
       // Step 2: Get SAS upload URL for the video
-      const sasRes = await fetch(`${API_BASE}/upload-url`, {
+      const sasData = await fetchJson(`${API_BASE}/upload-url`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify({ filename: file.name }),
       });
-      const sasData = await sasRes.json();
-      if (!sasRes.ok) throw new Error(sasData.error || 'Failed to get upload URL');
 
       // Step 3: Upload video directly to Azure using SAS URL
       await new Promise((resolve, reject) => {
@@ -217,7 +272,7 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
 
       // Step 4: Save metadata to our API (including thumbnailUrl if any)
       setStatus('saving');
-      const metaRes = await fetch(`${API_BASE}/videos`, {
+      await fetchJson(`${API_BASE}/videos`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify({
@@ -228,8 +283,6 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
           thumbnailUrl,
         }),
       });
-      const metaData = await metaRes.json();
-      if (!metaRes.ok) throw new Error(metaData.error || 'Failed to save metadata');
 
       setStatus('done');
       setTimeout(() => {
@@ -395,9 +448,16 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
           value={section}
           onChange={(e) => setSection(e.target.value)}
         >
-          {SECTIONS.map(s => (
-            <option key={s.id} value={s.id}>{s.label}</option>
-          ))}
+          {(() => {
+            const groups = [...new Set(SECTIONS.map(s => s.group))];
+            return groups.map(group => (
+              <optgroup key={group} label={group}>
+                {SECTIONS.filter(s => s.group === group).map(s => (
+                  <option key={s.id} value={s.id}>{s.label}</option>
+                ))}
+              </optgroup>
+            ));
+          })()}
         </select>
 
         {/* Progress Bar */}
@@ -463,13 +523,11 @@ function DomainThumbnailsModal({ onClose, onUpdated, domainThumbnails }) {
     setUploadingDomainId(domainId);
     try {
       // Step 1: Get SAS URL from our API
-      const sasRes = await fetch(`${API_BASE}/upload-url`, {
+      const sasData = await fetchJson(`${API_BASE}/upload-url`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify({ filename: file.name }),
       });
-      const sasData = await sasRes.json();
-      if (!sasRes.ok) throw new Error(sasData.error || 'Failed to get upload URL');
 
       // Step 2: Upload directly to Azure using SAS URL
       await new Promise((resolve, reject) => {
@@ -487,7 +545,7 @@ function DomainThumbnailsModal({ onClose, onUpdated, domainThumbnails }) {
       });
 
       // Step 3: Save metadata to our API
-      const metaRes = await fetch(`${API_BASE}/videos`, {
+      const metaData = await fetchJson(`${API_BASE}/videos`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify({
@@ -496,8 +554,6 @@ function DomainThumbnailsModal({ onClose, onUpdated, domainThumbnails }) {
           imageUrl: sasData.publicUrl,
         }),
       });
-      const metaData = await metaRes.json();
-      if (!metaRes.ok) throw new Error(metaData.error || 'Failed to save metadata');
 
       setThumbnails(metaData.domainThumbnails || {});
       onUpdated();
@@ -512,7 +568,7 @@ function DomainThumbnailsModal({ onClose, onUpdated, domainThumbnails }) {
     setUploadingDomainId(domainId);
     setErrorMsg('');
     try {
-      const metaRes = await fetch(`${API_BASE}/videos`, {
+      const metaData = await fetchJson(`${API_BASE}/videos`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify({
@@ -521,8 +577,6 @@ function DomainThumbnailsModal({ onClose, onUpdated, domainThumbnails }) {
           imageUrl: null,
         }),
       });
-      const metaData = await metaRes.json();
-      if (!metaRes.ok) throw new Error(metaData.error || 'Failed to save metadata');
 
       setThumbnails(metaData.domainThumbnails || {});
       onUpdated();
@@ -698,8 +752,7 @@ function Dashboard({ onLogout }) {
   const fetchVideos = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/videos`);
-      const data = await res.json();
+      const data = await fetchJson(`${API_BASE}/videos`);
       setVideos(data.videos || []);
       setDomainThumbnails(data.domainThumbnails || {});
     } catch (err) {
@@ -713,15 +766,13 @@ function Dashboard({ onLogout }) {
 
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`${API_BASE}/videos`, {
+      await fetchJson(`${API_BASE}/videos`, {
         method: 'DELETE',
         headers: authHeaders(),
         body: JSON.stringify({ id }),
       });
-      if (res.ok) {
-        setDeleteConfirm(null);
-        fetchVideos();
-      }
+      setDeleteConfirm(null);
+      fetchVideos();
     } catch (err) {
       console.error('Delete error:', err);
     }
