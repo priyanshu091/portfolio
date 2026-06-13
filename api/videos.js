@@ -167,6 +167,86 @@ export default async function handler(req, res) {
       }
     }
 
+    // ── Add a new custom section/sub-category ──
+    if (action === 'add_section') {
+      const { sectionId, label, color, group } = req.body || {};
+      if (!sectionId || !label || !color || !group) {
+        return res.status(400).json({ error: 'sectionId, label, color, group are required' });
+      }
+      try {
+        const data = await readMetadata();
+        if (!data.customSections) data.customSections = [];
+        // Check for duplicate ID
+        if (data.customSections.some(s => s.id === sectionId)) {
+          return res.status(409).json({ error: `Section "${sectionId}" already exists` });
+        }
+        data.customSections.push({ id: sectionId, label, color, group });
+        await writeMetadata(data);
+        return res.status(201).json({ success: true, customSections: data.customSections });
+      } catch (err) {
+        console.error('Add section error:', err);
+        return res.status(500).json({ error: 'Failed to add section' });
+      }
+    }
+
+    // ── Delete a custom section and all its videos ──
+    if (action === 'delete_section') {
+      const { sectionId } = req.body || {};
+      if (!sectionId) {
+        return res.status(400).json({ error: 'sectionId is required' });
+      }
+      try {
+        const data = await readMetadata();
+        if (!data.customSections) data.customSections = [];
+
+        // Remove from customSections list
+        data.customSections = data.customSections.filter(s => s.id !== sectionId);
+
+        // Delete all videos belonging to this section (and their Azure blobs)
+        const accountName = process.env.AZURE_STORAGE_ACCOUNT;
+        const videosToDelete = data.videos.filter(v => v.section === sectionId);
+        for (const video of videosToDelete) {
+          if (video.videoUrl && video.videoUrl.includes(accountName)) {
+            try {
+              const urlParts = new URL(video.videoUrl);
+              const blobName = urlParts.pathname.split('/').pop();
+              const container = getContainerClient();
+              await container.getBlockBlobClient(blobName).deleteIfExists();
+            } catch (deleteErr) {
+              console.warn('Blob delete warning:', deleteErr.message);
+            }
+          }
+          // Also delete thumbnail blob if exists
+          if (video.thumbnailUrl && video.thumbnailUrl.includes(accountName)) {
+            try {
+              const urlParts = new URL(video.thumbnailUrl);
+              const blobName = urlParts.pathname.split('/').pop();
+              const container = getContainerClient();
+              await container.getBlockBlobClient(blobName).deleteIfExists();
+            } catch (deleteErr) {
+              console.warn('Thumbnail blob delete warning:', deleteErr.message);
+            }
+          }
+        }
+        data.videos = data.videos.filter(v => v.section !== sectionId);
+
+        // Also remove domain thumbnail for this section
+        if (data.domainThumbnails && data.domainThumbnails[sectionId]) {
+          delete data.domainThumbnails[sectionId];
+        }
+
+        await writeMetadata(data);
+        return res.status(200).json({
+          success: true,
+          customSections: data.customSections,
+          deletedVideos: videosToDelete.length,
+        });
+      } catch (err) {
+        console.error('Delete section error:', err);
+        return res.status(500).json({ error: 'Failed to delete section' });
+      }
+    }
+
     // Standard video creation flow
     const { section, title, tag, videoUrl, thumbnailUrl } = req.body || {};
     if (!section || !title || !tag || !videoUrl) {

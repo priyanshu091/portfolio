@@ -140,6 +140,9 @@ const Work = () => {
   const [domainThumbnails, setDomainThumbnails] = useState({});
   const [cmsFullProduction, setCmsFullProduction] = useState([]);
   const [cmsGraphicDesign, setCmsGraphicDesign] = useState([]);
+  const [customSectionCards, setCustomSectionCards] = useState([]); // custom "Edited Videos" sections as cards
+  const [customFullProdSections, setCustomFullProdSections] = useState([]); // custom Full Production section cards
+  const [customGraphicSections, setCustomGraphicSections] = useState([]); // custom Graphic Designing section cards
 
   useEffect(() => {
     fetch('/api/videos')
@@ -160,6 +163,42 @@ const Work = () => {
               .filter(v => v.section === 'graphic-design')
               .map(v => ({ id: v.id, title: v.title, tag: v.tag, color: '#FFCC00', videoUrl: v.videoUrl, imageUrl: v.thumbnailUrl || null }))
           );
+        }
+        // Build cards from custom sections (added via admin)
+        if (result && result.customSections) {
+          const editedCards = result.customSections
+            .filter(s => s.group === 'Edited Videos')
+            .map(s => ({
+              id: s.id,
+              title: s.label.toUpperCase(),
+              tag: s.group.toUpperCase(),
+              gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
+              color: s.color,
+              imageUrl: result.domainThumbnails?.[s.id] || null,
+            }));
+          setCustomSectionCards(editedCards);
+
+          // Custom Full Production sub-sections → render as cards in Full Production tab
+          const fullProdCards = result.customSections
+            .filter(s => s.group === 'Full Production')
+            .flatMap(s => {
+              const sectionVideos = (result.videos || [])
+                .filter(v => v.section === s.id)
+                .map(v => ({ id: v.id, title: v.title, tag: v.tag, color: s.color, videoUrl: v.videoUrl, imageUrl: v.thumbnailUrl || null }));
+              return sectionVideos;
+            });
+          setCustomFullProdSections(fullProdCards);
+
+          // Custom Graphic Designing sub-sections → render as cards in Graphics tab
+          const graphicCards = result.customSections
+            .filter(s => s.group === 'Graphic Designing')
+            .flatMap(s => {
+              const sectionVideos = (result.videos || [])
+                .filter(v => v.section === s.id)
+                .map(v => ({ id: v.id, title: v.title, tag: v.tag, color: s.color, videoUrl: v.videoUrl, imageUrl: v.thumbnailUrl || null }));
+              return sectionVideos;
+            });
+          setCustomGraphicSections(graphicCards);
         }
       })
       .catch(err => console.error('Failed to fetch CMS data:', err));
@@ -345,7 +384,7 @@ const Work = () => {
           {displayedTab === 'edited' ? (
             /* GRID FOR EDITED VIDEOS (matching the own shooted videos styling) */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
-              {projects.map((project, i) => {
+              {[...projects, ...customSectionCards].map((project, i) => {
                 const customThumb = domainThumbnails[project.id];
                 const displayVideo = customThumb ? null : project.videoUrl;
                 const displayImage = customThumb || project.imageUrl;
@@ -409,7 +448,7 @@ const Work = () => {
           ) : displayedTab === 'shooted' ? (
             /* VIDEO GRID GALLERY FOR OWN SHOOTED VIDEOS */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
-              {[...cmsFullProduction, ...shootedVideos].map((video, i) => (
+              {[...cmsFullProduction, ...customFullProdSections, ...shootedVideos].map((video, i) => (
                 <div 
                   key={video.id}
                   className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${
@@ -469,7 +508,7 @@ const Work = () => {
                 style={{ 
                   borderColor: 'var(--border-subtle)', 
                   backgroundColor: 'var(--bg-surface)',
-                  animationDelay: isTransitioning ? '0s' : `${[...cmsFullProduction, ...shootedVideos].length * 0.08}s`
+                  animationDelay: isTransitioning ? '0s' : `${[...cmsFullProduction, ...customFullProdSections, ...shootedVideos].length * 0.08}s`
                 }}
                 onClick={() => {
                   const el = document.getElementById('contact');
@@ -501,7 +540,7 @@ const Work = () => {
           ) : (
             /* GRAPHIC DESIGN GRID GALLERY */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
-              {[...cmsGraphicDesign, ...graphicDesigns].map((design, i) => (
+              {[...cmsGraphicDesign, ...customGraphicSections, ...graphicDesigns].map((design, i) => (
                 <div 
                   key={design.id}
                   className={`group relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer border transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${
@@ -564,7 +603,7 @@ const Work = () => {
                 style={{ 
                   borderColor: 'var(--border-subtle)', 
                   backgroundColor: 'var(--bg-surface)',
-                  animationDelay: isTransitioning ? '0s' : `${[...cmsGraphicDesign, ...graphicDesigns].length * 0.08}s`
+                  animationDelay: isTransitioning ? '0s' : `${[...cmsGraphicDesign, ...customGraphicSections, ...graphicDesigns].length * 0.08}s`
                 }}
                 onClick={() => {
                   const el = document.getElementById('contact');

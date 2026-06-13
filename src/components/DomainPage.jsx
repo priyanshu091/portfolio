@@ -160,8 +160,9 @@ const DomainPage = () => {
   const [isCustomBuffering, setIsCustomBuffering] = useState(false);
   const [bufferProgress, setBufferProgress] = useState(0);
   const [cmsVideos, setCmsVideos] = useState([]);
+  const [dynamicData, setDynamicData] = useState(null); // for custom sections not in hardcoded list
   
-  const data = domainData[domainId];
+  const hardcodedData = domainData[domainId];
 
   // Fetch CMS videos and merge with hardcoded ones
   useEffect(() => {
@@ -172,14 +173,30 @@ const DomainPage = () => {
           .filter(v => v.section === domainId)
           .map(v => ({ id: v.id, title: v.title, tag: v.tag, videoUrl: v.videoUrl, thumbnailUrl: v.thumbnailUrl }));
         setCmsVideos(sectionVideos);
+
+        // If domainId not in hardcoded data, look for it in customSections
+        if (!domainData[domainId] && result.customSections) {
+          const customSection = result.customSections.find(s => s.id === domainId);
+          if (customSection) {
+            setDynamicData({
+              title: customSection.label.toUpperCase(),
+              tag: customSection.group.toUpperCase(),
+              color: customSection.color,
+              projects: [],
+            });
+          }
+        }
       })
       .catch(() => setCmsVideos([])); // silently fail, hardcoded data is fallback
   }, [domainId]);
 
-  // Merge: CMS videos first, then hardcoded
+  // Use hardcoded data if available, otherwise dynamic data from API
+  const data = hardcodedData || dynamicData;
+
+  // Merge: CMS videos first, then hardcoded projects
   const mergedData = data ? {
     ...data,
-    projects: [...cmsVideos, ...data.projects],
+    projects: [...cmsVideos, ...(data.projects || [])],
   } : data;
 
   // Reset aspect ratio when a new video is selected

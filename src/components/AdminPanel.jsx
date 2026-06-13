@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-// Section config — matches portfolio categories (all 3 main tabs)
-const SECTIONS = [
+// Default hardcoded section config — can be extended via CMS customSections
+const DEFAULT_SECTIONS = [
   // ── Edited Videos (sub-categories / domains) ──
   { id: 'doc',    label: 'Documentary & Fact',    color: '#FF3B30', group: 'Edited Videos' },
   { id: 'reels',  label: 'Podcast Reels',         color: '#00D4FF', group: 'Edited Videos' },
@@ -17,6 +17,19 @@ const SECTIONS = [
   // ── Graphic Designing ──
   { id: 'graphic-design', label: 'Graphic Designing', color: '#FFCC00', group: 'Graphic Designing' },
 ];
+
+const CATEGORY_GROUPS = ['Edited Videos', 'Full Production', 'Graphic Designing'];
+
+// Merge default + custom sections, avoiding duplicates by ID
+function mergeSections(customSections = []) {
+  const merged = [...DEFAULT_SECTIONS];
+  for (const cs of customSections) {
+    if (!merged.some(s => s.id === cs.id)) {
+      merged.push(cs);
+    }
+  }
+  return merged;
+}
 
 const API_BASE = '/api';
 
@@ -183,7 +196,7 @@ function LoginScreen({ onLogin }) {
 }
 
 /* ───────────────────── UPLOAD MODAL ───────────────────── */
-function UploadModal({ onClose, onUploaded, defaultSection }) {
+function UploadModal({ onClose, onUploaded, defaultSection, sections }) {
   const [file, setFile] = useState(null);
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [title, setTitle] = useState('');
@@ -449,10 +462,11 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
           onChange={(e) => setSection(e.target.value)}
         >
           {(() => {
-            const groups = [...new Set(SECTIONS.map(s => s.group))];
+            const secs = sections || DEFAULT_SECTIONS;
+            const groups = [...new Set(secs.map(s => s.group))];
             return groups.map(group => (
               <optgroup key={group} label={group}>
-                {SECTIONS.filter(s => s.group === group).map(s => (
+                {secs.filter(s => s.group === group).map(s => (
                   <option key={s.id} value={s.id}>{s.label}</option>
                 ))}
               </optgroup>
@@ -500,7 +514,7 @@ function UploadModal({ onClose, onUploaded, defaultSection }) {
 }
 
 /* ───────────────────── DOMAIN THUMBNAILS MODAL ───────────────────── */
-function DomainThumbnailsModal({ onClose, onUpdated, domainThumbnails }) {
+function DomainThumbnailsModal({ onClose, onUpdated, domainThumbnails, sections }) {
   const [uploadingDomainId, setUploadingDomainId] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [thumbnails, setThumbnails] = useState(domainThumbnails || {});
@@ -619,7 +633,7 @@ function DomainThumbnailsModal({ onClose, onUpdated, domainThumbnails }) {
         />
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, maxHeight: '60vh', overflowY: 'auto', paddingRight: 4 }}>
-          {SECTIONS.map(s => {
+          {(sections || DEFAULT_SECTIONS).map(s => {
             const currentThumb = thumbnails[s.id];
             const isUploading = uploadingDomainId === s.id;
 
@@ -738,16 +752,252 @@ function DomainThumbnailsModal({ onClose, onUpdated, domainThumbnails }) {
   );
 }
 
+/* ───────────────────── MANAGE SECTIONS MODAL ───────────────────── */
+function ManageSectionsModal({ onClose, onUpdated, sections }) {
+  const [newLabel, setNewLabel] = useState('');
+  const [newColor, setNewColor] = useState('#00D4FF');
+  const [newGroup, setNewGroup] = useState('Edited Videos');
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+
+  const colorPresets = ['#FF3B30', '#00D4FF', '#FFCC00', '#00FF9D', '#D998FF', '#FF6B3B', '#FF2D55', '#FFFFFF', '#FF5470', '#8B5CF6'];
+
+  const generateId = (label) => {
+    return label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  };
+
+  const handleAddSection = async () => {
+    if (!newLabel.trim()) return;
+    const sectionId = generateId(newLabel);
+    if (!sectionId) return;
+
+    // Check for duplicate
+    if (sections.some(s => s.id === sectionId)) {
+      setErrorMsg(`A section with ID "${sectionId}" already exists.`);
+      return;
+    }
+
+    setSaving(true);
+    setErrorMsg('');
+    setSuccessMsg('');
+    try {
+      await fetchJson(`${API_BASE}/videos`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          action: 'add_section',
+          sectionId,
+          label: newLabel.trim(),
+          color: newColor,
+          group: newGroup,
+        }),
+      });
+      setNewLabel('');
+      setSuccessMsg(`"${newLabel.trim()}" added successfully!`);
+      setTimeout(() => setSuccessMsg(''), 3000);
+      onUpdated();
+    } catch (err) {
+      setErrorMsg(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteSection = async (sectionId) => {
+    setDeleting(sectionId);
+    setErrorMsg('');
+    setSuccessMsg('');
+    try {
+      const result = await fetchJson(`${API_BASE}/videos`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          action: 'delete_section',
+          sectionId,
+        }),
+      });
+      setDeleteConfirmId(null);
+      setSuccessMsg(`Section deleted. ${result.deletedVideos || 0} video(s) removed.`);
+      setTimeout(() => setSuccessMsg(''), 4000);
+      onUpdated();
+    } catch (err) {
+      setErrorMsg(err.message);
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  return (
+    <div style={styles.modalOverlay} onClick={onClose}>
+      <div style={{ ...styles.modalCard, maxWidth: 600 }} onClick={e => e.stopPropagation()}>
+        <div style={styles.modalHeader}>
+          <h2 style={styles.modalTitle}>MANAGE SECTIONS</h2>
+          <button onClick={onClose} style={styles.closeBtn}>✕</button>
+        </div>
+
+        <p style={{ color: '#888', fontSize: 12, marginBottom: 16, lineHeight: '1.5' }}>
+          Add or remove sub-categories across all 3 main portfolio tabs.
+          <strong style={{ color: '#FF3B30' }}> Deleting a section will permanently remove all its videos from Azure.</strong>
+        </p>
+
+        {errorMsg && (
+          <div style={{ color: '#FF3B30', fontSize: 13, marginBottom: 12, textAlign: 'center', fontWeight: 'bold', padding: '8px 12px', background: 'rgba(255,59,48,0.08)', borderRadius: 8, border: '1px solid rgba(255,59,48,0.2)' }}>
+            ✕ {errorMsg}
+          </div>
+        )}
+        {successMsg && (
+          <div style={{ color: '#2D8B4E', fontSize: 13, marginBottom: 12, textAlign: 'center', fontWeight: 'bold', padding: '8px 12px', background: 'rgba(45,139,78,0.08)', borderRadius: 8, border: '1px solid rgba(45,139,78,0.2)' }}>
+            ✓ {successMsg}
+          </div>
+        )}
+
+        {/* Existing Sections List grouped by category */}
+        <div style={{ maxHeight: '40vh', overflowY: 'auto', marginBottom: 20, paddingRight: 4 }}>
+          {CATEGORY_GROUPS.map(group => {
+            const groupSections = sections.filter(s => s.group === group);
+            if (groupSections.length === 0) return null;
+            return (
+              <div key={group} style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', color: '#555', marginBottom: 8, textTransform: 'uppercase' }}>
+                  {group} ({groupSections.length})
+                </div>
+                {groupSections.map(s => (
+                  <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: '#1A1A1A', borderRadius: 8, border: '1px solid #2A2A2A', marginBottom: 6 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: s.color, flexShrink: 0 }} />
+                    <span style={{ color: '#fff', fontSize: 13, fontWeight: 600, flex: 1 }}>{s.label}</span>
+                    <span style={{ color: '#444', fontSize: 10, fontFamily: 'monospace' }}>{s.id}</span>
+                    {deleteConfirmId === s.id ? (
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button
+                          disabled={deleting === s.id}
+                          onClick={() => handleDeleteSection(s.id)}
+                          style={{ padding: '4px 10px', background: '#FF3B30', border: 'none', borderRadius: 4, color: '#fff', fontSize: 10, fontWeight: 700, cursor: 'pointer', letterSpacing: '1px' }}
+                        >
+                          {deleting === s.id ? '...' : 'YES, DELETE'}
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmId(null)}
+                          style={{ padding: '4px 10px', background: '#333', border: 'none', borderRadius: 4, color: '#fff', fontSize: 10, fontWeight: 700, cursor: 'pointer' }}
+                        >
+                          CANCEL
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setDeleteConfirmId(s.id)}
+                        style={{ padding: '4px 8px', background: 'transparent', border: '1px solid #333', borderRadius: 4, color: '#555', fontSize: 11, cursor: 'pointer', transition: 'all 0.2s' }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = '#FF3B30'; e.currentTarget.style.color = '#FF3B30'; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = '#333'; e.currentTarget.style.color = '#555'; }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Add New Section Form */}
+        <div style={{ padding: 16, background: '#141414', borderRadius: 12, border: '1px solid #222' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '2px', color: '#888', marginBottom: 12 }}>+ ADD NEW SUB-CATEGORY</div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+            <div>
+              <label style={styles.label}>NAME</label>
+              <input
+                style={styles.input}
+                value={newLabel}
+                onChange={e => setNewLabel(e.target.value)}
+                placeholder="e.g. Sports & Fitness"
+              />
+            </div>
+            <div>
+              <label style={styles.label}>PARENT CATEGORY</label>
+              <select
+                style={styles.select}
+                value={newGroup}
+                onChange={e => setNewGroup(e.target.value)}
+              >
+                {CATEGORY_GROUPS.map(g => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <label style={styles.label}>COLOR</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+            {colorPresets.map(c => (
+              <div
+                key={c}
+                onClick={() => setNewColor(c)}
+                style={{
+                  width: 24, height: 24, borderRadius: '50%', backgroundColor: c, cursor: 'pointer',
+                  border: newColor === c ? '2px solid #fff' : '2px solid transparent',
+                  boxShadow: newColor === c ? `0 0 8px ${c}` : 'none',
+                  transition: 'all 0.2s',
+                }}
+              />
+            ))}
+            <input
+              type="color"
+              value={newColor}
+              onChange={e => setNewColor(e.target.value)}
+              style={{ width: 24, height: 24, border: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}
+              title="Custom color"
+            />
+          </div>
+
+          {newLabel.trim() && (
+            <div style={{ fontSize: 11, color: '#555', marginBottom: 10 }}>
+              ID: <code style={{ color: '#888', background: '#0D0D0D', padding: '2px 6px', borderRadius: 4 }}>{generateId(newLabel)}</code>
+            </div>
+          )}
+
+          <button
+            onClick={handleAddSection}
+            disabled={saving || !newLabel.trim()}
+            style={{
+              ...styles.primaryBtn,
+              marginTop: 4,
+              opacity: saving || !newLabel.trim() ? 0.4 : 1,
+            }}
+          >
+            {saving ? 'ADDING...' : 'ADD SUB-CATEGORY'}
+          </button>
+        </div>
+
+        <button
+          onClick={onClose}
+          style={{ ...styles.primaryBtn, marginTop: 16, background: '#333' }}
+        >
+          CLOSE
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ───────────────────── DASHBOARD ───────────────────── */
 function Dashboard({ onLogout }) {
   const [videos, setVideos] = useState([]);
   const [domainThumbnails, setDomainThumbnails] = useState({});
+  const [customSections, setCustomSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('all');
   const [showUpload, setShowUpload] = useState(false);
   const [showDomainSettings, setShowDomainSettings] = useState(false);
+  const [showManageSections, setShowManageSections] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [playingId, setPlayingId] = useState(null);
+
+  // Merge default + custom sections
+  const SECTIONS = mergeSections(customSections);
 
   const fetchVideos = async () => {
     setLoading(true);
@@ -755,6 +1005,7 @@ function Dashboard({ onLogout }) {
       const data = await fetchJson(`${API_BASE}/videos`);
       setVideos(data.videos || []);
       setDomainThumbnails(data.domainThumbnails || {});
+      setCustomSections(data.customSections || []);
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
@@ -805,9 +1056,29 @@ function Dashboard({ onLogout }) {
       <header style={styles.dashHeader}>
         <div>
           <h1 style={styles.dashTitle}>VIDEO CMS</h1>
-          <p style={styles.dashSub}>{videos.length} videos across {SECTIONS.length} sections</p>
+          <p style={styles.dashSub}>{videos.length} videos across {SECTIONS.length} sections{customSections.length > 0 ? ` (${customSections.length} custom)` : ''}</p>
         </div>
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <button 
+            onClick={() => setShowManageSections(true)} 
+            style={{ ...styles.logoutBtn, borderColor: '#D998FF', color: '#D998FF', marginRight: 4 }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+              e.currentTarget.style.borderColor = '#D998FF';
+              e.currentTarget.style.color = '#fff';
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(217, 152, 255, 0.3)';
+              e.currentTarget.style.background = 'rgba(217, 152, 255, 0.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'none';
+              e.currentTarget.style.borderColor = '#D998FF';
+              e.currentTarget.style.color = '#D998FF';
+              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.background = 'transparent';
+            }}
+          >
+            SECTIONS
+          </button>
           <button 
             onClick={() => setShowDomainSettings(true)} 
             style={{ ...styles.logoutBtn, borderColor: '#00D4FF', color: '#00D4FF', marginRight: 4 }}
@@ -1088,6 +1359,7 @@ function Dashboard({ onLogout }) {
           onClose={() => setShowUpload(false)}
           onUploaded={fetchVideos}
           defaultSection={activeSection !== 'all' ? activeSection : 'doc'}
+          sections={SECTIONS}
         />
       )}
 
@@ -1096,6 +1368,16 @@ function Dashboard({ onLogout }) {
         <DomainThumbnailsModal
           domainThumbnails={domainThumbnails}
           onClose={() => setShowDomainSettings(false)}
+          onUpdated={fetchVideos}
+          sections={SECTIONS}
+        />
+      )}
+
+      {/* Manage Sections Modal */}
+      {showManageSections && (
+        <ManageSectionsModal
+          sections={SECTIONS}
+          onClose={() => setShowManageSections(false)}
           onUpdated={fetchVideos}
         />
       )}
