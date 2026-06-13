@@ -30,23 +30,23 @@ export default function ApertureToolkit() {
     offset: ['start end', 'end start'],
   });
 
-  // Scroll choreography:
-  //   0.20–0.45  iris opens
-  //   0.45–0.58  iris fades away, swiper emerges
-  const sectionOpacity = useTransform(scrollYProgress, [0, 0.2], [0, 1]);
+  // Scroll choreography (tight + early so it snaps in as the section enters):
+  //   0.10–0.22  iris opens
+  //   0.22–0.30  iris fades away, swiper emerges
+  const sectionOpacity = useTransform(scrollYProgress, [0, 0.12], [0, 1]);
   const irisProgress = useTransform(
     scrollYProgress,
-    reduced ? [0, 1] : [0.2, 0.45],
+    reduced ? [0, 1] : [0.1, 0.22],
     reduced ? [1, 1] : [0, 1],
   );
   const irisOpacity = useTransform(
     scrollYProgress,
-    reduced ? [0, 1] : [0.45, 0.58],
+    reduced ? [0, 1] : [0.22, 0.3],
     reduced ? [0, 0] : [1, 0],
   );
   const irisScale = useTransform(
     scrollYProgress,
-    reduced ? [0, 1] : [0.45, 0.58],
+    reduced ? [0, 1] : [0.22, 0.3],
     reduced ? [1.3, 1.3] : [1, 1.3],
   );
 
@@ -54,7 +54,7 @@ export default function ApertureToolkit() {
   const [swiperRevealed, setSwiperRevealed] = useState<boolean>(!!reduced);
 
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    setSwiperRevealed(v >= 0.52);
+    setSwiperRevealed(v >= 0.26);
   });
 
   const handleActiveChange = useCallback((i: number) => setActiveIndex(i), []);
@@ -134,7 +134,7 @@ export default function ApertureToolkit() {
               scale: swiperRevealed ? 1 : 0.6,
               filter: swiperRevealed ? 'blur(0px)' : 'blur(10px)',
             }}
-            transition={{ duration: reduced ? 0.1 : 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: reduced ? 0.1 : 0.3, ease: [0.16, 1, 0.3, 1] }}
             style={{ pointerEvents: swiperRevealed ? 'auto' : 'none' }}
             className="flex flex-col items-center gap-4"
           >
