@@ -40,7 +40,7 @@ const clients = [
   { name: 'Kuku FM', slug: 'kuku-fm', logo: '/clients/kuku-fm.png', from: '#FF2D55', to: '#f97316' },
   { name: 'AssetPlus', slug: 'assetplus', logo: '/clients/assetplus.png', from: '#00FF9D', to: '#10b981' },
   { name: 'Choice Connect', slug: 'choice-connect', logo: '/clients/choice-connect.jpg', from: '#a78bfa', to: '#6366f1' },
-  { name: 'Smartmatic Detergent', slug: 'smartmatic-detergent', from: '#fbbf24', to: '#ef4444' },
+  { name: 'DIGIAANSH', slug: 'digiaansh', logo: '/clients/digiaansh.png', from: '#00D9FF', to: '#0ea5e9' },
 ];
 
 // Seven-point growth 2020 → 2026 (relative height %), 2026 = current/emphasized.
