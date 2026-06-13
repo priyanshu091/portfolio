@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import WorkCarousel from './WorkCarousel';
 
 const projects = [
   { 
@@ -232,6 +233,15 @@ const Work = () => {
     }
   };
 
+  // Active dataset for the mobile carousel — mirrors each tab's desktop grid.
+  const CONTACT_CARD = { __contact: true, id: '__contact' };
+  const carouselItems =
+    displayedTab === 'edited'
+      ? [...projects, ...customSectionCards]
+      : displayedTab === 'shooted'
+        ? [...cmsFullProduction, ...customFullProdSections, ...shootedVideos, CONTACT_CARD]
+        : [...cmsGraphicDesign, ...customGraphicSections, ...graphicDesigns, CONTACT_CARD];
+
   return (
     <section 
       id="work" 
@@ -381,6 +391,13 @@ const Work = () => {
         {/* Content Render based on selected Tab with transition effects */}
         <div className="relative w-full">
 
+          {/* MOBILE: Connoisseur stack carousel (desktop grid is hidden below md) */}
+          <div className="work-carousel-wrap md:hidden" style={{ overflow: 'hidden', width: '100%' }}>
+            <WorkCarousel key={displayedTab} items={carouselItems} variant={displayedTab} />
+          </div>
+
+          {/* DESKTOP: original grid — untouched, simply hidden on mobile */}
+          <div className="work-grid hidden md:block">
           {displayedTab === 'edited' ? (
             /* GRID FOR EDITED VIDEOS (matching the own shooted videos styling) */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
@@ -633,6 +650,7 @@ const Work = () => {
 
             </div>
           )}
+          </div>
         </div>
 
       </div>
