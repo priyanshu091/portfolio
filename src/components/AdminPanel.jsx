@@ -525,8 +525,8 @@ function DomainThumbnailsModal({ onClose, onUpdated, domainThumbnails, sections 
     const file = e.target.files[0];
     if (!file) return;
 
-    if (file.size > 819200) {
-      setErrorMsg('Image file size exceeds the 800 KB performance limit.');
+    if (file.size > 512000) {
+      setErrorMsg('Image file size exceeds the 500 KB performance limit.');
       return;
     }
     setErrorMsg('');
@@ -615,7 +615,7 @@ function DomainThumbnailsModal({ onClose, onUpdated, domainThumbnails, sections 
         </div>
 
         <p style={{ color: '#888', fontSize: 12, marginBottom: 16, lineHeight: '1.5' }}>
-          Assign custom images to represent categories/domains on the homepage. Images must be <strong>JPEG, PNG, or WebP under 800 KB</strong> to protect performance.
+          Assign custom images to represent categories/domains on the homepage. Images must be <strong>JPEG, PNG, or WebP under 500 KB</strong> to protect performance.
         </p>
 
         {errorMsg && (

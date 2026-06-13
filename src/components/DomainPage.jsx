@@ -7,9 +7,7 @@ const domainData = {
     tag: 'LONG FORM', 
     color: 'var(--scarlet-primary)',
     projects: [
-      { id: 'doc-1', title: 'THE SILENT ALPS', tag: 'NATURE DOCUMENTARY', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' },
-      { id: 'doc-2', title: 'METROPOLIS LIFE', tag: 'URBAN EXPLORATION', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-curvy-road-on-a-grassy-hill-42223-large.mp4' },
-      { id: 'doc-3', title: 'BEYOND THE STARS', tag: 'SPACE SCIENCE', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4' }
+      { id: 'doc-1781252685751', title: 'WHY DID INDIA INCREASE IMPORT DUTY ON GOLD & SILVER?', tag: 'DOCUMENTARY', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781252672159-Documantary.mp4' }
     ]
   },
   reels: { 
@@ -17,9 +15,7 @@ const domainData = {
     tag: 'SHORT FORM', 
     color: 'var(--cyan-primary)',
     projects: [
-      { id: 'reels-1', title: 'TRS PODCAST SHORTS', tag: 'PODCAST REEL', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/BBROs.mp4' },
-      { id: 'reels-2', title: '3 RULES OF FOCUS', tag: 'MOTIVATION REEL', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' },
-      { id: 'reels-3', title: 'WHY AI WILL CHANGE WORK', tag: 'TECH REEL', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-curvy-road-on-a-grassy-hill-42223-large.mp4' }
+      { id: 'reels-1781251025636', title: 'POONAM VIJAY THAKKAR', tag: 'PODCAST ', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781251006705-pvt_2-2.mp4' }
     ]
   },
   comm: { 
@@ -27,8 +23,10 @@ const domainData = {
     tag: 'ADVERTISING', 
     color: '#FFFFFF',
     projects: [
-      { id: 'comm-1', title: 'NEO-RUN RUNNING SHOES', tag: 'SPEC AD', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-curvy-road-on-a-grassy-hill-42223-large.mp4' },
-      { id: 'comm-2', title: 'AURA WATCH COMPANY', tag: 'BRAND FILM', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' }
+      { id: 'comm-1781253123509', title: 'MARKETING VIDEO ', tag: 'SIMPLE BRAND VIDEO ', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781253108762-5-_digiansh-.mov' },
+      { id: 'comm-1781255937451', title: 'CHOICE CONNECT ', tag: 'BRAND VIDEO ', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781255918878-Untitled.mp4' },
+      { id: 'comm-1781256326538', title: 'CHOICE CONNECT ', tag: 'MARKETING VIDEO', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781256320981-choice.mp4' },
+      { id: 'comm-1781256752747', title: 'ALUZE BRAND VIDEO ', tag: 'MARKETING VIDEO', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781256744582-0501_2_.mp4' }
     ]
   },
   beat: { 
@@ -36,8 +34,8 @@ const domainData = {
     tag: 'DYNAMIC', 
     color: 'var(--scarlet-glow)',
     projects: [
-      { id: 'beat-1', title: 'GARTANG GALI EXPEDITION', tag: 'TRAVEL SYNC', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/GARTANGGALI4.mp4' },
-      { id: 'beat-2', title: 'NEON STREETS TOKYO', tag: 'BEAT SYNC', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4' }
+      { id: 'beat-1781256622761', title: 'WEDDING EDIT', tag: 'BEAT SYNC', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781256616759-0418__1_.mp4' },
+      { id: 'beat-1781256701504', title: 'PHILIPPINES EDIT', tag: 'BEAT SYNC', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781256694160-3-INSTA.mp4' }
     ]
   },
   long: { 
@@ -45,8 +43,7 @@ const domainData = {
     tag: 'RETENTION', 
     color: 'var(--cyan-primary)',
     projects: [
-      { id: 'long-1', title: 'THE BEERBICEPS SHOW', tag: 'FULL EPISODE', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/BBROs.mp4' },
-      { id: 'long-2', title: 'THE FUTURE OF WORKPLACE', tag: 'DISCUSSION', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-curvy-road-on-a-grassy-hill-42223-large.mp4' }
+      { id: 'long-1781252288870', title: 'DIGITAL ARREST SCAM', tag: 'MOTION GRAPHIC INTRO', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781252268916-Podcast_Sample.mp4' }
     ]
   },
   ai: { 
@@ -54,8 +51,7 @@ const domainData = {
     tag: 'GENERATIVE', 
     color: 'var(--cyan-primary)',
     projects: [
-      { id: 'ai-1', title: 'SYNTHETIC JAGUAR RUN', tag: 'AI GENERATED', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/aijaguar.mp4' },
-      { id: 'ai-2', title: 'DIGITAL PARADISE', tag: 'STOCK COMPILATION', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' }
+      { id: 'ai-1781256565135', title: 'BLACK PANTHER', tag: 'HIGH QUALITY AI VIDEO ', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781256548984-AI_VIDEO_-02_4K_.mp4' }
     ]
   },
   wed: { 
@@ -63,8 +59,9 @@ const domainData = {
     tag: 'CINEMATIC', 
     color: 'var(--scarlet-primary)',
     projects: [
-      { id: 'wed-1', title: 'ANISH & KRITIKA - TEASER', tag: 'WEDDING TEASER', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' },
-      { id: 'wed-2', title: 'THE ROYAL WEDDING HIGHLIGHTS', tag: 'CINEMATIC FILM', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-curvy-road-on-a-grassy-hill-42223-large.mp4' }
+      { id: 'wed-1781252946061', title: 'WEDDING VIDEO ', tag: 'BRIDE EDIT', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781252935768-Bride_02__without_Flare_.mp4' },
+      { id: 'wed-1781253028954', title: 'WEDDING VIDEO', tag: 'BRIDE REELS EDIT', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781253014437-Bride_01.mp4' },
+      { id: 'wed-1781256876067', title: 'BRIDE REELS ', tag: 'BEAT SYNC', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781256848110-wedding.mp4' }
     ]
   },
   motion: { 
@@ -72,8 +69,8 @@ const domainData = {
     tag: 'ANIMATION', 
     color: '#D998FF',
     projects: [
-      { id: 'motion-1', title: 'CYBER TECH LOGO REVEAL', tag: 'LOGO ANIMATION', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4' },
-      { id: 'motion-2', title: 'KINETIC TYPOGRAPHY PROMO', tag: 'KINETIC TEXT', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' }
+      { id: 'motion-1781251838070', title: 'EDACTION STUDIOS', tag: 'MOTION GRAPHICS', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781251832889-MotionGraphics.mp4' },
+      { id: 'motion-1781251943453', title: 'DOON TRADING ACADEMY', tag: 'MOTION GRAPHICS', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/1781251940823-MotionGraphics__1_.mp4' }
     ]
   },
   'real-estate': { 

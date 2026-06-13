@@ -56,8 +56,7 @@ const projects = [
     title: 'WEDDING & EVENT', 
     tag: 'CINEMATIC', 
     gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
-    color: '#FF2D55',
-    imageUrl: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=800&auto=format&fit=crop'
+    color: '#FF2D55'
   },
   { 
     id: 'motion', 
@@ -72,8 +71,7 @@ const projects = [
     title: 'PROPERTY & REAL ESTATE', 
     tag: 'ARCHITECTURE', 
     gridClasses: 'col-span-1 md:col-span-1 row-span-1 md:row-span-1',
-    color: '#00FF9D',
-    imageUrl: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=800&auto=format&fit=crop'
+    color: '#00FF9D'
   }
 ];
 
@@ -81,19 +79,10 @@ const shootedVideos = [
   { id: 'shoot-1', title: 'ICELAND VOLCANIC ERUPTION', tag: 'TRAVEL // CINEMATIC', color: '#FF2D55', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-curvy-road-on-a-grassy-hill-42223-large.mp4' },
   { id: 'shoot-2', title: 'ROADSIDE STORIES: TOKYO', tag: 'STREET // COLD STYLE', color: '#00D9FF', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4' },
   { id: 'shoot-3', title: 'CHASING LIGHT: AMSTERDAM', tag: 'TRAVEL // ARCHIVE', color: '#FFFFFF', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' },
-  { id: 'shoot-4', title: 'CYBERPUNK NEON RIDE', tag: 'CREATIVE // SHOTOVER', color: '#FF5470', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/GARTANGGALI4.mp4' },
-  { id: 'shoot-5', title: 'AESTHETIC FITNESS PROMO', tag: 'SPORTS // SPEC AD', color: '#00D9FF', imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop' },
-  { id: 'shoot-6', title: 'MOUNTAIN SUMMIT RETREAT', tag: 'CINEMATIC // DRONE', color: '#FF2D55', imageUrl: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800&auto=format&fit=crop' }
+  { id: 'shoot-4', title: 'CYBERPUNK NEON RIDE', tag: 'CREATIVE // SHOTOVER', color: '#FF5470', videoUrl: 'https://divyanshassets091.blob.core.windows.net/portfolio-media/GARTANGGALI4.mp4' }
 ];
 
-const graphicDesigns = [
-  { id: 'design-1', title: 'CINEMATIC KEY ART POSTER', tag: 'POSTER // KEY ART', color: '#FFCC00', imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop' },
-  { id: 'design-2', title: 'YOUTUBE THUMBNAIL SUITE', tag: 'THUMBNAIL // RETENTION', color: '#00D9FF', imageUrl: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=800&auto=format&fit=crop' },
-  { id: 'design-3', title: 'GAMING STREAM OVERLAY PACK', tag: 'UI // STREAMING', color: '#FF2D55', imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop' },
-  { id: 'design-4', title: 'BRAND VISUAL IDENTITY SYSTEM', tag: 'BRANDING // IDENTITY', color: '#00FF9D', imageUrl: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=800&auto=format&fit=crop' },
-  { id: 'design-5', title: 'MATTE PAINTING & CONCEPT ART', tag: 'CONCEPT // VFX', color: '#D998FF', imageUrl: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=800&auto=format&fit=crop' },
-  { id: 'design-6', title: 'SOCIAL MEDIA MARKETING KIT', tag: 'PROMOTION // AD', color: '#FF5470', imageUrl: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=800&auto=format&fit=crop' }
-];
+const graphicDesigns = [];
 
 const BackgroundMedia = ({ videoUrl, imageUrl }) => {
   const [visible, setVisible] = useState(false);
